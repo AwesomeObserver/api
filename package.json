@@ -1,0 +1,38 @@
+{
+  "name": "ravepro-api",
+  "version": "0.21.0",
+  "description": "RavePro API",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "node_modules/.bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://sygeman@bitbucket.org/ravepro/api.git"
+  },
+  "author": "Sygeman",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/ravepro/api#readme",
+  "devDependencies": {
+    "@types/koa": "^2.0.41",
+    "@types/node": "^8.0.53",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
+  },
+  "dependencies": {
+    "apollo-link": "^1.0.3",
+    "apollo-server-koa": "^1.2.0",
+    "graphql": "^0.11.7",
+    "graphql-subscriptions": "^0.5.5",
+    "graphql-tools": "^2.8.0",
+    "koa": "^2.4.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.3.0",
+    "koa2-cors": "^2.0.5",
+    "subscriptions-transport-ws": "^0.9.1",
+    "typeorm": "^0.1.6"
+  }
+}
