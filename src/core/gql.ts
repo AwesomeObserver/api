@@ -1,31 +1,14 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { getFolderData } from './utils';
 import { makeExecutableSchema } from 'graphql-tools';
 import pubsub from './pubsub';
 
 const typeDefs = [];
+let isQueries = false;
+let isMutations = false;
+let isSubscriptions = false;
 const queriesResolvers = {};
 const mutationsResolvers = {};
 const subscriptionsResolvers = {};
-
-function getFolderData(folderPath) {
-  const files = fs.readdirSync(folderPath, 'utf-8');
-  let data = {};
-  
-  files.forEach(fileName => {
-    const fullFileName = `${folderPath}${fileName}`;
-    const { ext, name } = path.parse(fullFileName);
-    
-    if (ext === '.ts' || ext === '.js') {
-      data[name] = require(fullFileName);
-    } else if (ext === '') {
-      const folderData = getFolderData(`${folderPath}${name}/`);
-      data = { ...data, ...folderData };
-    }
-  });
-
-  return data;
-}
 
 const gqlDir = __dirname + '/../gql/';
 
@@ -49,7 +32,10 @@ const gqlDir = __dirname + '/../gql/';
     queriesResolvers[name] = data[name].resolver;
   }
 
-  typeDefs.push(`type Query { ${schema.join(' ')} }`);
+  if (schema.length > 0) {
+    isQueries = true;
+    typeDefs.push(`type Query { ${schema.join(' ')} }`);
+  }
 })();
 
 // Mutations
@@ -61,8 +47,11 @@ const gqlDir = __dirname + '/../gql/';
     schema.push(data[name].schema);
     mutationsResolvers[name] = data[name].resolver;
   }
-  
-  typeDefs.push(`type Mutation { ${schema.join(' ')} }`);
+
+  if (schema.length > 0) {
+    isMutations = true;
+    typeDefs.push(`type Mutation { ${schema.join(' ')} }`);
+  }
 })();
 
 // Subscriptions
@@ -72,25 +61,39 @@ const gqlDir = __dirname + '/../gql/';
 
   for (const name of Object.keys(data)) {
     schema.push(data[name].schema);
-    subscriptionsResolvers[name] = data[name].resolver;
+    subscriptionsResolvers[name] = data[name].resolver({ pubsub });
   }
 
-  typeDefs.push(`type Subscription { ${schema.join(' ')} }`);
+  if (schema.length > 0) {
+    isSubscriptions = true;
+    typeDefs.push(`type Subscription { ${schema.join(' ')} }`);
+  }
 })();
 
+if (!isQueries && !isMutations) {
+  throw new Error('Must be queries or mutations in schema');
+}
 
 typeDefs.push(`
   schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
+    ${isQueries ? 'query: Query' : ''}
+    ${isMutations ? 'mutation: Mutation': ''}
+    ${isSubscriptions ? 'subscription: Subscription' : ''}    
   }
 `);
 
-const resolvers = {
-  Query: queriesResolvers,
-  Mutation: mutationsResolvers,
-  Subscription: subscriptionsResolvers
-};
+let resolvers = {};
+
+if (isQueries) {
+  resolvers['Query'] = queriesResolvers;
+}
+
+if (isMutations) {
+  resolvers['Mutation'] = mutationsResolvers;
+}
+
+if (isSubscriptions) {
+  resolvers['Subscription'] = subscriptionsResolvers;
+}
 
 export default makeExecutableSchema({ typeDefs, resolvers });

@@ -7,11 +7,19 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import schema from './gql';
+import pubsub from './pubsub';
+import { setupAPI } from './api';
 
 export async function runServer() {
   const app = new koa();
   const router = new koaRouter();
   const PORT = 8080;
+
+  let GG = {
+    pubsub
+  };
+
+  GG['API'] = setupAPI(GG);
 
   app.use(cors({ 
     origin(ctx) {
@@ -24,7 +32,13 @@ export async function runServer() {
   }));
   app.use(koaBody());
 
-  router.post('/graphql', graphqlKoa({ schema }));
+  router.post('/graphql', graphqlKoa({
+    schema,
+    context: {
+      GG
+    }
+  }));
+
   router.get('/graphiql', graphiqlKoa({
     endpointURL: '/graphql',
     subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`
