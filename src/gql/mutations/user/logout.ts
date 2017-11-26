@@ -1,7 +1,7 @@
 export const schema = `
-  getUser: User
+  logout: Boolean
 `;
 
 export async function resolver(root, args, ctx) {
-  return ctx.GG.API.User.get(1);
+  return true;
 }

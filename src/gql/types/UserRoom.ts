@@ -1,11 +1,9 @@
 export const type = `
-  type User {
-    id: String
-    name: String
-    avatar: String
+  type UserRoom {
     role: String
-    isTester: Boolean
     isBanned: Boolean
+    isFollower: Boolean
+    isSubscriber: Boolean
     unbanDate: String
   }
 `;

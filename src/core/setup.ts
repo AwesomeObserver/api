@@ -11,6 +11,7 @@ import pubsub from './pubsub';
 import { setupAPI } from './api';
 import { setupDB } from './db';
 import { getEntites } from './entity';
+import { setupAuth } from './auth';
 
 export async function runServer() {
   const app = new koa();
@@ -24,6 +25,8 @@ export async function runServer() {
   GG['DB'] = await setupDB();
   GG['Entity'] = await getEntites();
   GG['API'] = setupAPI(GG);
+  
+  await setupAuth(GG);
 
   app.use(cors({ 
     origin(ctx) {
