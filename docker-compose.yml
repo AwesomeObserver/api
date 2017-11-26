@@ -5,6 +5,9 @@ services:
     build: 
       context: ../proxy-dev
     command: "nginx -g 'daemon off;'"
+    depends_on:
+      - "client"
+      - "api"
     ports:
       - "80:80"
 
@@ -31,6 +34,10 @@ services:
     build: 
       context: ./
       dockerfile: Dockerfile-dev
+    depends_on:
+      - "redis"
+      - "postgres"
+      - "mongo"
     environment:
       WS_PORT: 8000
       
