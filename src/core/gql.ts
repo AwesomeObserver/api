@@ -13,17 +13,17 @@ const subscriptionsResolvers = {};
 const gqlDir = __dirname + '/../gql/';
 
 // Types
-(() => {
+{
   const data = getFolderData(`${gqlDir}types/`);
 
   for (const name of Object.keys(data)) {
     typeDefs.push(data[name].type);
   }
 
-})();
+}
 
 // Queries
-(() => {
+{
   const data = getFolderData(`${gqlDir}queries/`);
   const schema = [];
 
@@ -36,10 +36,10 @@ const gqlDir = __dirname + '/../gql/';
     isQueries = true;
     typeDefs.push(`type Query { ${schema.join(' ')} }`);
   }
-})();
+}
 
 // Mutations
-(() => {
+{
   const data = getFolderData(`${gqlDir}mutations/`);
   const schema = [];
 
@@ -52,10 +52,10 @@ const gqlDir = __dirname + '/../gql/';
     isMutations = true;
     typeDefs.push(`type Mutation { ${schema.join(' ')} }`);
   }
-})();
+}
 
 // Subscriptions
-(() => {
+{
   const data = getFolderData(`${gqlDir}subscriptions/`);
   const schema = [];
 
@@ -68,7 +68,7 @@ const gqlDir = __dirname + '/../gql/';
     isSubscriptions = true;
     typeDefs.push(`type Subscription { ${schema.join(' ')} }`);
   }
-})();
+}
 
 if (!isQueries && !isMutations) {
   throw new Error('Must be queries or mutations in schema');

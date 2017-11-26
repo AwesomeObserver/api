@@ -6,11 +6,14 @@ export default class {
   }
 
   async get(id) {
-    await this.GG.API.Access.check();
+    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.User);
+    return userRepository.findOneById(id);
+  }
 
-    return {
-      id: 1,
-      name: 'Sygeman'
-    };
+  async create(name) {
+    let user = new this.GG.Entity.User();
+    user.name = name;
+
+    return this.GG.DB.TO.manager.save(user);
   }
 }

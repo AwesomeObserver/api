@@ -8,7 +8,6 @@ export function setupAPI(Global) {
   const API = {};
   
   for (const APIName of Object.keys(APIData)) {
-    // console.log(APIName, APIData[APIName].default);
     API[APIName] = new APIData[APIName].default(Global);
   }
 

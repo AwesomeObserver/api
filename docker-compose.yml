@@ -1,0 +1,95 @@
+version: '3'
+services:
+
+  proxy:
+    build: 
+      context: ../proxy-dev
+    command: "nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+
+  # CLIENT
+  client:
+    build: 
+      context: ../client
+      dockerfile: Dockerfile-dev
+    environment:
+      NODE_ENV: development
+      BASE_URL: "http://localhost/"
+      API_URL: "http://localhost/ws/"
+      AUTH_URL: "http://localhost/auth/"
+      SC_CLIENT_ID: d03bc67acf78cf6f304edecde8cfc48c
+    command: yarn dev
+    volumes:
+      - ../client:/src
+      - /src/node_modules
+    ports:
+      - "3000:3000"
+
+  # SERVER
+  api:
+    build: 
+      context: ./
+      dockerfile: Dockerfile-dev
+    environment:
+      WS_PORT: 8000
+      
+      CHAT_SECRET: 0293g02j39g023gn23
+      TOKEN_SECRET: j9f84923vsndv821
+      AUTH_KEY_SECRET: weojf9230j0923jr023
+      SESSION_SECRET: f092m0f93j093n1-nfg023
+
+      GOOGLE_CLIENT_ID: "146472258192-mio4jc9tvoku8a7efnimou72du9c7lqd.apps.googleusercontent.com"
+      GOOGLE_SECRET: "xu8K3cB1gsISX2unhSXYmvhy"
+      GOOGLE_CALLBACK_URL: "http://localhost/authend/google"
+      VK_CLIENT_ID: "5631679"
+      VK_SECRET: "CLN5xTCfBR6YEmiCL6tU"
+      VK_CALLBACK_URL: "http://localhost/authend/vk"
+      TWITCH_CLIENT_ID: "sakl7zvgcbpy2hyg28vdj2g9v8ybyi"
+      TWITCH_SECRET: "kggsonhfxe74efkfuhx8n71nfjdpzq"
+      TWITCH_CALLBACK_URL: "http://localhost/authend/twitch"
+
+      YT_KEY: "AIzaSyD3hVAg2TV7rrtBC7Rw4oxy_js-rAYx74M"
+      SC_KEY: "d03bc67acf78cf6f304edecde8cfc48c"
+
+      REDIS_URL: "redis://redis:6379"
+      POSTGRES_USERNAME: "postgres"
+      POSTGRES_DB: "ravepro"
+      MONGO_URL: "mongodb://mongo/ravepro"
+    command: yarn dev
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "8000:8000"
+
+  # REDIS
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"
+  
+  # POSTGRES
+  postgres:
+    image: "postgres"
+    environment:
+      - POSTGRES_DB=ravepro
+    ports:
+      - "5432:5432"
+  
+  # MONGO
+  mongo:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+  
+  # ad:
+  #   build: 
+  #     context: ../ad
+  #     dockerfile: Dockerfile
+  #   command: yarn start
+  #   volumes:
+  #     - ../ad:/src
+  #     - /src/node_modules
+  #   ports:
+  #     - "3001:3001"
