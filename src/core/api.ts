@@ -1,6 +1,6 @@
 import { getFolderData } from './utils';
 
-const apiDir = __dirname + '/../api/';
+const apiDir = __dirname + '/../app/api/';
 
 export function setupAPI(Global) {
 

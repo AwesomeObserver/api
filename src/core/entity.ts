@@ -1,7 +1,7 @@
 import { getFolderData } from './utils';
 
 export async function getEntites() {
-  const data = getFolderData(__dirname + '/../entity/');
+  const data = getFolderData(__dirname + '/../app/entity/');
 
   let entites = {};
 

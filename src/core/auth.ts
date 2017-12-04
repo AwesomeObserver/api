@@ -6,7 +6,7 @@ import * as koaBody from 'koa-bodyparser';
 import * as koaRouter from 'koa-router';
 import { getFolderData } from './utils';
 
-const authDir = __dirname + '/../auth/';
+const authDir = __dirname + '/../app/auth/';
 
 function setupServices(...args) {
   const AuthServices = getFolderData(authDir);

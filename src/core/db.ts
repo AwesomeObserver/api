@@ -21,7 +21,7 @@ export async function setupDB() {
     username: POSTGRES_USERNAME,
     database: POSTGRES_DB,
     entities: [
-      __dirname + "/../entity/*.ts"
+      __dirname + "/../app/entity/*.ts"
     ],
     synchronize: true,
   });

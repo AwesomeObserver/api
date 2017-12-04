@@ -10,7 +10,7 @@ const queriesResolvers = {};
 const mutationsResolvers = {};
 const subscriptionsResolvers = {};
 
-const gqlDir = __dirname + '/../gql/';
+const gqlDir = __dirname + '/../app/';
 
 // Types
 {
