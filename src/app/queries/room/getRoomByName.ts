@@ -3,5 +3,25 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
-  return ctx.GG.API.Room.getRoomByName(args.roomName);
+  const room = await ctx.GG.API.Room.getByName(args.roomName);
+
+  if (!room) {
+    throw new Error('NotFound');
+  }
+
+  const user = null; // getByConnectionId
+
+  if (!user) {
+    return room;
+  }
+
+  if (user.site.isBanned) {
+    throw new Error('UserBanned');
+  }
+
+  if (user.room.isBanned) {
+    throw new Error('UserRoomBanned');
+  }
+
+  return room;
 }

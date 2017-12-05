@@ -3,5 +3,5 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
-  return ctx.GG.API.Room.getRooms();
+  return ctx.GG.API.Room.get();
 }

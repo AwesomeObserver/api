@@ -23,4 +23,12 @@ export default class {
 
     return this.GG.DB.TO.manager.save(user);
   }
+
+  async ban() {
+
+  }
+
+  async setRole() {
+    
+  }
 }

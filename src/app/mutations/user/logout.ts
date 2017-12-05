@@ -3,7 +3,6 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
-  console.log('logout', ctx.connectionId);
-
+  ctx.GG.API.ConnectionEvents.onLogin(ctx.connectionId);
   return true;
 }

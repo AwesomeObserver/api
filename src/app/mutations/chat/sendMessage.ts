@@ -8,21 +8,19 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
+
+  const cData = await ctx.GG.API.Connection.getOne(ctx.connectionId);
+
+  if (!cData) {
+    throw new Error('UserOnly');
+  }
+
+  const user = await ctx.GG.API.RoomUser.getOneFull(cData.userId, args.roomId);
+
+  if (!user) {
+    throw new Error('UserOnly');
+  }
   
-  console.log(ctx);
-
-  const user = {
-    site: {
-      id: '1',
-      name: 'Sygeman',
-      avatar: 'https://pp.userapi.com/c638225/v638225510/26a4/MEvCIFtSVxc.jpg',
-      role: 'founder'
-    },
-    room: {
-      role: 'user'
-    }
-  };
-
   const messageId = crypto.randomBytes(10).toString('hex');
 
   const payload = {

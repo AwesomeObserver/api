@@ -4,8 +4,7 @@ export const type = `
     name: String
     avatar: String
     role: String
-    isTester: Boolean
-    isBanned: Boolean
+    banned: Boolean
     unbanDate: String
   }
 `;

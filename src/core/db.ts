@@ -24,6 +24,13 @@ export async function setupDB() {
       __dirname + "/../app/entity/*.ts"
     ],
     synchronize: true,
+    cache: {
+      type: "redis",
+      options: {
+        host: "redis",
+        port: 6379
+      }
+    }
   });
 
   return DB;

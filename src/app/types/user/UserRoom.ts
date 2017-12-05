@@ -1,9 +1,8 @@
 export const type = `
   type UserRoom {
     role: String
-    isBanned: Boolean
-    isFollower: Boolean
-    isSubscriber: Boolean
+    banned: Boolean
+    follower: Boolean
     unbanDate: String
   }
 `;

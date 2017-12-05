@@ -1,11 +1,11 @@
 import { withFilter } from 'graphql-subscriptions';
 
 export const schema = `
-  chatMessagesDeleted(roomId: String!): Boolean
+  userBannedInRoom(roomId: String!): UserRoomBanData
 `;
 
 export const resolver = ({ pubsub }) => ({
-  subscribe: withFilter(() => pubsub.asyncIterator('chatMessagesDeleted'), (payload, variables) => {
+  subscribe: withFilter(() => pubsub.asyncIterator('userBannedInRoom'), (payload, variables) => {
     return payload.roomId === variables.roomId;
   })
 });
