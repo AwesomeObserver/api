@@ -6,6 +6,8 @@ export async function resolver(root, args, ctx) {
   const userId = await ctx.GG.API.Connection.checkToken(args.token);
   const user = await ctx.GG.API.User.getById(userId);
 
+  console.log('login', ctx.connectionId, userId);
+
   if (!user) {
     throw new Error('User not found');
   }
