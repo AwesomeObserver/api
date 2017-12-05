@@ -52,15 +52,15 @@ export async function resolver(
   },
   ctx: any
 ) {
-  // const { roomId, userId, role } = vars;
+  const { roomId, userId, role } = args;
+  const whoSetId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
 
   // await access(vars, connectionData);
 
-  // return setRole({
-  //   userId,
-  //   roomId,
-  //   role,
-  //   whoSetId: connectionData.userId,
-  //   lastRole: 'user'
-  // });
+  return ctx.GG.API.RoomRole.set({
+    roomId,
+    userId,
+    role,
+    whoSetId
+  });
 }

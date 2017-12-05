@@ -39,14 +39,23 @@ export default class {
     return this.getOne({ name });
   }
 
-  async create(data) {
+  async create(data, userId) {
     let room = new this.GG.Entity.Room();
 
     for (const name of Object.keys(data) ) {
       room[name] = data[name];
     }
 
-    return this.GG.DB.TO.manager.save(room);
+    const roomData = await this.GG.DB.TO.manager.save(room);
+
+    await this.GG.API.RoomRole.set({
+      roomId: roomData.id,
+      userId,
+      role: 'owner',
+      whoSetRoleId: null
+    });
+
+    return roomData;
   }
 
   async remove(roomId) {

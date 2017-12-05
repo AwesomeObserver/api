@@ -1,3 +1,5 @@
+import * as format from 'date-fns/format';
+
 export default class {
 
   GG: any;
@@ -21,13 +23,16 @@ export default class {
       }
 
       return userRepository.updateById(data.id, {
-        follower: true
+        follower: true,
+        lastFollowDate: format(+new Date())
       });
     } else {
       let roomUser = new this.GG.Entity.RoomUser();
       roomUser.roomId = roomId;
       roomUser.userId = userId;
       roomUser.follower = true;
+      roomUser.firstFollowDate = format(+new Date());
+      roomUser.lastFollowDate = format(+new Date());
       return userRepository.save(roomUser);
     }
   }
@@ -41,7 +46,8 @@ export default class {
     }
 
     return userRepository.updateById(data.id, {
-      follower: false
+      follower: false,
+      lastUnfollowDate: format(+new Date())
     });
   }
 }

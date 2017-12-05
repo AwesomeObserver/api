@@ -27,9 +27,10 @@ export async function resolver(
   ctx: any
 ) {
   const { name, title } = args;
+  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
   // const { userId } = connectionData;
   
   // await access(args, connectionData);
 
-  return ctx.GG.API.Room.create({ name, title });
+  return ctx.GG.API.Room.create({ name, title }, userId);
 }

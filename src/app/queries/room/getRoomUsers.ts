@@ -4,7 +4,6 @@ export const schema = `
   getRoomUsers(roomId: String!): [UserWithRoom]
 `;
 
-export async function resolver(root, args) {
-  return [];
-  // return getUsersOnline(roomId);
+export async function resolver(root, args, ctx) {
+  return ctx.GG.API.RoomUser.getOnline(args.roomId);
 }

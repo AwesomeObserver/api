@@ -36,8 +36,6 @@ export default class {
     let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.RoomUser);
     let data = await userRepository.findOne({ userId, roomId });
 
-    console.log({ userId, roomId }, data);
-
     if (!data) {
       data = this.getDefaultRoomUser(userId, roomId);
     }
@@ -50,5 +48,20 @@ export default class {
       this.GG.API.User.getById(userId),
       this.getOne(userId, roomId)
     ]).then(([ site, room ]) => ({ site, room }));
+  }
+
+  async getOnline(roomId: string) {
+    const key = `rooms:${roomId}:users:connections`;
+    const usersOnline = await this.GG.DB.Redis.hgetall(key);
+    
+    const users = [];
+  
+    for (const userId of Object.keys(usersOnline)) {
+      if (usersOnline[userId] > 0) {
+        users.push(this.getOneFull(userId, roomId));
+      }
+    }
+
+    return users;
   }
 }

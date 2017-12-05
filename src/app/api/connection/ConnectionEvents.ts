@@ -13,7 +13,7 @@ export default class {
     const { roomId, userId } = await this.GG.API.Connection.getOne(connectionId);
 
     if (roomId) {
-    //   await RoomEvents.onLeaveRoom(roomId, connectionId, userId);
+      await this.GG.API.RoomEvents.onLeave(roomId, connectionId, userId);
     }
     
     return this.GG.API.Connection.del(connectionId);
@@ -25,7 +25,7 @@ export default class {
     const { roomId } = await this.GG.API.Connection.getOne(connectionId);;
   
     if (roomId) {
-      // await RoomEvents.onLoginInRoom(roomId, connectionId, userId);
+      await this.GG.API.RoomEvents.onLogin(roomId, connectionId, userId);
     }
   
     return true;
@@ -37,7 +37,7 @@ export default class {
     await this.GG.API.Connection.setUserId(connectionId, null);
     
     if (roomId) {
-      // await RoomEvents.onLogoutInRoom(roomId, connectionId, userId);
+      await this.GG.API.RoomEvents.onLogout(roomId, connectionId, userId);
     }
   
     return true;
