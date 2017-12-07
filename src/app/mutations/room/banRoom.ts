@@ -25,10 +25,13 @@ export async function resolver(
   },
   ctx
 ) {
-  // const { roomId } = vars;
-  // const { userId } = connectionData;
+  const { roomId } = args;
+  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
 
   // await access(vars, connectionData);
 
-  // return banRoom(roomId, userId);
+  return ctx.GG.API.Room.ban(roomId, {
+    whoSetBanId: userId,
+    banReason: null
+  });
 }

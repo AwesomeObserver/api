@@ -27,9 +27,9 @@ export async function resolver(
   },
   ctx: any
 ) {
-  // const { roomId, isActive } = vars;
+  const { roomId, isActive } = args;
 
   // await access(vars, connectionData);
 
-  // return changeSlowMode(roomId, isActive);
+  return ctx.GG.API.Room.setSlowMode(roomId, isActive);
 }

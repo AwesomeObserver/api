@@ -9,6 +9,10 @@ export async function resolver(root, args, ctx) {
     throw new Error('NotFound');
   }
 
+  if (room.banned) {
+    throw new Error('RoomBanned');
+  }
+
   const user = null; // getByConnectionId
 
   if (!user) {

@@ -15,6 +15,18 @@ export class Room {
   avatar: string;
 
   @Column({ type: 'boolean', default: false })
+  banned: boolean;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  banDate: string;
+
+  @Column({ type: 'integer', nullable: true })
+  whoSetBanId: number;
+
+  @Column({ type: 'text', nullable: true })
+  banReason: string;
+
+  @Column({ type: 'boolean', default: false })
   followerMode: boolean;
 
   @Column({ type: 'boolean', default: false })

@@ -1,3 +1,5 @@
+import * as format from 'date-fns/format';
+
 export default class {
   GG: any;
 
@@ -24,6 +26,10 @@ export default class {
   async getOne(where) {
     const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
     const room = await roomRepository.findOne(where);
+
+    if (!room) {
+      return null;
+    }
     
     return this.withData(room);
   }
@@ -64,14 +70,48 @@ export default class {
   }
 
   async ban(roomId, data) {
+    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
     
+    await roomRepository.updateById(roomId, {
+      banned: true,
+      banDate: format(+new Date()),
+      whoSetBanId: data.whoSetBanId,
+      banReason: data.banReason
+    });
+
+    return true;
+  }
+
+  async unbanByName(roomName) {
+    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    
+    await roomRepository.update({ name: roomName }, {
+      banned: false,
+      banDate: null,
+      whoSetBanId: null,
+      banReason: null
+    });
+
+    return true;
   }
 
   async setSlowMode(roomId: string, isActive: boolean) {
+    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    
+    await roomRepository.updateById(roomId, {
+      slowMode: isActive
+    });
 
+    return true;
   }
 
   async setFollowerMode(roomId: string, isActive: boolean) {
+    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
     
+    await roomRepository.updateById(roomId, {
+      followerMode: isActive
+    });
+
+    return true;
   }
 }

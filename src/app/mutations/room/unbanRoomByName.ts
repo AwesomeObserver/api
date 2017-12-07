@@ -19,15 +19,15 @@ export const schema = `
 
 export async function resolver(
   root: any,
-  vars: {
+  args: {
     roomName: string
   },
   ctx: any
 ) {
-  // const { roomName } = vars;
+  const { roomName } = args;
   // const { userId } = connectionData;
 
   // await access(vars, connectionData);
 
-  // return unbanRoomByName(roomName, userId);
+  return ctx.GG.API.Room.unbanByName(roomName);
 }
