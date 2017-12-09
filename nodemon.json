@@ -1,6 +1,5 @@
-{
-  "watch": ["src"],
+{ 
+  "watch": ["app", "core"], 
   "ext": "ts",
-  "ignore": ["src/**/*.spec.ts"],
-  "exec": "node ./index"
+  "exec": "yarn watch:serve" 
 }

@@ -11,6 +11,10 @@
     "noImplicitThis": true,
     "moduleResolution": "node",
     "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "rootDir": ".",
     "inlineSourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -19,7 +23,7 @@
       "esnext"
     ]
   },
-  "include": [
-    "src"
+  "exclude": [
+    "node_modules"
   ]
 }

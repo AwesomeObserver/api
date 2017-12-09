@@ -46,7 +46,7 @@ export default class {
   async getOneFull(userId: string, roomId: string) {
     return Promise.all([
       this.GG.API.User.getById(userId),
-      this.getOne(userId, roomId)
+      this.GG.API.RoomUser.getOne(userId, roomId)
     ]).then(([ site, room ]) => ({ site, room }));
   }
 

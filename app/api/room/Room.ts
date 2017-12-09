@@ -24,14 +24,18 @@ export default class {
   }
 
   async getOne(where) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
-    const room = await roomRepository.findOne(where);
+    const room = await this.getOnePure(where);
 
     if (!room) {
       return null;
     }
     
     return this.withData(room);
+  }
+
+  async getOnePure(where) {
+    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    return roomRepository.findOne(where);
   }
 
   async get() {
@@ -102,6 +106,13 @@ export default class {
       slowMode: isActive
     });
 
+    const payload = {
+      slowModeChanged: isActive,
+      roomId
+    };
+    
+    this.GG.pubsub.publish('slowModeChanged', payload);
+
     return true;
   }
 
@@ -111,6 +122,13 @@ export default class {
     await roomRepository.updateById(roomId, {
       followerMode: isActive
     });
+
+    const payload = {
+      followerModeChanged: isActive,
+      roomId
+    };
+    
+    this.GG.pubsub.publish('followerModeChanged', payload);
 
     return true;
   }

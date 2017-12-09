@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
+    "watch:serve": "ts-node -r tsconfig-paths/register core/index",
     "build": "node_modules/.bin/tsc"
   },
   "repository": {
@@ -19,10 +20,12 @@
     "@types/node": "^8.0.57",
     "nodemon": "^1.12.5",
     "ts-node": "^3.3.0",
+    "tsconfig-paths": "^2.4.3",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.88",
     "agenda": "^1.0.3",
     "apollo-link": "^1.0.5",
     "apollo-server-koa": "^1.2.0",
@@ -38,6 +41,7 @@
     "koa-router": "^7.3.0",
     "koa-session": "^5.5.1",
     "koa2-cors": "^2.0.5",
+    "lodash": "^4.17.4",
     "passport-google-oauth2": "^0.1.6",
     "passport-twitch": "^1.0.3",
     "passport-vkontakte": "^0.3.2",
