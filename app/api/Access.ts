@@ -5,9 +5,9 @@ import {
   uniq
 } from 'lodash';
 
-import * as allActions from '../access/actions';
-import * as allRoles from '../access/roles';
-import rolesWeight from '../access/weight';
+import * as allActions from 'app/access/actions';
+import * as allRoles from 'app/access/roles';
+import rolesWeight from 'app/access/weight';
 
 const isBoolean = (val) => typeof val === 'boolean';
 
