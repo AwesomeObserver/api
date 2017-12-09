@@ -163,9 +163,9 @@ apollo-cache-control@^0.0.x:
   dependencies:
     graphql-extensions "^0.0.x"
 
-apollo-link@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/apollo-link/-/apollo-link-1.0.5.tgz#7ce058b61cb2f5071496968ef82499c202211d10"
+apollo-link@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/apollo-link/-/apollo-link-1.0.6.tgz#ed5e975b4582b2471fd8eebf9efbd6691188dc0a"
   dependencies:
     "@types/zen-observable" "0.5.3"
     apollo-utilities "^1.0.0"
@@ -515,8 +515,8 @@ copy-to@^2.0.1:
   resolved "https://registry.yarnpkg.com/copy-to/-/copy-to-2.0.1.tgz#2680fbb8068a48d08656b6098092bdafc906f4a5"
 
 core-js@^2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.1.tgz#ae6874dc66937789b80754ff5428df66819ca50b"
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.2.tgz#bc4648656e7dc9dc80d7d3c7bbc172d96e744e63"
 
 core-util-is@1.0.2, core-util-is@^1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
