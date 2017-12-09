@@ -6,6 +6,30 @@ import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserClass {
 
+  async count(options: Object) {
+    const TypeORM = await TypeORMConnect;
+    let roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    return roomUserRepository.count(options);
+  }
+
+  async create(data) {
+    let roomUser = new RoomUserEntity();
+  
+    for (const name of Object.keys(data) ) {
+      roomUser[name] = data[name];
+    }
+
+    const TypeORM = await TypeORMConnect;
+    return TypeORM.manager.save(roomUser);
+  }
+
+  async update(id, data) {
+    const TypeORM = await TypeORMConnect;
+    const roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+
+    return roomUserRepository.updateById(id, data);
+  }
+
   getDefaultRoomUser(userId: number, roomId: number) {
     return {
       userId,
@@ -28,6 +52,12 @@ export class RoomUserClass {
     const unbanDate = roomUser.unbanDate;
     roomUser.banned = !!unbanDate ? isAfter(unbanDate, +new Date()) : false;
     return roomUser;
+  }
+
+  async getPure(userId: number, roomId: number) {
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(RoomUserEntity);
+    return userRepository.findOne({ userId, roomId });
   }
 
   async getOne(userId: number, roomId: number) {
