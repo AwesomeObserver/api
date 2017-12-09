@@ -49,7 +49,7 @@ export class RoomClass {
     return rooms.map(room => this.withData(room));
   }
 
-  async getByName(name) {
+  async getByName(name: string) {
     return this.getOne({ name });
   }
 
