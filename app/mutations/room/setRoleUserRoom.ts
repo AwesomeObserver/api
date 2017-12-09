@@ -1,7 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { setRole } from 'api/room/user/role';
-// import type { ConnectionData } from 'types';
+import { Connection } from 'app/api/connection/Connection';
+import { RoomRole } from 'app/api/room/RoomRole';
 
 export const schema = `
   setRoleUserRoom(
@@ -53,11 +51,11 @@ export async function resolver(
   ctx: any
 ) {
   const { roomId, userId, role } = args;
-  const whoSetId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
+  const whoSetId = await Connection.getUserId(ctx.connectionId);
 
   // await access(vars, connectionData);
 
-  return ctx.GG.API.RoomRole.set({
+  return RoomRole.set({
     roomId,
     userId,
     role,

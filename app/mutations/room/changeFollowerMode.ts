@@ -1,7 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { changeFollowerMode } from 'api/room';
-// import type { ConnectionData } from 'types';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   changeFollowerMode(
@@ -31,5 +29,5 @@ export async function resolver(
 
   // await access(vars, connectionData);
 
-  return ctx.GG.API.Room.setFollowerMode(roomId, isActive);
+  return Room.setFollowerMode(roomId, isActive);
 }

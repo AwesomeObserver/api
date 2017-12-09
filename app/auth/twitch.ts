@@ -1,16 +1,15 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-twitch';
 
+import { UserSocial } from 'app/api/user/UserSocial';
+
 const {
   TWITCH_CLIENT_ID,
   TWITCH_SECRET,
   TWITCH_CALLBACK_URL
 } = process.env;
 
-export default function(router, authEnd, GG) {
-
-  const UserSocial = GG.API.UserSocial;
-
+export default function(router, authEnd) {
   passport.use(new Strategy({
     clientID: TWITCH_CLIENT_ID,
     clientSecret: TWITCH_SECRET,

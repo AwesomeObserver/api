@@ -1,27 +1,27 @@
-export default class {
-  GG: any;
+import { TypeORMConnect } from 'core/db';
+import { User as UserEntity } from 'app/entity/User';
 
-  constructor(GG) {
-    this.GG = GG;
-  }
+export class UserClass {
 
-  async getById(userId: string) {
+  async getById(userId: number) {
     return this.getOne({ id: userId });
   }
 
   async getOne(where) {
-    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.User);
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(UserEntity);
     return userRepository.findOne(where);
   }
 
   async create(userData) {
-    let user = new this.GG.Entity.User();
+    let user = new UserEntity();
 
     for (const name of Object.keys(userData) ) {
       user[name] = userData[name];
     }
 
-    return this.GG.DB.TO.manager.save(user);
+    const TypeORM = await TypeORMConnect;
+    return TypeORM.manager.save(user);
   }
 
   async ban() {
@@ -32,3 +32,5 @@ export default class {
     
   }
 }
+
+export const User = new UserClass();

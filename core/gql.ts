@@ -1,6 +1,5 @@
 import { getFolderData } from './utils';
 import { makeExecutableSchema } from 'graphql-tools';
-import pubsub from './pubsub';
 
 const typeDefs = [];
 let isQueries = false;
@@ -61,7 +60,7 @@ const gqlDir = __dirname + '/../app/';
 
   for (const name of Object.keys(data)) {
     schema.push(data[name].schema);
-    subscriptionsResolvers[name] = data[name].resolver({ pubsub });
+    subscriptionsResolvers[name] = data[name].resolver();
   }
 
   if (schema.length > 0) {

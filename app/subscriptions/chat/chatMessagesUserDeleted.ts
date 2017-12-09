@@ -1,11 +1,13 @@
 import { withFilter } from 'graphql-subscriptions';
 
+import { PubSub } from 'core/pubsub';
+
 export const schema = `
   chatMessagesUserDeleted(roomId: String!): String
 `;
 
-export const resolver = ({ pubsub }) => ({
-  subscribe: withFilter(() => pubsub.asyncIterator('chatMessagesUserDeleted'), (payload, variables) => {
+export const resolver = () => ({
+  subscribe: withFilter(() => PubSub.asyncIterator('chatMessagesUserDeleted'), (payload, variables) => {
     return payload.roomId === variables.roomId;
   })
 });

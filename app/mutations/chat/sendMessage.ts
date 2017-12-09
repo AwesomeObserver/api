@@ -3,8 +3,12 @@ import * as jwt from 'jsonwebtoken';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
 
-import { Access } from 'app/napi/Access';
-import PubSub from 'core/pubsub';
+import { PubSub } from 'core/pubsub';
+import { Access } from 'app/api/Access';
+import { ActionTime } from 'app/api/ActionTime';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
+import { RoomUser } from 'app/api/room/RoomUser';
 
 const { CHAT_SECRET } = process.env;
 
@@ -13,8 +17,7 @@ export const schema = `
 `;
 
 export async function access(args, ctx, current) {
-  const room = await ctx.GG.API.Room.getOnePure({ id: args.roomId });
-  const ActionTime = ctx.GG.API.ActionTime;
+  const room = await Room.getOnePure({ id: args.roomId });
   const userId = current.site.id;
   const roomId = args.roomId;
 
@@ -74,12 +77,12 @@ export async function resolver(
 ) {
   const { roomId, message } = args;
 
-  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
-  const user = await ctx.GG.API.RoomUser.getOneFull(userId, args.roomId);
+  const userId = await Connection.getUserId(ctx.connectionId);
+  const user = await RoomUser.getOneFull(userId, args.roomId);
 
   await access(args, ctx, user);
 
-  ctx.GG.API.ActionTime.set(userId, `sendMessage:${roomId}`);
+  ActionTime.set(userId, `sendMessage:${roomId}`);
   
   const messageId = crypto.randomBytes(10).toString('hex');
   

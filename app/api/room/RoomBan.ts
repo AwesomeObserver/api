@@ -1,10 +1,4 @@
-export default class {
-
-  GG: any;
-
-  constructor(GG) {
-    this.GG = GG;
-  }
+export class RoomBanClass {
 
   get() {
     
@@ -19,3 +13,5 @@ export default class {
   }
 
 }
+
+export const RoomBan = new RoomBanClass();

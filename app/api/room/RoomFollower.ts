@@ -1,20 +1,19 @@
 import * as format from 'date-fns/format';
 
-export default class {
+import { TypeORMConnect } from 'core/db';
+import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
-  GG: any;
+export class RoomFollowerClass {
 
-  constructor(GG) {
-    this.GG = GG;
-  }
-
-  async getCount(roomId: string) {
-    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.RoomUser);
+  async getCount(roomId: number) {
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(RoomUserEntity);
     return userRepository.count({ roomId, follower: true });
   }
 
-  async follow(roomId: string, userId: string) {
-    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.RoomUser);
+  async follow(roomId: number, userId: number) {
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(RoomUserEntity);
     let data = await userRepository.findOne({ userId, roomId });
 
     if (data) {
@@ -27,7 +26,7 @@ export default class {
         lastFollowDate: format(+new Date())
       });
     } else {
-      let roomUser = new this.GG.Entity.RoomUser();
+      let roomUser = new RoomUserEntity();
       roomUser.roomId = roomId;
       roomUser.userId = userId;
       roomUser.follower = true;
@@ -37,8 +36,9 @@ export default class {
     }
   }
 
-  async unfollow(roomId: string, userId: string) {
-    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.RoomUser);
+  async unfollow(roomId: number, userId: number) {
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(RoomUserEntity);
     let data = await userRepository.findOne({ userId, roomId });
 
     if (!data.follower) {
@@ -51,3 +51,5 @@ export default class {
     });
   }
 }
+
+export const RoomFollower = new RoomFollowerClass();

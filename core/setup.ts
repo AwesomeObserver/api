@@ -7,26 +7,15 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import schema from './gql';
-import pubsub from './pubsub';
-import { setupAPI } from './api';
-import { setupDB } from './db';
-import { getEntites } from './entity';
 import { setupAuth } from './auth';
+import { Connection } from 'app/api/connection/Connection';
 
 export async function runServer() {
   const app = new koa();
   const router = new koaRouter();
   const PORT = 8000;
-
-  let GG = {
-    pubsub
-  };
-
-  GG['DB'] = await setupDB();
-  GG['Entity'] = await getEntites();
-  GG['API'] = setupAPI(GG);
   
-  await setupAuth(GG);
+  await setupAuth();
 
   app.use(cors({ 
     origin(ctx) {
@@ -55,18 +44,18 @@ export async function runServer() {
         execute,
         subscribe,
         schema,
-        onConnect: (...args) => {
-          return GG['API'].Connection.onConnect(...args);
+        onConnect: (connectionParams, webSocket) => {
+          return Connection.onConnect(connectionParams, webSocket);
         },
-        onDisconnect: (...args) => {
-          return GG['API'].Connection.onDisconnect(...args);
+        onDisconnect: (webSocket) => {
+          return Connection.onDisconnect(webSocket);
         }
       }, {
         server: ws,
         path: '/graphql',
       });
 
-      resolve(GG);
+      resolve();
     });
   });
 }

@@ -1,7 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserById } from 'api/user';
-// import { banRoom } from 'api/room';
-// import type { ConnectionData } from 'types';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   banRoom(roomId: String!): Boolean
@@ -26,11 +24,11 @@ export async function resolver(
   ctx
 ) {
   const { roomId } = args;
-  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
+  const userId = await Connection.getUserId(ctx.connectionId);
 
   // await access(vars, connectionData);
 
-  return ctx.GG.API.Room.ban(roomId, {
+  return Room.ban(roomId, {
     whoSetBanId: userId,
     banReason: null
   });

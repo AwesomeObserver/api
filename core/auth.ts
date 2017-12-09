@@ -5,6 +5,7 @@ import * as koaSession from 'koa-session';
 import * as koaBody from 'koa-bodyparser';
 import * as koaRouter from 'koa-router';
 import { getFolderData } from './utils';
+import { Connection } from 'app/api/connection/Connection';
 
 const authDir = __dirname + '/../app/auth/';
 
@@ -16,7 +17,7 @@ function setupServices(...args) {
   }
 }
 
-export async function setupAuth(GG) {
+export async function setupAuth() {
   const PORT = 8500;
   const app = new koa();
   const router = new koaRouter();
@@ -33,7 +34,7 @@ export async function setupAuth(GG) {
     const connectionKey = ctx.session.cak;
     const userId = ctx.session.passport.user.userId;
     
-    GG.API.Connection.auth(connectionKey, userId);
+    Connection.auth(connectionKey, userId);
 
     ctx.type = 'html';
     ctx.body = `
@@ -47,7 +48,7 @@ export async function setupAuth(GG) {
     `;
   }
   
-  setupServices(router, authEnd, GG);
+  setupServices(router, authEnd);
   
   passport.serializeUser((user, cb) => cb(null, user));
   passport.deserializeUser((obj, cb) => cb(null, obj));

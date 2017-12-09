@@ -1,45 +1,45 @@
-export default class {
-  GG: any;
+import { Connection } from './Connection';
+import { RoomEvents } from '../room/RoomEvents';
 
-  constructor(GG) {
-    this.GG = GG;
-  }
+export class ConnectionEventsClass {
 
   async onJoin(connectionId: string) {
-    return this.GG.API.Connection.save(connectionId);
+    return Connection.save(connectionId);
   }
 
   async onLeave(connectionId: string) {
-    const { roomId, userId } = await this.GG.API.Connection.getOne(connectionId);
+    const { roomId, userId } = await Connection.getOne(connectionId);
 
     if (roomId) {
-      await this.GG.API.RoomEvents.onLeave(roomId, connectionId, userId);
+      await RoomEvents.onLeave(roomId, connectionId);
     }
     
-    return this.GG.API.Connection.del(connectionId);
+    return Connection.del(connectionId);
   }
 
-  async onLogin(connectionId: string, userId: string) {
-    await this.GG.API.Connection.setUserId(connectionId, userId);
+  async onLogin(connectionId: string, userId: number) {
+    await Connection.setUserId(connectionId, userId);
   
-    const { roomId } = await this.GG.API.Connection.getOne(connectionId);;
+    const { roomId } = await Connection.getOne(connectionId);;
   
     if (roomId) {
-      await this.GG.API.RoomEvents.onLogin(roomId, connectionId, userId);
+      await RoomEvents.onLogin(roomId, connectionId, userId);
     }
   
     return true;
   }
 
   async onLogout(connectionId: string) {
-    const { roomId, userId } = await this.GG.API.Connection.getOne(connectionId);
+    const { roomId, userId } = await Connection.getOne(connectionId);
   
-    await this.GG.API.Connection.setUserId(connectionId, null);
+    await Connection.setUserId(connectionId, null);
     
     if (roomId) {
-      await this.GG.API.RoomEvents.onLogout(roomId, connectionId, userId);
+      await RoomEvents.onLogout(roomId, connectionId, userId);
     }
   
     return true;
   }
 }
+
+export const ConnectionEvents = new ConnectionEventsClass();

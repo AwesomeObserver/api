@@ -1,15 +1,15 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-google-oauth2';
 
+import { UserSocial } from 'app/api/user/UserSocial';
+
 const {
   GOOGLE_CLIENT_ID,
   GOOGLE_SECRET,
   GOOGLE_CALLBACK_URL
 } = process.env;
 
-export default function(router, authEnd, GG) {
-
-  const UserSocial = GG.API.UserSocial;
+export default function(router, authEnd) {
 
   passport.use(new Strategy({
     clientID: GOOGLE_CLIENT_ID,

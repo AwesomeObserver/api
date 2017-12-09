@@ -1,6 +1,10 @@
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 
+import { Redis } from 'core/db';
+import { PubSub } from 'core/pubsub';
+import { ConnectionEvents } from './ConnectionEvents';
+
 const {
   TOKEN_SECRET,
   AUTH_KEY_SECRET
@@ -17,18 +21,13 @@ function transformerArray(array) {
   return obj;
 }
 
-export default class {
-  GG: any;
+export class ConnectionClass {
 
-  constructor(GG) {
-    this.GG = GG;
-  }
-
-  genToken(userId: string): string {
+  genToken(userId: number): string {
     return jwt.sign(userId, TOKEN_SECRET);
   }
 
-  checkToken(token: string): string {
+  checkToken(token: string): number {
     return jwt.verify(token, TOKEN_SECRET);
   }
 
@@ -40,29 +39,26 @@ export default class {
       connectionKey
     };
     
-    this.GG.pubsub.publish('onConnectionAuth', payload);
+    PubSub.publish('onConnectionAuth', payload);
   }
 
   onConnect(connectionParams, webSocket) {
     const connectionId = crypto.randomBytes(20).toString('hex');
     webSocket['connectionId'] = connectionId;
 
-    this.GG.API.ConnectionEvents.onJoin(connectionId);
+    ConnectionEvents.onJoin(connectionId);
 
-    return {
-      GG: this.GG,
-      connectionId
-    };
+    return { connectionId };
   }
 
   onDisconnect(webSocket) {
-    this.GG.API.ConnectionEvents.onLeave(webSocket.connectionId);
+    ConnectionEvents.onLeave(webSocket.connectionId);
   }
 
   async save(connectionId: string) {
     const key = `connections:${connectionId}`;
   
-    return this.GG.DB.Redis.multi()
+    return Redis.multi()
       .hset(key, 'userId', null)
       .hset(key, 'roomId', null)
       .exec();
@@ -70,7 +66,7 @@ export default class {
 
   async getOne(connectionId: string) {
     const key = `connections:${connectionId}`;
-    const connection = await this.GG.DB.Redis.hgetall(key);
+    const connection = await Redis.hgetall(key);
   
     if (!Object.keys(connection).length) {
       return null;
@@ -85,8 +81,6 @@ export default class {
   }
 
   async get(connectionIds: string[]) {
-    const Redis = this.GG.DB.Redis;
-
     Redis.multi({ pipeline: false });
   
     for (let connectionId of connectionIds) {
@@ -108,17 +102,17 @@ export default class {
   }
 
   async del(connectionId: string) {
-    return this.GG.DB.Redis.del(`connections:${connectionId}`);
+    return Redis.del(`connections:${connectionId}`);
   }
 
-  async setRoomId(connectionId: string, roomId?: string) {
+  async setRoomId(connectionId: string, roomId?: number) {
     const key = `connections:${connectionId}`;
-    return this.GG.DB.Redis.hset(key, 'roomId', roomId);
+    return Redis.hset(key, 'roomId', roomId);
   }
 
-  async setUserId(connectionId: string, userId?: string) {
+  async setUserId(connectionId: string, userId?: number) {
     const key = `connections:${connectionId}`;
-    return this.GG.DB.Redis.hset(key, 'userId', userId);
+    return Redis.hset(key, 'userId', userId);
   }
 
   async getUserId(connectionId: string) {
@@ -126,19 +120,21 @@ export default class {
     return cData ? cData.userId : null;
   }
 
-  async getCCountUserRoom(roomId: string, userId: string) {
+  async getCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const count = await this.GG.DB.Redis.hget(key, userId);
+    const count = await Redis.hget(key, userId);
     return parseInt(count, 10) || 0;
   }
 
-  async incCCountUserRoom(roomId: string, userId: string) {
+  async incCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return this.GG.DB.Redis.hincrby(key, userId, '1');
+    return Redis.hincrby(key, userId, '1');
   }
 
-  async decCCountUserRoom(roomId: string, userId: string) {
+  async decCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return this.GG.DB.Redis.hincrby(key, userId, '-1');
+    return Redis.hincrby(key, userId, '-1');
   }
 }
+
+export const Connection = new ConnectionClass();

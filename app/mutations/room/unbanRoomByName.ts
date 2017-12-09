@@ -1,6 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserById } from 'api/user';
-// import { unbanRoomByName } from 'api/room';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   unbanRoomByName(roomName: String!): Boolean
@@ -29,5 +28,5 @@ export async function resolver(
 
   // await access(vars, connectionData);
 
-  return ctx.GG.API.Room.unbanByName(roomName);
+  return Room.unbanByName(roomName);
 }

@@ -1,12 +1,11 @@
-export default class {
-  GG: any;
+import { PubSub } from 'core/pubsub';
+import { Connection } from '../connection/Connection';
+import { RoomConnection } from './RoomConnection';
 
-  constructor(GG) {
-    this.GG = GG;
-  }
+export class RoomEventsClass {
 
-  async onJoin(roomId: string, connectionId: string) {
-    const connection = await this.GG.API.Connection.getOne(connectionId);
+  async onJoin(roomId: number, connectionId: string) {
+    const connection = await Connection.getOne(connectionId);
   
     if (!connection) {
       throw new Error('Connection not found');
@@ -14,13 +13,13 @@ export default class {
   
     const { userId } = connection;
 
-    const isNotExist = await this.GG.API.RoomConnection.set(roomId, connectionId);
+    const isNotExist = await RoomConnection.set(roomId, connectionId);
 
     if (!isNotExist) {
       return false;
     }
   
-    await this.GG.API.Connection.setRoomId(connectionId, roomId);
+    await Connection.setRoomId(connectionId, roomId);
   
     if (userId) {
       return this.onUserJoin(roomId, connectionId, userId);
@@ -29,14 +28,14 @@ export default class {
     }
   }
 
-  async onGuestJoin(roomId: string, connectionId: string) {
-    return this.GG.API.RoomConnection.incGuestsCount(roomId);
+  async onGuestJoin(roomId: number, connectionId: string) {
+    return RoomConnection.incGuestsCount(roomId);
   }
 
-  async onUserJoin(roomId: string, connectionId: string, userId: string) {
-    const cCount = await this.GG.API.Connection.getCCountUserRoom(roomId, userId);
+  async onUserJoin(roomId: number, connectionId: string, userId: number) {
+    const cCount = await Connection.getCCountUserRoom(roomId, userId);
   
-    await this.GG.API.Connection.incCCountUserRoom(roomId, userId);
+    await Connection.incCCountUserRoom(roomId, userId);
   
     if (cCount > 0) {
       return this.onUserJoinAgain(roomId, connectionId, userId);
@@ -45,16 +44,16 @@ export default class {
     }
   }
 
-  async onUserJoinAgain(roomId: string, connectionId: string, userId: string) {
+  async onUserJoinAgain(roomId: number, connectionId: string, userId: number) {
 
   }
 
-  async onUserJoinFirst(roomId: string, connectionId: string, userId: string) {
-    return this.GG.API.RoomConnection.incUsersCount(roomId);
+  async onUserJoinFirst(roomId: number, connectionId: string, userId: number) {
+    return RoomConnection.incUsersCount(roomId);
   }
 
-  async onLeave(roomId: string, connectionId: string) {
-    const connection = await this.GG.API.Connection.getOne(connectionId);
+  async onLeave(roomId: number, connectionId: string) {
+    const connection = await Connection.getOne(connectionId);
   
     if (!connection) {
       throw new Error('Connection not found');
@@ -62,13 +61,13 @@ export default class {
 
     const { userId } = connection;
   
-    const isNotExist = await this.GG.API.RoomConnection.del(roomId, connectionId);
+    const isNotExist = await RoomConnection.del(roomId, connectionId);
     
     if (!isNotExist) {
       return false;
     }
   
-    await this.GG.API.Connection.setRoomId(connectionId, null);
+    await Connection.setRoomId(connectionId, null);
   
     if (userId) {
       return this.onUserLeave(roomId, connectionId, userId);
@@ -77,14 +76,14 @@ export default class {
     }
   }
 
-  async onGuestLeave(roomId: string, connectionId: string) {
-    return this.GG.API.RoomConnection.decGuestsCount(roomId);
+  async onGuestLeave(roomId: number, connectionId: string) {
+    return RoomConnection.decGuestsCount(roomId);
   }
 
-  async onUserLeave(roomId: string, connectionId: string, userId: string) {
-    const cCount = await this.GG.API.Connection.getCCountUserRoom(roomId, userId);
+  async onUserLeave(roomId: number, connectionId: string, userId: number) {
+    const cCount = await Connection.getCCountUserRoom(roomId, userId);
   
-    await this.GG.API.Connection.decCCountUserRoom(roomId, userId);
+    await Connection.decCCountUserRoom(roomId, userId);
   
     if (cCount > 1) {
       return this.onUserLeaveSome(roomId, connectionId, userId);
@@ -93,32 +92,34 @@ export default class {
     }
   }
 
-  async onUserLeaveSome(roomId: string, connectionId: string, userId: string) {
+  async onUserLeaveSome(roomId: number, connectionId: string, userId: number) {
    
   }
 
-  async onUserLeaveLast(roomId: string, connectionId: string, userId: string) {
-    this.GG.API.RoomConnection.decUsersCount(roomId);
+  async onUserLeaveLast(roomId: number, connectionId: string, userId: number) {
+    RoomConnection.decUsersCount(roomId);
   }
 
-  async onLogin(roomId: string, connectionId: string, userId: string) {
+  async onLogin(roomId: number, connectionId: string, userId: number) {
     await this.onGuestLeave(roomId, connectionId);
     return this.onUserJoin(roomId, connectionId, userId);
   }
 
-  async onLogout(roomId: string, connectionId: string, userId: string) {    
+  async onLogout(roomId: number, connectionId: string, userId: number) {    
     await this.onUserLeave(roomId, connectionId, userId);
     return this.onGuestJoin(roomId, connectionId);
   }
 
-  async onConnectionsCountChanged(roomId: string) {
-    const counts = await this.GG.API.RoomConnection.getCount(roomId);
+  async onConnectionsCountChanged(roomId: number) {
+    const counts = await RoomConnection.getCount(roomId);
     
     const payload = {
       connectionsCountChanged: counts,
       roomId
     };
     
-    this.GG.pubsub.publish('connectionsCountChanged', payload);
+    PubSub.publish('connectionsCountChanged', payload);
   }
 }
+
+export const RoomEvents = new RoomEventsClass();

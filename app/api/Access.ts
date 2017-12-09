@@ -11,7 +11,7 @@ import rolesWeight from '../access/weight';
 
 const isBoolean = (val) => typeof val === 'boolean';
 
-export default class {
+export class AccessClass {
 
   actionMask = {
     // Нужна ли инфа о пользователе в контексте
@@ -123,14 +123,14 @@ export default class {
     });
   }
 
-  checkAccess = (
+  check(
     action: {
       group: string,
       name: string
     },
     current,
-    context
-  ) => {
+    context?
+  ) {
     if (current) {
       current = this.userDataFormatHack(current);
     }
@@ -149,4 +149,6 @@ export default class {
     const accessByActionData = this.checkAccessByActionData(action, current, context);
     if (!accessByActionData) throw new Error('Deny');
   }
-}
+} 
+
+export const Access = new AccessClass();

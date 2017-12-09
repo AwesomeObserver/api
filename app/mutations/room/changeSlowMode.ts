@@ -1,7 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { changeSlowMode } from 'api/room';
-// import type { ConnectionData } from 'types';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   changeSlowMode(
@@ -31,5 +29,5 @@ export async function resolver(
 
   // await access(vars, connectionData);
 
-  return ctx.GG.API.Room.setSlowMode(roomId, isActive);
+  return Room.setSlowMode(roomId, isActive);
 }

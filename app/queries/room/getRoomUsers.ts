@@ -1,9 +1,9 @@
-// import { getUsersOnline } from 'api/room/user';
+import { RoomUser } from 'app/api/room/RoomUser';
 
 export const schema = `
   getRoomUsers(roomId: String!): [UserWithRoom]
 `;
 
 export async function resolver(root, args, ctx) {
-  return ctx.GG.API.RoomUser.getOnline(args.roomId);
+  return RoomUser.getOnline(args.roomId);
 }

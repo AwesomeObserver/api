@@ -1,16 +1,15 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-vkontakte';
 
+import { UserSocial } from 'app/api/user/UserSocial';
+
 const {
   VK_CLIENT_ID,
   VK_SECRET,
   VK_CALLBACK_URL
 } = process.env;
 
-export default function(router, authEnd, GG) {
-
-  const UserSocial = GG.API.UserSocial;
-
+export default function(router, authEnd) {
   passport.use(new Strategy({
     clientID: VK_CLIENT_ID,
     clientSecret: VK_SECRET,

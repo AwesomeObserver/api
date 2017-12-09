@@ -1,6 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserById } from 'api/user';
-// import { createRoom } from 'api/room';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   createRoom(name: String!, title: String!): Boolean
@@ -27,10 +26,10 @@ export async function resolver(
   ctx: any
 ) {
   const { name, title } = args;
-  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
+  const userId = await Connection.getUserId(ctx.connectionId);
   // const { userId } = connectionData;
   
   // await access(args, connectionData);
 
-  return ctx.GG.API.Room.create({ name, title }, userId);
+  return Room.create({ name, title }, userId);
 }

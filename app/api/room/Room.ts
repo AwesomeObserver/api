@@ -1,16 +1,18 @@
 import * as format from 'date-fns/format';
 
-export default class {
-  GG: any;
+import { TypeORMConnect } from 'core/db';
+import { PubSub } from 'core/pubsub';
+import { RoomConnection } from './RoomConnection';
+import { RoomFollower } from './RoomFollower';
+import { RoomRole } from './RoomRole';
+import { Room as RoomEntity } from 'app/entity/Room';
 
-  constructor(GG) {
-    this.GG = GG;
-  }
+export class RoomClass {
 
   async withData(room) {
     const [counts, followersCount] = await Promise.all([
-      this.GG.API.RoomConnection.getCount(room.id),
-      this.GG.API.RoomFollower.getCount(room.id)
+      RoomConnection.getCount(room.id),
+      RoomFollower.getCount(room.id)
     ]);
 
     const defaultAvatar = 'https://pp.userapi.com/c626221/v626221510/7026b/zKYk5tlr530.jpg';
@@ -34,12 +36,14 @@ export default class {
   }
 
   async getOnePure(where) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     return roomRepository.findOne(where);
   }
 
   async get() {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     const rooms = await roomRepository.find();
 
     return rooms.map(room => this.withData(room));
@@ -50,15 +54,16 @@ export default class {
   }
 
   async create(data, userId) {
-    let room = new this.GG.Entity.Room();
+    let room = new RoomEntity();
 
     for (const name of Object.keys(data) ) {
       room[name] = data[name];
     }
 
-    const roomData = await this.GG.DB.TO.manager.save(room);
+    const TypeORM = await TypeORMConnect;
+    const roomData = await TypeORM.manager.save(room);
 
-    await this.GG.API.RoomRole.set({
+    await RoomRole.set({
       roomId: roomData.id,
       userId,
       role: 'owner',
@@ -69,12 +74,14 @@ export default class {
   }
 
   async remove(roomId) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     return roomRepository.removeById(roomId);
   }
 
   async ban(roomId, data) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       banned: true,
@@ -87,7 +94,8 @@ export default class {
   }
 
   async unbanByName(roomName) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     
     await roomRepository.update({ name: roomName }, {
       banned: false,
@@ -100,7 +108,8 @@ export default class {
   }
 
   async setSlowMode(roomId: string, isActive: boolean) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       slowMode: isActive
@@ -111,13 +120,14 @@ export default class {
       roomId
     };
     
-    this.GG.pubsub.publish('slowModeChanged', payload);
+    PubSub.publish('slowModeChanged', payload);
 
     return true;
   }
 
   async setFollowerMode(roomId: string, isActive: boolean) {
-    const roomRepository = this.GG.DB.TO.getRepository(this.GG.Entity.Room);
+    const TypeORM = await TypeORMConnect;
+    const roomRepository = TypeORM.getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       followerMode: isActive
@@ -128,8 +138,10 @@ export default class {
       roomId
     };
     
-    this.GG.pubsub.publish('followerModeChanged', payload);
+    PubSub.publish('followerModeChanged', payload);
 
     return true;
   }
 }
+
+export const Room = new RoomClass();

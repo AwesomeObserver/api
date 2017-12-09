@@ -1,14 +1,12 @@
 import * as isAfter from 'date-fns/is_after';
 
-export default class {
+import { TypeORMConnect, Redis } from 'core/db';
+import { User } from 'app/api/user/User';
+import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
-  GG: any;
+export class RoomUserClass {
 
-  constructor(GG) {
-    this.GG = GG;
-  }
-
-  getDefaultRoomUser(userId: string, roomId: string) {
+  getDefaultRoomUser(userId: number, roomId: number) {
     return {
       userId,
       roomId,
@@ -32,36 +30,41 @@ export default class {
     return roomUser;
   }
 
-  async getOne(userId: string, roomId: string) {
-    let userRepository = this.GG.DB.TO.getRepository(this.GG.Entity.RoomUser);
+  async getOne(userId: number, roomId: number) {
+    const TypeORM = await TypeORMConnect;
+    let userRepository = TypeORM.getRepository(RoomUserEntity);
     let data = await userRepository.findOne({ userId, roomId });
 
     if (!data) {
-      data = this.getDefaultRoomUser(userId, roomId);
+      const defaultData = this.getDefaultRoomUser(userId, roomId);
+      return this.withFormat(defaultData);
     }
 
     return this.withFormat(data);
   }
 
-  async getOneFull(userId: string, roomId: string) {
+  async getOneFull(userId: number, roomId: number) {
     return Promise.all([
-      this.GG.API.User.getById(userId),
-      this.GG.API.RoomUser.getOne(userId, roomId)
+      User.getById(userId),
+      this.getOne(userId, roomId)
     ]).then(([ site, room ]) => ({ site, room }));
   }
 
-  async getOnline(roomId: string) {
+  async getOnline(roomId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const usersOnline = await this.GG.DB.Redis.hgetall(key);
+    const usersOnline = await Redis.hgetall(key);
     
     const users = [];
   
     for (const userId of Object.keys(usersOnline)) {
       if (usersOnline[userId] > 0) {
-        users.push(this.getOneFull(userId, roomId));
+        const userIdInt = parseInt(userId, 10);
+        users.push(this.getOneFull(userIdInt, roomId));
       }
     }
 
     return users;
   }
 }
+
+export const RoomUser = new RoomUserClass();

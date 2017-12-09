@@ -1,4 +1,4 @@
-import * as Agenda from 'agenda';
+import * as agenda from 'agenda';
 import * as ioRedis from 'ioredis';
 import { createConnection } from "typeorm";
 
@@ -9,29 +9,22 @@ const {
   MONGO_URL
 } = process.env;
 
-export async function setupDB() {
-  let DB = {};
-
-  DB['Redis'] = new ioRedis(REDIS_URL);
-  DB['Agenda'] = new Agenda({ db: { address: MONGO_URL } });
-
-  DB['TO'] = await createConnection({
-    type: "postgres",
-    host: "postgres",
-    username: POSTGRES_USERNAME,
-    database: POSTGRES_DB,
-    entities: [
-      __dirname + "/../app/entity/*.ts"
-    ],
-    synchronize: true,
-    cache: {
-      type: "redis",
-      options: {
-        host: "redis",
-        port: 6379
-      }
+export const Redis = new ioRedis(REDIS_URL);
+export const Agenda = new agenda({ db: { address: MONGO_URL } });
+export const TypeORMConnect = createConnection({
+  type: "postgres",
+  host: "postgres",
+  username: POSTGRES_USERNAME,
+  database: POSTGRES_DB,
+  entities: [
+    __dirname + "/../app/entity/*.ts"
+  ],
+  synchronize: true,
+  cache: {
+    type: "redis",
+    options: {
+      host: "redis",
+      port: 6379
     }
-  });
-
-  return DB;
-}
+  }
+});

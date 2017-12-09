@@ -1,5 +1,10 @@
 import * as jwt from 'jsonwebtoken';
 
+import { PubSub } from 'core/pubsub';
+import { Access } from 'app/api/Access';
+import { RoomUser } from 'app/api/room/RoomUser';
+import { Connection } from 'app/api/connection/Connection';
+
 const { CHAT_SECRET } = process.env;
 
 export const schema = `
@@ -12,15 +17,12 @@ export const schema = `
 
 async function access(
   args: {
-    roomId: string,
+    roomId: number,
     messageId: string,
     authorSign: string
   },
   ctx: any
 ) {
-  const checkAccess = ctx.GG.API.Access.checkAccess;
-  const getOneFull = ctx.GG.API.RoomUser.getOneFull;
-  const getUserId = ctx.GG.API.Connection.getUserId;
   
   const { userId, messageId } = jwt.verify(args.authorSign, CHAT_SECRET);
 
@@ -28,14 +30,14 @@ async function access(
     throw new Error('NotBad');
   }
 
-  const currentUserId = await getUserId(ctx.connectionId);
+  const currentUserId = await Connection.getUserId(ctx.connectionId);
   
   const [current, context] = await Promise.all([
-    getOneFull(currentUserId, args.roomId),
-    getOneFull(userId, args.roomId)
+    RoomUser.getOneFull(currentUserId, args.roomId),
+    RoomUser.getOneFull(userId, args.roomId)
   ]);
   
-  checkAccess({
+  Access.check({
     group: 'room',
     name: 'removeMessage'
   }, current, context);
@@ -44,7 +46,7 @@ async function access(
 export async function resolver(
   root: any,
   args: {
-    roomId: string,
+    roomId: number,
     messageId: string,
     authorSign: string
   },
@@ -52,7 +54,7 @@ export async function resolver(
 ) {
   await access(args, ctx);
 
-  await ctx.GG.pubsub.publish('chatMessageDeleted', {
+  await PubSub.publish('chatMessageDeleted', {
     chatMessageDeleted: args.messageId,
     roomId: args.roomId
   });

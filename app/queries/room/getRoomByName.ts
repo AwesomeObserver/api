@@ -1,9 +1,12 @@
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
+
 export const schema = `
   getRoomByName(roomName: String!): Room
 `;
 
 export async function resolver(root, args, ctx) {
-  const room = await ctx.GG.API.Room.getByName(args.roomName);
+  const room = await Room.getByName(args.roomName);
 
   if (!room) {
     throw new Error('NotFound');

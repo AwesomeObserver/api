@@ -1,6 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { unfollowRoom } from 'api/room/user/follower';
+import { Connection } from 'app/api/connection/Connection';
+import { RoomFollower } from 'app/api/room/RoomFollower';
 
 export const schema = `
   unfollowRoom(roomId: String!): Int
@@ -16,10 +15,10 @@ export const schema = `
 // }
 
 export async function resolver(root, args, ctx) {
-  const userId = await ctx.GG.API.Connection.getUserId(ctx.connectionId);
+  const userId = await Connection.getUserId(ctx.connectionId);
 
   // await access(vars, connectionData);
 
-  await ctx.GG.API.RoomFollower.unfollow(args.roomId, userId);
-  return ctx.GG.API.RoomFollower.getCount(args.roomId);
+  await RoomFollower.unfollow(args.roomId, userId);
+  return RoomFollower.getCount(args.roomId);
 }

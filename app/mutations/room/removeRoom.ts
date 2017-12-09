@@ -1,6 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserById } from 'api/user';
-// import { removeRoom } from 'api/room';
+import { Connection } from 'app/api/connection/Connection';
+import { Room } from 'app/api/room/Room';
 
 export const schema = `
   removeRoom(roomId: String!): Boolean
@@ -23,6 +22,5 @@ export async function resolver(root, args, ctx) {
   
   // await access(vars, connectionData);
 
-  return ctx.GG.API.Room.remove(args.roomId);
-  // return removeRoom(roomId, userId);
+  return Room.remove(args.roomId);
 }

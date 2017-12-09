@@ -1,14 +1,11 @@
-export default class {
+import { Redis } from 'core/db';
+import { RoomEvents } from './RoomEvents';
 
-  GG: any;
+export class RoomConnectionClass {
 
-  constructor(GG) {
-    this.GG = GG;
-  }
-
-  async getCount(roomId: string) {
+  async getCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    const countsObj = await this.GG.DB.Redis.hgetall(key);
+    const countsObj = await Redis.hgetall(key);
     
     const usersCount = parseInt(countsObj['users'], 10) || 0;
     const guestsCount = parseInt(countsObj['guests'], 10) || 0;
@@ -20,37 +17,39 @@ export default class {
     };
   }
 
-  async set(roomId: string, connectionId: string) {
+  async set(roomId: number, connectionId: string) {
     const key = `rooms:${roomId}:connections`;
-    return this.GG.DB.Redis.hset(key, connectionId, null);
+    return Redis.hset(key, connectionId, null);
   }
 
-  async del(roomId: string, connectionId: string) {
+  async del(roomId: number, connectionId: string) {
     const key = `rooms:${roomId}:connections`;
-    return this.GG.DB.Redis.hdel(key, connectionId, null);
+    return Redis.hdel(key, connectionId, null);
   }
 
-  async incGuestsCount(roomId: string) {
+  async incGuestsCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await this.GG.DB.Redis.hincrby(key, 'guests', '1');
-    return this.GG.API.RoomEvents.onConnectionsCountChanged(roomId);
+    await Redis.hincrby(key, 'guests', '1');
+    return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
-  async decGuestsCount(roomId: string) {
+  async decGuestsCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await this.GG.DB.Redis.hincrby(key, 'guests', '-1');
-    return this.GG.API.RoomEvents.onConnectionsCountChanged(roomId);
+    await Redis.hincrby(key, 'guests', '-1');
+    return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
-  async incUsersCount(roomId: string) {
+  async incUsersCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await this.GG.DB.Redis.hincrby(key, 'users', '1');
-    return this.GG.API.RoomEvents.onConnectionsCountChanged(roomId);
+    await Redis.hincrby(key, 'users', '1');
+    return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
-  async decUsersCount(roomId: string) {
+  async decUsersCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await this.GG.DB.Redis.hincrby(key, 'users', '-1');
-    return this.GG.API.RoomEvents.onConnectionsCountChanged(roomId);
+    await Redis.hincrby(key, 'users', '-1');
+    return RoomEvents.onConnectionsCountChanged(roomId);
   }
 }
+
+export const RoomConnection = new RoomConnectionClass();
