@@ -3,11 +3,12 @@ import { withFilter } from 'graphql-subscriptions';
 import { PubSub } from 'core/pubsub';
 
 export const schema = `
-  chatMessagesDeleted(roomId: String!): Boolean
+  chatMessagesDeleted(roomId: Int!): Boolean
 `;
 
-export const resolver = () => ({
-  subscribe: withFilter(() => PubSub.asyncIterator('chatMessagesDeleted'), (payload, variables) => {
-    return payload.roomId === variables.roomId;
-  })
-});
+export const resolver = {
+  subscribe: withFilter(
+    () => PubSub.asyncIterator('chatMessagesDeleted'),
+    (payload, vars) => payload.roomId === vars.roomId
+  )
+};

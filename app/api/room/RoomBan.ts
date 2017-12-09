@@ -1,14 +1,10 @@
 export class RoomBanClass {
 
-  get() {
-    
-  }
-
-  ban(roomId: string, userId: string) {
+  ban(roomId: number, userId: number) {
 
   }
 
-  unban(roomId: string, userId: string) {
+  unban(roomId: number, userId: number) {
     
   }
 

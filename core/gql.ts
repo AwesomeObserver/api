@@ -60,7 +60,7 @@ const gqlDir = __dirname + '/../app/';
 
   for (const name of Object.keys(data)) {
     schema.push(data[name].schema);
-    subscriptionsResolvers[name] = data[name].resolver();
+    subscriptionsResolvers[name] = data[name].resolver;
   }
 
   if (schema.length > 0) {

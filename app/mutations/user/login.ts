@@ -6,11 +6,17 @@ export const schema = `
   login(token: String!): User
 `;
 
-export async function resolver(root, args, ctx) {
+export async function resolver(
+  root: any,
+  args: {
+    token: string
+  },
+  ctx: any
+) {
   const userId = await Connection.checkToken(args.token);
   const user = await User.getById(userId);
 
-  ConnectionEvents.onLogin(ctx.connectionId, userId);
+  await ConnectionEvents.onLogin(ctx.connectionId, userId);
 
   if (!user) {
     throw new Error('User not found');

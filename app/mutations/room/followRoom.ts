@@ -1,24 +1,33 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
 import { RoomFollower } from 'app/api/room/RoomFollower';
 
 export const schema = `
-  followRoom(roomId: String!): Int
+  followRoom(roomId: Int!): Int
 `;
 
-// async function access(vars, connectionData) {
-//   const current = await getUserWithRoom(connectionData.userId, vars.roomId);
+async function access(userId: number, roomId: number) {
+  const current = await RoomUser.getOneFull(userId, roomId);
 
-//   checkAccess({
-//     group: 'room',
-//     name: 'follow'
-//   }, current);
-// }
+  await Access.check({
+    group: 'room',
+    name: 'follow'
+  }, current);
+}
 
-export async function resolver(root, args, ctx) {
+export async function resolver(
+  root: any,
+  args: {
+    roomId: number
+  },
+  ctx: any
+) {
+  const { roomId } = args;
   const userId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(vars, connectionData);
+  await access(userId, roomId);
 
-  await RoomFollower.follow(args.roomId, userId);
-  return RoomFollower.getCount(args.roomId);
+  await RoomFollower.follow(roomId, userId);
+  return RoomFollower.getCount(roomId);
 }

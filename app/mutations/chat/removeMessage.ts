@@ -9,7 +9,7 @@ const { CHAT_SECRET } = process.env;
 
 export const schema = `
   removeMessage(
-    roomId: String!,
+    roomId: Int!,
     messageId: String!,
     authorSign: String!
   ): Boolean
@@ -21,7 +21,7 @@ async function access(
     messageId: string,
     authorSign: string
   },
-  ctx: any
+  connectionId: string
 ) {
   
   const { userId, messageId } = jwt.verify(args.authorSign, CHAT_SECRET);
@@ -30,7 +30,7 @@ async function access(
     throw new Error('NotBad');
   }
 
-  const currentUserId = await Connection.getUserId(ctx.connectionId);
+  const currentUserId = await Connection.getUserId(connectionId);
   
   const [current, context] = await Promise.all([
     RoomUser.getOneFull(currentUserId, args.roomId),
@@ -52,7 +52,8 @@ export async function resolver(
   },
   ctx: any
 ) {
-  await access(args, ctx);
+  const { connectionId } = ctx;
+  await access(args, connectionId);
 
   await PubSub.publish('chatMessageDeleted', {
     chatMessageDeleted: args.messageId,

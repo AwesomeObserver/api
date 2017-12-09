@@ -1,45 +1,53 @@
-// import { setRole } from 'api/user';
-// import { checkAccess } from 'access';
-// import { getUserById } from 'api/user';
+import { Access } from 'app/api/Access';
+import { Connection } from 'app/api/connection/Connection';
+import { User } from 'app/api/user/User';
 
 export const schema = `
   setRoleUser(
-    userId: String!,
+    userId: Int!,
     role: String!
   ): Boolean
 `;
 
-export async function access(args, ctx) {
-  // const [ current, context ] = await Promise.all([
-  //   getUserById(connectionData.userId),
-  //   getUserById(vars.userId)
-  // ]);
+async function access(currentUserId: number, userId: number, role: string) {
+  const [current, context] = await Promise.all([
+    User.getById(currentUserId),
+    User.getById(userId)
+  ]);
 
-  // checkAccess({
-  //   group: 'global',
-  //   name: 'setRole'
-  // }, current, context);
+  await Access.check({
+    group: 'global',
+    name: 'setRole'
+  }, current, context);
 
-  // switch (vars.role) {
-  //   case 'admin':
-  //     return checkAccess({
-  //       group: 'room',
-  //       name: 'setRoleAdmin'
-  //     }, current, context);
-  //   case 'user':
-  //     return checkAccess({
-  //       group: 'room',
-  //       name: 'setRoleUser'
-  //     }, current, context);
-  //   default:
-  //     throw new Error('Deny');
-  // }
+  switch (role) {
+    case 'admin':
+      return Access.check({
+        group: 'room',
+        name: 'setRoleAdmin'
+      }, current, context);
+    case 'user':
+      return Access.check({
+        group: 'room',
+        name: 'setRoleUser'
+      }, current, context);
+    default:
+      throw new Error('Deny');
+  }
 }
 
-export async function resolver(root, args, ctx) {
-  // const { userId, role } = vars;
+export async function resolver(
+  root: any,
+  args: {
+    userId: number,
+    role: string
+  },
+  ctx: any
+) {
+  const { userId, role } = args;
+  const currentUserId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(vars, connectionData);
+  await access(currentUserId, userId, role);
 
-  // return setRole(userId, role);
+  return User.setRole(userId, role);
 }

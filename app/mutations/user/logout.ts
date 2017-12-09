@@ -5,6 +5,6 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
-  ConnectionEvents.onLogout(ctx.connectionId);
+  await ConnectionEvents.onLogout(ctx.connectionId);
   return true;
 }

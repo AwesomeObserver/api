@@ -1,6 +1,6 @@
 export const type = `
   type Room {
-    id: String
+    id: Int
     name: String
     title: String
     avatar: String

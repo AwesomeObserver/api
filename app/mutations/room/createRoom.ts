@@ -1,21 +1,20 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
 import { Room } from 'app/api/room/Room';
+import { User } from 'app/api/user/User';
 
 export const schema = `
-  createRoom(name: String!, title: String!): Boolean
+  createRoom(
+    name: String!,
+    title: String!
+  ): Boolean
 `;
 
-// export async function access(
-//   vars: {
-//     name: String,
-//     title: String
-//   },
-//   connectionData: ConnectionData
-// ) {
-//   const current = await getUserById(connectionData.userId);
-
-//   checkAccess({ group: 'global', name: 'createRoom' }, current);
-// }
+async function access(userId: number) {
+  const current = await User.getById(userId);
+  
+  await Access.check({ group: 'global', name: 'createRoom' }, current);
+}
 
 export async function resolver(
   root: any,
@@ -27,9 +26,8 @@ export async function resolver(
 ) {
   const { name, title } = args;
   const userId = await Connection.getUserId(ctx.connectionId);
-  // const { userId } = connectionData;
   
-  // await access(args, connectionData);
+  await access(userId);
 
   return Room.create({ name, title }, userId);
 }

@@ -1,64 +1,71 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
 import { RoomRole } from 'app/api/room/RoomRole';
 
 export const schema = `
   setRoleUserRoom(
-    roomId: String!,
-    userId: String!,
+    roomId: Int!,
+    userId: Int!,
     role: String!
   ): Boolean
 `;
 
-// async function access(vars, connectionData) {
-//   const [ current, context ] = await Promise.all([
-//     getUserWithRoom(connectionData.userId, vars.roomId),
-//     getUserWithRoom(vars.userId, vars.roomId)
-//   ]);
+async function access(
+  currentUserId: number,
+  userId: number,
+  roomId: number,
+  role: string
+) {
+  const [current, context] = await Promise.all([
+    RoomUser.getOneFull(currentUserId, roomId),
+    RoomUser.getOneFull(userId, roomId)
+  ]);
 
-//   checkAccess({
-//     group: 'room',
-//     name: 'setRoleRoom'
-//   }, current, context);
+  await Access.check({
+    group: 'room',
+    name: 'setRoleRoom'
+  }, current, context);
 
-//   switch (vars.role) {
-//     case 'manager':
-//       return checkAccess({
-//         group: 'room',
-//         name: 'setRoleRoomManager'
-//       }, current, context);
-//     case 'mod':
-//       return checkAccess({
-//         group: 'room',
-//         name: 'setRoleRoomMod'
-//       }, current, context);
-//     case 'user':
-//       return checkAccess({
-//         group: 'room',
-//         name: 'setRoleRoomUser'
-//       }, current, context);
-//     default:
-//       throw new Error('Deny');
-//   }
-// }
+  switch (role) {
+    case 'manager':
+      return Access.check({
+        group: 'room',
+        name: 'setRoleRoomManager'
+      }, current, context);
+    case 'mod':
+      return Access.check({
+        group: 'room',
+        name: 'setRoleRoomMod'
+      }, current, context);
+    case 'user':
+      return Access.check({
+        group: 'room',
+        name: 'setRoleRoomUser'
+      }, current, context);
+    default:
+      throw new Error('Deny');
+  }
+}
 
 export async function resolver(
   root,
   args: {
-    roomId: string,
-    userId: string,
+    roomId: number,
+    userId: number,
     role: string
   },
   ctx: any
 ) {
   const { roomId, userId, role } = args;
-  const whoSetId = await Connection.getUserId(ctx.connectionId);
+  const currentUserId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(vars, connectionData);
+  await access(currentUserId, userId, roomId, role);
 
   return RoomRole.set({
     roomId,
     userId,
     role,
-    whoSetId
+    whoSetId: currentUserId
   });
 }

@@ -1,33 +1,36 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
 import { Room } from 'app/api/room/Room';
 
 export const schema = `
   changeFollowerMode(
-    roomId: String!,
+    roomId: Int!,
     isActive: Boolean!
   ): Boolean
 `;
 
-// async function access(vars, connectionData) {
-//   const current = await getUserWithRoom(connectionData.userId, vars.roomId);
+async function access(userId: number, roomId: number) {
+  const current = await RoomUser.getOneFull(userId, roomId);
 
-//   checkAccess({
-//     group: 'room',
-//     name: 'changeFollowerMode'
-//   }, current);
-// }
+  await Access.check({
+    group: 'room',
+    name: 'changeFollowerMode'
+  }, current);
+}
 
 export async function resolver(
-  root,
+  root: any,
   args: {
-    roomId: string,
+    roomId: number,
     isActive: boolean
   },
   ctx: any
 ) {
   const { roomId, isActive } = args;
+  const userId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(vars, connectionData);
+  await access(userId, roomId);
 
   return Room.setFollowerMode(roomId, isActive);
 }
