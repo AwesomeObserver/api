@@ -73,7 +73,9 @@ export const mod = {
         removeMessage: true,
         removeAllMessages: true,
         changeFollowerMode: true,
-        changeSlowMode: true
+        changeSlowMode: true,
+        sendMessageSlowModeIgnore: true,
+        sendMessageFollowerModeIgnore: true
       }
     }
   }
