@@ -70,7 +70,7 @@ export async function access(args, ctx, current) {
 export async function resolver(
   root: any,
   args: {
-    roomId: string,
+    roomId: number,
     message: string
   },
   ctx: any
