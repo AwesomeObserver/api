@@ -24,11 +24,15 @@ export class UserClass {
     return TypeORM.manager.save(user);
   }
 
-  async ban() {
+  async ban(userId: number) {
 
   }
 
-  async setRole() {
+  async unban(userId: number) {
+
+  }
+
+  async setRole(userId: number, role: string) {
     
   }
 }

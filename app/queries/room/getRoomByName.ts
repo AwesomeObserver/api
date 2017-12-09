@@ -5,7 +5,13 @@ export const schema = `
   getRoomByName(roomName: String!): Room
 `;
 
-export async function resolver(root, args, ctx) {
+export async function resolver(
+  root: any,
+  args: {
+    roomName: string
+  },
+  ctx: any
+) {
   const room = await Room.getByName(args.roomName);
 
   if (!room) {

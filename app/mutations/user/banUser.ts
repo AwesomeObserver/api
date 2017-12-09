@@ -1,32 +1,35 @@
-// import { checkAccess } from 'access';
-// import { getUserById, banUser } from 'api/user';
+import { Access } from 'app/api/Access';
+import { Connection } from 'app/api/connection/Connection';
+import { User } from 'app/api/user/User';
 
 export const schema = `
   banUser(
-    userId: String!,
+    userId: Int!,
     reason: String
   ): Boolean
 `;
 
-export async function access(args, ctx) {
-  // const [ current, context ] = await Promise.all([
-  //   getUserById(connectionData.userId),
-  //   getUserById(vars.userId)
-  // ]);
+export async function access(currentUserId: number, userId: number) {
+  const [current, context] = await Promise.all([
+    User.getById(currentUserId),
+    User.getById(userId)
+  ]);
 
-  // checkAccess({
-  //   group: 'global',
-  //   name: 'setRole'
-  // }, current, context);
+  await Access.check({ group: 'global', name: 'banRoom' }, current, context);
 }
 
-export async function resolver(root, args, ctx) {
+export async function resolver(
+  root: any,
+  args: {
+    userId: number,
+    reason?: string
+  },
+  ctx: any
+) {
+  const { userId } = args;
+  const currentUserId = await Connection.getUserId(ctx.connectionId);
+  
+  await access(currentUserId, userId);
 
-  // await access(vars, connectionData);
-
-  // return banUser({
-  //   userId: vars.userId,
-  //   reason: vars.reason,
-  //   whoSetId: connectionData.userId
-  // });
+  return User.ban(userId);
 }

@@ -107,7 +107,7 @@ export class RoomClass {
     return true;
   }
 
-  async setSlowMode(roomId: string, isActive: boolean) {
+  async setSlowMode(roomId: number, isActive: boolean) {
     const TypeORM = await TypeORMConnect;
     const roomRepository = TypeORM.getRepository(RoomEntity);
     
@@ -125,7 +125,7 @@ export class RoomClass {
     return true;
   }
 
-  async setFollowerMode(roomId: string, isActive: boolean) {
+  async setFollowerMode(roomId: number, isActive: boolean) {
     const TypeORM = await TypeORMConnect;
     const roomRepository = TypeORM.getRepository(RoomEntity);
     

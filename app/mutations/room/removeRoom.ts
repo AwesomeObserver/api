@@ -1,26 +1,33 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
 import { Room } from 'app/api/room/Room';
 
 export const schema = `
-  removeRoom(roomId: String!): Boolean
+  removeRoom(roomId: Int!): Boolean
 `;
 
-// export async function access(
-//   vars: {
-//     roomId: String
-//   },
-//   connectionData: ConnectionData
-// ) {
-//   const current = await getUserById(connectionData.userId);
+async function access(userId: number, roomId: number) {
+  const current = await RoomUser.getOneFull(userId, roomId);
 
-//   checkAccess({ group: 'global', name: 'removeRoom' }, current);
-// }
+  await Access.check({
+    group: 'room',
+    name: 'removeRoom'
+  }, current);
+}
 
-export async function resolver(root, args, ctx) {
-  // const { roomId } = vars;
-  // const { userId } = connectionData;
-  
-  // await access(vars, connectionData);
+export async function resolver(
+  root: any,
+  args: {
+    roomId: number
+  },
+  ctx: any
+) {
+  const { roomId } = args;
+  const userId = await Connection.getUserId(ctx.connectionId);
+
+  await access(userId, roomId);
+
 
   return Room.remove(args.roomId);
 }

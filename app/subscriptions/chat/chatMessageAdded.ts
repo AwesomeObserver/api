@@ -3,11 +3,12 @@ import { withFilter } from 'graphql-subscriptions';
 import { PubSub } from 'core/pubsub';
 
 export const schema = `
-  chatMessageAdded(roomId: String!): ChatMessage
+  chatMessageAdded(roomId: Int!): ChatMessage
 `;
 
-export const resolver = () => ({
-  subscribe: withFilter(() => PubSub.asyncIterator('chatMessageAdded'), (payload, variables) => {
-    return payload.roomId === variables.roomId;
-  })
-});
+export const resolver = {
+  subscribe: withFilter(
+    () => PubSub.asyncIterator('chatMessageAdded'),
+    (payload, vars) => payload.roomId === vars.roomId
+  )
+};

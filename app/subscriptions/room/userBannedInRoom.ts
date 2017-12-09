@@ -3,11 +3,12 @@ import { withFilter } from 'graphql-subscriptions';
 import { PubSub } from 'core/pubsub';
 
 export const schema = `
-  userBannedInRoom(roomId: String!): UserRoomBanData
+  userBannedInRoom(roomId: Int!): UserRoomBanData
 `;
 
-export const resolver = () => ({
-  subscribe: withFilter(() => PubSub.asyncIterator('userBannedInRoom'), (payload, variables) => {
-    return payload.roomId === variables.roomId;
-  })
-});
+export const resolver = {
+  subscribe: withFilter(
+    () => PubSub.asyncIterator('userBannedInRoom'),
+    (payload, vars) => payload.roomId === vars.roomId
+  )
+};

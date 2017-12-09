@@ -13,13 +13,12 @@ import { RoomUser } from 'app/api/room/RoomUser';
 const { CHAT_SECRET } = process.env;
 
 export const schema = `
-  sendMessage(roomId: String!, message: String!): Boolean
+  sendMessage(roomId: Int!, message: String!): Boolean
 `;
 
-export async function access(args, ctx, current) {
-  const room = await Room.getOnePure({ id: args.roomId });
+async function access(roomId: number, current) {
+  const room = await Room.getOnePure({ id: roomId });
   const userId = current.site.id;
-  const roomId = args.roomId;
 
   await Access.check({
     group: 'room',
@@ -70,7 +69,7 @@ export async function access(args, ctx, current) {
 export async function resolver(
   root: any,
   args: {
-    roomId: string,
+    roomId: number,
     message: string
   },
   ctx: any
@@ -80,7 +79,7 @@ export async function resolver(
   const userId = await Connection.getUserId(ctx.connectionId);
   const user = await RoomUser.getOneFull(userId, args.roomId);
 
-  await access(args, ctx, user);
+  await access(roomId, user);
 
   ActionTime.set(userId, `sendMessage:${roomId}`);
   

@@ -3,11 +3,11 @@
 // import { getBans } from 'api/room/user/ban';
 
 export const schema = `
-  roomUsersBans(roomId: String!): [UserRoomBan]
+  roomUsersBans(roomId: Int!): [UserRoomBan]
 `;
 
-export async function access(vars, connectionData) {
-  // const current = await getUserWithRoom(connectionData.userId, vars.roomId);
+export async function access(args, ctx) {
+  // const current = await getUserWithRoom(connectionData.userId, args.roomId);
 
   // checkAccess({
   //   group: 'room',
@@ -15,13 +15,19 @@ export async function access(vars, connectionData) {
   // }, current);
 }
 
-export async function resolver(root, vars, connectionData) {
-  // await access(vars, connectionData);
+export async function resolver(
+  root: any,
+  args: {
+    roomId: number
+  },
+  ctx: any
+) {
+  // await access(args, connectionData);
 
-  // let bansData = await getBans(vars.roomId);
+  // let bansData = await getBans(args.roomId);
 
   // return bansData.map(async function(banData) {
-  //   const user = await getUserWithRoom(banData.userId, vars.roomId);
+  //   const user = await getUserWithRoom(banData.userId, args.roomId);
 
   //   return Object.assign(banData, { user });
   // });

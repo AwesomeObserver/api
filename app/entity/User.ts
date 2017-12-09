@@ -14,6 +14,9 @@ export class User {
   @Column({ type: 'varchar', default: 'user' })
   role: string;
 
+  @Column({ type: 'boolean', default: false })
+  banned: boolean;
+
   @Column({ type: 'varchar', nullable: true, unique: true })
   vkId: string;
 

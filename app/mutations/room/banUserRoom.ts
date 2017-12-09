@@ -1,56 +1,45 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { setBanUserInRoom } from 'api/room/user/ban';
-// import type { ConnectionData } from 'types';
+import { Access } from 'app/api/Access';
+import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
+import { RoomBan } from 'app/api/room/RoomBan';
 
 export const schema = `
   banUserRoom(
-    userId: String!,
-    roomId: String!,
+    userId: Int!,
+    roomId: Int!,
     reason: String
   ): Boolean
 `;
 
-// export async function access(
-//   args: {
-//     userId: string,
-//     roomId: string,
-//     reason?: string
-//   },
-//   ctx: any
-// ) {
-//   const [ current, context ] = await Promise.all([
-//     getUserWithRoom(connectionData.userId, args.roomId),
-//     getUserWithRoom(args.userId, args.roomId)
-//   ]);
+async function access(
+  currentUserId: number,
+  userId: number,
+  roomId: number
+) {
+  const [current, context] = await Promise.all([
+    RoomUser.getOneFull(currentUserId, roomId),
+    RoomUser.getOneFull(userId, roomId)
+  ]);
 
-//   checkAccess({
-//     group: 'room',
-//     name: 'banUserRoom'
-//   }, current, context);
-// }
+  await Access.check({
+    group: 'room',
+    name: 'banUserRoom'
+  }, current, context);
+}
 
 export async function resolver(
   root: any,
   args: {
-    userId: string,
-    roomId: string,
+    userId: number,
+    roomId: number,
     reason?: string
   },
   ctx: any
 ) {
-  // const {
-  //   userId,
-  //   roomId,
-  //   reason
-  // } = args;
+  const { userId, roomId, reason } = args;
+  const currentUserId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(args, connectionData);
+  await access(currentUserId, userId, roomId);
 
-  // return setBanUserInRoom({
-  //   userId,
-  //   roomId,
-  //   reason,
-  //   whoSetId: connectionData.userId
-  // });
+  return RoomBan.ban(roomId, userId);
 }

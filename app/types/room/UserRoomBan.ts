@@ -1,6 +1,6 @@
 export const type = `
   type UserRoomBan {
-    userId: String
+    userId: Int
     banDate: String
     unbanDate: String
     reason: String

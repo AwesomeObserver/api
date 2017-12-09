@@ -1,32 +1,29 @@
+import { Access } from 'app/api/Access';
 import { Connection } from 'app/api/connection/Connection';
 import { Room } from 'app/api/room/Room';
+import { User } from 'app/api/user/User';
 
 export const schema = `
-  banRoom(roomId: String!): Boolean
+  banRoom(roomId: Int!): Boolean
 `;
 
-// export async function access(
-//   vars: {
-//     roomId: String
-//   },
-//   connectionData: ConnectionData
-// ) {
-//   const current = await getUserById(connectionData.userId);
+async function access(userId: number) {
+  const current = await User.getById(userId);
 
-//   checkAccess({ group: 'global', name: 'banRoom' }, current);
-// }
+  await Access.check({ group: 'global', name: 'banRoom' }, current);
+}
 
 export async function resolver(
   root: any,
   args: {
-    roomId: String
+    roomId: number
   },
-  ctx
+  ctx: any
 ) {
   const { roomId } = args;
   const userId = await Connection.getUserId(ctx.connectionId);
 
-  // await access(vars, connectionData);
+  await access(userId);
 
   return Room.ban(roomId, {
     whoSetBanId: userId,

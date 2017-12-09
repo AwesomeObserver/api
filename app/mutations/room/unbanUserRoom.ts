@@ -1,46 +1,35 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-// import { unbanUserInRoom } from 'api/room/user/ban';
+import { Access } from 'app/api/Access';
+import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
+import { RoomBan } from 'app/api/room/RoomBan';
 
 export const schema = `
   unbanUserRoom(
-    userId: String!,
-    roomId: String!
+    userId: Int!,
+    roomId: Int!
   ): Boolean
 `;
 
-// export async function access(
-//   args: {
-//     userId: String,
-//     roomId: String
-//   },
-//   connectionData: ConnectionData
-// ) {
-//   const current = await getUserWithRoom(connectionData.userId, args.roomId);
+async function access(userId: number, roomId: number) {
+  const current = await RoomUser.getOneFull(userId, roomId);
 
-//   checkAccess({
-//     group: 'room',
-//     name: 'unbanUserRoom'
-//   }, current);
-// }
+  await Access.check({
+    group: 'room',
+    name: 'unbanUserRoom'
+  }, current);
+}
 
 export async function resolver(
   root: any,
   args: {
-    userId: String,
-    roomId: String
+    userId: number,
+    roomId: number
   },
   ctx: any
 ) {
-  // const {
-  //   userId,
-  //   roomId
-  // } = args;
+  const { userId, roomId } = args;
 
-  // await access(args, connectionData);
+  await access(userId, roomId);
 
-  // return unbanUserInRoom({
-  //   userId,
-  //   roomId
-  // });
+  return RoomBan.unban(roomId, userId);
 }
