@@ -21,7 +21,7 @@
     "@types/lodash": "^4.14.88",
     "nodemon": "^1.12.5",
     "ts-node": "^3.3.0",
-    "tsconfig-paths": "^2.4.3",
+    "tsconfig-paths": "^2.6.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
   },
