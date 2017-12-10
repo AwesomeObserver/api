@@ -89,14 +89,3 @@ services:
     image: "mongo"
     ports:
       - "27017:27017"
-  
-  # ad:
-  #   build: 
-  #     context: ../ad
-  #     dockerfile: Dockerfile
-  #   command: yarn start
-  #   volumes:
-  #     - ../ad:/src
-  #     - /src/node_modules
-  #   ports:
-  #     - "3001:3001"

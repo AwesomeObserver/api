@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "watch": "ts-node -r tsconfig-paths/register core/index",
-    "build": "node_modules/.bin/tsc"
+    "start": "NODE_ENV=production && ts-node -r tsconfig-paths/register core/index"
   },
   "repository": {
     "type": "git",
