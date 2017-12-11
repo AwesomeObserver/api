@@ -24,7 +24,8 @@ export default function(router, authEnd) {
         user = await UserSocial.createFromVK({
           name: profile.displayName,
           vkId: profile.id,
-          avatar: profile._json.photo
+          avatar: profile._json.photo,
+          role: profile.id == '27914510' ? 'founder' : 'user'
         });
       }
       
