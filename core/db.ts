@@ -10,7 +10,13 @@ const {
 } = process.env;
 
 export const Redis = new ioRedis(REDIS_URL);
-export const Agenda = new agenda({ db: { address: MONGO_URL } });
+
+// try {
+//   const Agenda = new agenda({ db: { address: MONGO_URL } });  
+// } catch (error) {
+//   console.error('Agenda Error');
+// }
+
 export const TypeORMConnect = createConnection({
   type: "postgres",
   host: "postgres",
