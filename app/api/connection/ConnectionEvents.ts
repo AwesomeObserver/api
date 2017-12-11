@@ -12,6 +12,7 @@ export class ConnectionEventsClass {
 
     if (!connection) {
       console.log('onLeave Error');
+      return false;
     }
 
     const { roomId } = connection;
@@ -30,6 +31,7 @@ export class ConnectionEventsClass {
     
     if (!connection) {
       console.log('onLogin Error');
+      return false;
     }
 
     const { roomId } = connection;
@@ -46,6 +48,7 @@ export class ConnectionEventsClass {
     
     if (!connection) {
       console.log('onLogout Error');
+      return false;
     }
 
     const { roomId, userId } = connection;
