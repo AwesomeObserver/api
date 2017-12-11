@@ -1,3 +1,9 @@
-import { PubSub as ps } from 'graphql-subscriptions';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import * as ioRedis from 'ioredis';
 
-export const PubSub = new ps();
+const { REDIS_URL } = process.env;
+
+export const PubSub = new RedisPubSub({
+  publisher: new ioRedis(REDIS_URL),
+  subscriber: new ioRedis(REDIS_URL)
+});
