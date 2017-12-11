@@ -8,7 +8,13 @@ export class ConnectionEventsClass {
   }
 
   async onLeave(connectionId: string) {
-    const { roomId, userId } = await Connection.getOne(connectionId);
+    let connection = await Connection.getOne(connectionId);
+
+    if (!connection) {
+      console.log('onLeave Error');
+    }
+
+    const { roomId } = connection;
 
     if (roomId) {
       await RoomEvents.onLeave(roomId, connectionId);
@@ -20,7 +26,13 @@ export class ConnectionEventsClass {
   async onLogin(connectionId: string, userId: number) {
     await Connection.setUserId(connectionId, userId);
   
-    const { roomId } = await Connection.getOne(connectionId);;
+    let connection = await Connection.getOne(connectionId);
+    
+    if (!connection) {
+      console.log('onLogin Error');
+    }
+
+    const { roomId } = connection;
   
     if (roomId) {
       await RoomEvents.onLogin(roomId, connectionId, userId);
@@ -30,8 +42,14 @@ export class ConnectionEventsClass {
   }
 
   async onLogout(connectionId: string) {
-    const { roomId, userId } = await Connection.getOne(connectionId);
-  
+    let connection = await Connection.getOne(connectionId);
+    
+    if (!connection) {
+      console.log('onLogout Error');
+    }
+
+    const { roomId, userId } = connection;
+
     await Connection.setUserId(connectionId, null);
     
     if (roomId) {
