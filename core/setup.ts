@@ -44,7 +44,7 @@ export async function runServer() {
         execute,
         subscribe,
         schema,
-        // keepAlive: 10 * 1000,
+        keepAlive: 5 * 1000,
         // onConnect: (connectionParams, webSocket) => {
         //   return Connection.onConnect(connectionParams, webSocket);
         // },
