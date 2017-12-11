@@ -16,9 +16,6 @@ services:
     build: 
       context: ../client
     environment:
-      BASE_URL: "http://localhost/"
-      API_URL: "http://localhost/ws/"
-      AUTH_URL: "http://localhost/auth/"
       SC_CLIENT_ID: d03bc67acf78cf6f304edecde8cfc48c
     command: "nginx -g 'daemon off;'"
 
