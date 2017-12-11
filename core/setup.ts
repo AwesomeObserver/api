@@ -28,10 +28,10 @@ export async function runServer() {
   }));
   app.use(koaBody());
 
-  router.get('/graphiql', graphiqlKoa({
-    endpointURL: `ws://localhost:${PORT}/graphql`,
-    subscriptionsEndpoint: `ws://localhost:${PORT}/graphql`
-  }));
+  // router.get('/graphiql', graphiqlKoa({
+  //   endpointURL: `ws://localhost:${PORT}/graphql`,
+  //   subscriptionsEndpoint: `ws://localhost:${PORT}/graphql`
+  // }));
 
   app.use(router.routes());
   app.use(router.allowedMethods());
