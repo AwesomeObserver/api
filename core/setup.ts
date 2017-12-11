@@ -45,12 +45,12 @@ export async function runServer() {
         subscribe,
         schema,
         keepAlive: 5 * 1000,
-        // onConnect: (connectionParams, webSocket) => {
-        //   return Connection.onConnect(connectionParams, webSocket);
-        // },
-        // onDisconnect: (webSocket) => {
-        //   return Connection.onDisconnect(webSocket);
-        // }
+        onConnect: (connectionParams, webSocket) => {
+          return Connection.onConnect(connectionParams, webSocket);
+        },
+        onDisconnect: (webSocket) => {
+          return Connection.onDisconnect(webSocket);
+        }
       }, {
         server: ws,
         path: '/graphql',
