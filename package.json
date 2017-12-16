@@ -7,7 +7,7 @@
     "dev": "nodemon",
     "watch": "ts-node -r tsconfig-paths/register core/index",
     "build": "tsc",
-    "start": "pm2-docker start ./index.js -i 2"
+    "start": "pm2-docker start ./index.js -i max"
   },
   "repository": {
     "type": "git",
