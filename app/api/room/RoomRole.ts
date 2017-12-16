@@ -1,3 +1,4 @@
+import { PubSub } from 'core/pubsub';
 import { RoomUser } from 'app/api/room/RoomUser';
 
 export class RoomRoleClass {
@@ -10,13 +11,33 @@ export class RoomRoleClass {
     if (data) {
       if (data.role == roleData.role) return true;
 
-      return RoomUser.update(data.id, {
+      const res = await RoomUser.update(data.id, {
         role: roleData.role,
         lastRole: data.role
       });
+
+      PubSub.publish('userRoleRoomChanged', {
+        userRoleRoomChanged: {
+          userId,
+          role: roleData.role
+        },
+        roomId
+      });
+
+      return res;
     }
 
-    return RoomUser.create(roleData);
+    const res = await RoomUser.create(roleData);
+
+    PubSub.publish('userRoleRoomChanged', {
+      userRoleRoomChanged: {
+        userId,
+        role: roleData.role
+      },
+      roomId
+    });
+
+    return res;
   }
   
 }

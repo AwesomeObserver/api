@@ -26,8 +26,6 @@ export async function resolver(
   const userId = await Connection.getUserId(ctx.connectionId);
   const user = await RoomUser.getOneFull(userId, room.id);
 
-  console.log(user)
-
   if (!user) {
     return room;
   }
