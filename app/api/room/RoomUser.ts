@@ -12,6 +12,12 @@ export class RoomUserClass {
     return roomUserRepository.count(options);
   }
 
+  async get(options: Object) {
+    const TypeORM = await TypeORMConnect;
+    let roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    return roomUserRepository.find(options);
+  }
+
   async create(data) {
     let roomUser = new RoomUserEntity();
   
@@ -41,17 +47,12 @@ export class RoomUserClass {
       role: 'user',
       whoSetRoleId: null,
       lastRole: 'user',
+      banned: false,
       banDate: null,
       unbanDate: null,
       whoSetBanId: null,
       banReason: null
     };
-  }
-
-  withFormat(roomUser) {
-    const unbanDate = roomUser.unbanDate;
-    roomUser.banned = !!unbanDate ? isAfter(unbanDate, +new Date()) : false;
-    return roomUser;
   }
 
   async getPure(userId: number, roomId: number) {
@@ -66,14 +67,17 @@ export class RoomUserClass {
     let data = await userRepository.findOne({ userId, roomId });
 
     if (!data) {
-      const defaultData = this.getDefaultRoomUser(userId, roomId);
-      return this.withFormat(defaultData);
+      return this.getDefaultRoomUser(userId, roomId);
     }
 
-    return this.withFormat(data);
+    return data;
   }
 
   async getOneFull(userId: number, roomId: number) {
+    if (!userId) {
+      return null;
+    }
+
     return Promise.all([
       User.getById(userId),
       this.getOne(userId, roomId)
