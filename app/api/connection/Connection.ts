@@ -122,18 +122,18 @@ export class ConnectionClass {
 
   async getCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const count = await Redis.hget(key, userId);
+    const count = await Redis.hget(key, `${userId}`);
     return parseInt(count, 10) || 0;
   }
 
   async incCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return Redis.hincrby(key, userId, '1');
+    return Redis.hincrby(key, `${userId}`, 1);
   }
 
   async decCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return Redis.hincrby(key, userId, '-1');
+    return Redis.hincrby(key, `${userId}`, -1);
   }
 }
 

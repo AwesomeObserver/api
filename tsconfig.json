@@ -12,9 +12,15 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./*"]
+      "*": [
+        "*",
+        "dist/*"
+      ]
     },
-    "rootDir": ".",
+    "rootDirs": [
+      ".",
+      "./dist"
+    ],
     "inlineSourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
