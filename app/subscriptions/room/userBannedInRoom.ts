@@ -3,7 +3,7 @@ import { withFilter } from 'graphql-subscriptions';
 import { PubSub } from 'core/pubsub';
 
 export const schema = `
-  userBannedInRoom(roomId: Int!): UserRoomBanData
+  userBannedInRoom(roomId: Int!): Int
 `;
 
 export const resolver = {

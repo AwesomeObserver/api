@@ -27,9 +27,7 @@ services:
       - "redis"
       - "postgres"
       - "mongo"
-    environment:
-      WS_PORT: 8000
-      
+    environment:      
       CHAT_SECRET: 0293g02j39g023gn23
       TOKEN_SECRET: j9f84923vsndv821
       AUTH_KEY_SECRET: weojf9230j0923jr023
@@ -53,14 +51,10 @@ services:
       POSTGRES_DB: "ravepro"
       MONGO_URL: "mongodb://mongo/ravepro"
     command: yarn start
-    ports:
-      - "8000:8000"
 
   # REDIS
   redis:
     image: "redis"
-    ports:
-      - "6379:6379"
   
   # POSTGRES
   postgres:
@@ -73,5 +67,3 @@ services:
   # MONGO
   mongo:
     image: "mongo"
-    ports:
-      - "27017:27017"

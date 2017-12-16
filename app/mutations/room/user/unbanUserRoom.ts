@@ -28,8 +28,9 @@ export async function resolver(
   ctx: any
 ) {
   const { userId, roomId } = args;
+  const contextUserId = await Connection.getUserId(ctx.connectionId);
 
-  await access(userId, roomId);
+  await access(contextUserId, roomId);
 
   return RoomBan.unban(roomId, userId);
 }

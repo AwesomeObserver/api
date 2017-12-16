@@ -3,7 +3,7 @@ services:
 
   proxy:
     build: 
-      context: ../pdev
+      context: ../proxy-dev
     command: "nginx -g 'daemon off;'"
     depends_on:
       - "client"

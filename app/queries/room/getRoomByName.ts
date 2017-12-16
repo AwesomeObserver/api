@@ -1,4 +1,5 @@
 import { Connection } from 'app/api/connection/Connection';
+import { RoomUser } from 'app/api/room/RoomUser';
 import { Room } from 'app/api/room/Room';
 
 export const schema = `
@@ -22,17 +23,18 @@ export async function resolver(
     throw new Error('RoomBanned');
   }
 
-  const user = null; // getByConnectionId
+  const userId = await Connection.getUserId(ctx.connectionId);
+  const user = await RoomUser.getOneFull(userId, room.id);
 
   if (!user) {
     return room;
   }
 
-  if (user.site.isBanned) {
+  if (user.site.banned) {
     throw new Error('UserBanned');
   }
 
-  if (user.room.isBanned) {
+  if (user.room.banned) {
     throw new Error('UserRoomBanned');
   }
 

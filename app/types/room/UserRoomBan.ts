@@ -4,6 +4,6 @@ export const type = `
     banDate: String
     unbanDate: String
     reason: String
-    user: UserWithRoom
+    user: User
   }
 `;

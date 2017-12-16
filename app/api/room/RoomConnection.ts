@@ -29,25 +29,25 @@ export class RoomConnectionClass {
 
   async incGuestsCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await Redis.hincrby(key, 'guests', '1');
+    await Redis.hincrby(key, 'guests', 1);
     return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
   async decGuestsCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await Redis.hincrby(key, 'guests', '-1');
+    await Redis.hincrby(key, 'guests', -1);
     return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
   async incUsersCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await Redis.hincrby(key, 'users', '1');
+    await Redis.hincrby(key, 'users', 1);
     return RoomEvents.onConnectionsCountChanged(roomId);
   }
   
   async decUsersCount(roomId: number) {
     const key = `rooms:${roomId}:connectionCounts`;
-    await Redis.hincrby(key, 'users', '-1');
+    await Redis.hincrby(key, 'users', -1);
     return RoomEvents.onConnectionsCountChanged(roomId);
   }
 }

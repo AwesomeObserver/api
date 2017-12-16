@@ -23,7 +23,7 @@ export const TypeORMConnect = createConnection({
   username: POSTGRES_USERNAME,
   database: POSTGRES_DB,
   entities: [
-    __dirname + "/../app/entity/*.ts"
+    __dirname + "/../app/entity/*"
   ],
   synchronize: true,
   cache: {

@@ -1,9 +1,9 @@
 // import { checkAccess } from 'access';
 // import { getUserWithRoom } from 'api/room/user';
-// import { getBans } from 'api/room/user/ban';
+import { RoomBan } from 'app/api/room/RoomBan';
 
 export const schema = `
-  roomUsersBans(roomId: Int!): [UserRoomBan]
+  getRoomBans(roomId: Int!): [UserRoomBan]
 `;
 
 export async function access(args, ctx) {
@@ -22,6 +22,8 @@ export async function resolver(
   },
   ctx: any
 ) {
+  const { roomId } = args;
+
   // await access(args, connectionData);
 
   // let bansData = await getBans(args.roomId);
@@ -32,5 +34,5 @@ export async function resolver(
   //   return Object.assign(banData, { user });
   // });
 
-  return [];
+  return RoomBan.getUsers(roomId);
 }
