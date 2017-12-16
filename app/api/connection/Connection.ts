@@ -115,9 +115,9 @@ export class ConnectionClass {
     return Redis.hset(key, 'userId', userId);
   }
 
-  async getUserId(connectionId: string) {
+  async getUserId(connectionId: string): Promise<number|null> {
     const cData = await this.getOne(connectionId);
-    return cData ? cData.userId : null;
+    return (cData && cData.userId) ? cData.userId : null;
   }
 
   async getCCountUserRoom(roomId: number, userId: number) {
