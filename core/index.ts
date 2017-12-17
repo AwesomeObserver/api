@@ -1,4 +1,8 @@
 import { runServer } from './setup';
 import startup from '../app/startup';
 
-runServer().then(startup);
+try {
+  runServer().then(startup);
+} catch (errors) {
+  console.error(errors);
+}
