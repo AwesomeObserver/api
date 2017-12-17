@@ -1,6 +1,6 @@
 {
   "name": "ravepro-api",
-  "version": "0.22.15",
+  "version": "0.22.21",
   "description": "RavePro API",
   "main": "index.js",
   "scripts": {
