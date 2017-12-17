@@ -1,13 +1,14 @@
 {
   "name": "ravepro-api",
-  "version": "0.22.13",
+  "version": "0.22.15",
   "description": "RavePro API",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
     "watch": "ts-node -r tsconfig-paths/register core/index",
     "build": "tsc",
-    "start": "pm2-docker start ./index.js -i max"
+    "start:cluster": "pm2-docker start ./index.js -i max",
+    "start:debug": "node debug ./index.js"
   },
   "repository": {
     "type": "git",
