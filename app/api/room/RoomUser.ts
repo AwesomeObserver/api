@@ -1,20 +1,19 @@
 import * as isAfter from 'date-fns/is_after';
 
-import { TypeORMConnect, Redis } from 'core/db';
+import { getConnection } from "typeorm";
+import { Redis } from 'core/db';
 import { User } from 'app/api/user/User';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserClass {
 
   async count(options: Object) {
-    const TypeORM = await TypeORMConnect;
-    let roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
     return roomUserRepository.count(options);
   }
 
   async get(options: Object) {
-    const TypeORM = await TypeORMConnect;
-    let roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
     return roomUserRepository.find(options);
   }
 
@@ -25,13 +24,11 @@ export class RoomUserClass {
       roomUser[name] = data[name];
     }
 
-    const TypeORM = await TypeORMConnect;
-    return TypeORM.manager.save(roomUser);
+    return getConnection().manager.save(roomUser);
   }
 
   async update(id, data) {
-    const TypeORM = await TypeORMConnect;
-    const roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    const roomUserRepository = getConnection().getRepository(RoomUserEntity);
 
     return roomUserRepository.updateById(id, data);
   }
@@ -56,14 +53,12 @@ export class RoomUserClass {
   }
 
   async getPure(userId: number, roomId: number) {
-    const TypeORM = await TypeORMConnect;
-    let userRepository = TypeORM.getRepository(RoomUserEntity);
+    let userRepository = getConnection().getRepository(RoomUserEntity);
     return userRepository.findOne({ userId, roomId });
   }
 
   async getOne(userId: number, roomId: number) {
-    const TypeORM = await TypeORMConnect;
-    let userRepository = TypeORM.getRepository(RoomUserEntity);
+    let userRepository = getConnection().getRepository(RoomUserEntity);
     let data = await userRepository.findOne({ userId, roomId });
 
     if (!data) {

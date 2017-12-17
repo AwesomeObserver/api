@@ -1,4 +1,4 @@
-import { TypeORMConnect } from 'core/db';
+import { getConnection } from "typeorm";
 import { User as UserEntity } from 'app/entity/User';
 
 export class UserClass {
@@ -8,8 +8,7 @@ export class UserClass {
   }
 
   async getOne(where) {
-    const TypeORM = await TypeORMConnect;
-    let userRepository = TypeORM.getRepository(UserEntity);
+    let userRepository = getConnection().getRepository(UserEntity);
     return userRepository.findOne(where);
   }
 
@@ -20,8 +19,7 @@ export class UserClass {
       user[name] = userData[name];
     }
 
-    const TypeORM = await TypeORMConnect;
-    return TypeORM.manager.save(user);
+    return getConnection().manager.save(user);
   }
 
   async ban(userId: number) {

@@ -1,6 +1,6 @@
 import * as format from 'date-fns/format';
 
-import { TypeORMConnect } from 'core/db';
+import { getConnection } from "typeorm";
 import { PubSub } from 'core/pubsub';
 import { RoomConnection } from './RoomConnection';
 import { RoomFollower } from './RoomFollower';
@@ -36,14 +36,12 @@ export class RoomClass {
   }
 
   async getOnePure(where) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     return roomRepository.findOne(where);
   }
 
   async get() {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     const rooms = await roomRepository.find();
 
     return rooms.map(room => this.withData(room));
@@ -60,8 +58,7 @@ export class RoomClass {
       room[name] = data[name];
     }
 
-    const TypeORM = await TypeORMConnect;
-    const roomData = await TypeORM.manager.save(room);
+    const roomData = await getConnection().manager.save(room);
 
     await RoomRole.set({
       roomId: roomData.id,
@@ -74,14 +71,12 @@ export class RoomClass {
   }
 
   async remove(roomId) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     return roomRepository.removeById(roomId);
   }
 
   async ban(roomId, data) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       banned: true,
@@ -94,8 +89,7 @@ export class RoomClass {
   }
 
   async unbanByName(roomName) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     
     await roomRepository.update({ name: roomName }, {
       banned: false,
@@ -108,8 +102,7 @@ export class RoomClass {
   }
 
   async setSlowMode(roomId: number, isActive: boolean) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       slowMode: isActive
@@ -126,8 +119,7 @@ export class RoomClass {
   }
 
   async setFollowerMode(roomId: number, isActive: boolean) {
-    const TypeORM = await TypeORMConnect;
-    const roomRepository = TypeORM.getRepository(RoomEntity);
+    const roomRepository = getConnection().getRepository(RoomEntity);
     
     await roomRepository.updateById(roomId, {
       followerMode: isActive

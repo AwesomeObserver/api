@@ -11,5 +11,5 @@ export async function resolver(
   },
   ctx: any
 ) {
-  return RoomEvents.onLeave(args.roomId, ctx.connectionId);
+  // return RoomEvents.onLeave(args.roomId, ctx.connectionId);
 }

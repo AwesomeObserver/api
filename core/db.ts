@@ -17,20 +17,22 @@ export const Redis = new ioRedis(REDIS_URL);
 //   console.error('Agenda Error');
 // }
 
-export const TypeORMConnect = createConnection({
-  type: "postgres",
-  host: "postgres",
-  username: POSTGRES_USERNAME,
-  database: POSTGRES_DB,
-  entities: [
-    __dirname + "/../app/entity/*"
-  ],
-  synchronize: true,
-  cache: {
-    type: "redis",
-    options: {
-      host: "redis",
-      port: 6379
+export async function setupDB () {
+  return createConnection({
+    type: "postgres",
+    host: "postgres",
+    username: POSTGRES_USERNAME,
+    database: POSTGRES_DB,
+    entities: [
+      __dirname + "/../app/entity/*"
+    ],
+    synchronize: true,
+    cache: {
+      type: "redis",
+      options: {
+        host: "redis",
+        port: 6379
+      }
     }
-  }
-});
+  });
+}
