@@ -11,5 +11,5 @@ export async function resolver(
   },
   ctx: any
 ) {
-  return RoomEvents.onJoin(args.roomId, ctx.connectionId);
+  // return RoomEvents.onJoin(args.roomId, ctx.connectionId);
 }

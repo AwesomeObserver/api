@@ -44,15 +44,15 @@ export class ConnectionClass {
 
   onConnect(connectionParams, webSocket) {
     const connectionId = crypto.randomBytes(20).toString('hex');
-    webSocket['connectionId'] = connectionId;
+    // webSocket['connectionId'] = connectionId;
 
-    ConnectionEvents.onJoin(connectionId);
+    // ConnectionEvents.onJoin(connectionId);
 
     return { connectionId };
   }
 
   onDisconnect(webSocket) {
-    ConnectionEvents.onLeave(webSocket.connectionId);
+    // ConnectionEvents.onLeave(webSocket.connectionId);
   }
 
   async save(connectionId: string) {

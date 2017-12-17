@@ -1,6 +1,6 @@
 import * as format from 'date-fns/format';
 
-import { TypeORMConnect } from 'core/db';
+import { getConnection } from "typeorm";
 import { PubSub } from 'core/pubsub';
 import { RoomUser } from 'app/api/room/RoomUser';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
@@ -12,8 +12,7 @@ export class RoomBanClass {
   }
 
   async getUsers(roomId: number) {
-    const TypeORM = await TypeORMConnect;
-    let roomUserRepository = TypeORM.getRepository(RoomUserEntity);
+    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
     const data = await roomUserRepository
       .createQueryBuilder("roomUser")
       .where("roomUser.roomId = :roomId", { roomId })

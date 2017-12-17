@@ -8,6 +8,7 @@ import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
 import schema from './gql';
 import { setupAuth } from './auth';
+import { setupDB } from './db';
 import { Connection } from 'app/api/connection/Connection';
 
 export async function runServer() {
@@ -15,6 +16,7 @@ export async function runServer() {
   const router = new koaRouter();
   const PORT = 8000;
   
+  await setupDB();
   await setupAuth();
 
   app.use(cors({ 
