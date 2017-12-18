@@ -1,8 +1,8 @@
-import { runServer } from './setup';
+import { RPServer } from './server';
 import startup from '../app/startup';
 
-try {
-  runServer().then(startup);
-} catch (errors) {
-  console.error(errors);
-}
+(async () => {
+  const server = new RPServer();
+  await server.run();
+  startup();
+})();
