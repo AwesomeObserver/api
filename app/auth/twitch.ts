@@ -27,10 +27,10 @@ export default function(router, authEnd) {
           twitchId: profile.id,
           email: profile._json.email,
           avatar: profile._json.logo,
-          role: profile.id == 52703474 ? 'founder' : 'user'
+          role: profile.id === 52703474 ? 'founder' : 'user'
         });
       }
-      
+
       done(null, { userId: user.id });
     });
   }));
