@@ -118,7 +118,7 @@ export class RoomEventsClass {
       roomId
     };
     
-    PubSub.publish('connectionsCountChanged', payload);
+    // PubSub.publish('connectionsCountChanged', payload);
   }
 }
 
