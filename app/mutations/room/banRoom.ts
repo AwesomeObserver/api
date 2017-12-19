@@ -21,7 +21,7 @@ export async function resolver(
   ctx: any
 ) {
   const { roomId } = args;
-  const userId = await Connection.getUserId(ctx.connectionId);
+  const userId = ctx.userId;
 
   await access(userId);
 

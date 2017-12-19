@@ -23,8 +23,7 @@ export async function resolver(
     throw new Error('RoomBanned');
   }
 
-  const userId = await Connection.getUserId(ctx.connectionId);
-  const user = await RoomUser.getOneFull(userId, room.id);
+  const user = await RoomUser.getOneFull(ctx.userId, room.id);
 
   if (!user) {
     return room;

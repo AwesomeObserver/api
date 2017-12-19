@@ -1,5 +1,4 @@
 import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
 import { User } from 'app/api/user/User';
 
 export const schema = `
@@ -45,7 +44,7 @@ export async function resolver(
   ctx: any
 ) {
   const { userId, role } = args;
-  const currentUserId = await Connection.getUserId(ctx.connectionId);
+  const currentUserId = ctx.userId;
 
   await access(currentUserId, userId, role);
 

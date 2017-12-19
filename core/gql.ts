@@ -16,7 +16,6 @@ const gqlDir = __dirname + '/../app/';
   for (const name of Object.keys(data)) {
     typeDefs.push(data[name].type);
   }
-
 }
 
 // Queries

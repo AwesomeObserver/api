@@ -24,22 +24,24 @@ function transformerArray(array) {
 export class ConnectionClass {
 
   genToken(userId: number): string {
-    return jwt.sign(userId, TOKEN_SECRET);
+    return jwt.sign(`${userId}`, TOKEN_SECRET);
   }
 
   checkToken(token: string): number {
-    return jwt.verify(token, TOKEN_SECRET);
+    const userIdStr = jwt.verify(token, TOKEN_SECRET);
+
+    if (typeof userIdStr != 'string') {
+      throw new Error('Bad format');
+    }
+
+    return parseInt(userIdStr, 10);
   }
 
   auth(connectionKey, userId) {
+    const connectionId = jwt.verify(connectionKey, AUTH_KEY_SECRET);
     const token = this.genToken(userId);
-
-    const payload = {
-      onConnectionAuth: token,
-      connectionKey
-    };
     
-    PubSub.publish('onConnectionAuth', payload);
+    PubSub.publish('token', token, { connectionId });
   }
 
   onConnect(connectionParams, webSocket) {

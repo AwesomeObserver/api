@@ -1,5 +1,4 @@
 import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
 import { RoomUser } from 'app/api/room/RoomUser';
 import { RoomBan } from 'app/api/room/RoomBan';
 
@@ -37,7 +36,7 @@ export async function resolver(
   ctx: any
 ) {
   const { userId, roomId, reason } = args;
-  const currentUserId = await Connection.getUserId(ctx.connectionId);
+  const currentUserId = ctx.userId;
 
   await access(currentUserId, userId, roomId);
 

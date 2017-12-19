@@ -7,6 +7,7 @@ import { schema } from './gql';
 import { setupAuth } from './auth';
 import { setupDB } from './db';
 import { wsAPI } from './wsapi';
+import { Connection } from 'app/api/connection/Connection';
 
 export class RPServer {
 
@@ -24,13 +25,32 @@ export class RPServer {
 
     app.use(koaBody());
 
-    router.post('/graphql', graphqlKoa({ schema }));
+    router.post('/graphql', graphqlKoa(function(req) {
+      const token = req.request.header.token;
+      let userId = null;
+
+      if (token) {
+        userId = Connection.checkToken(token);
+      }
+
+      return {
+        schema,
+        context: {
+          userId
+        }
+      }
+    }));
+
     router.get('/graphiql', graphiqlKoa({
       endpointURL: `http://localhost/graphql`
     }));
 
     app.use(router.routes());
     app.use(router.allowedMethods());
+
+    app.on('error', function(err) {
+      // console.log(err);
+    });
 
     app.listen(this.API_PORT);
   }
