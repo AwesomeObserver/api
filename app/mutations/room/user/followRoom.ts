@@ -10,7 +10,7 @@ export const schema = `
 async function access(userId: number, roomId: number) {
   const current = await RoomUser.getOneFull(userId, roomId);
 
-  await Access.check({
+  return Access.check({
     group: 'room',
     name: 'follow'
   }, current);
@@ -24,9 +24,11 @@ export async function resolver(
   ctx: any
 ) {
   const { roomId } = args;
-  const userId = await Connection.getUserId(ctx.connectionId);
+  const userId = ctx.userId;
 
-  await access(userId, roomId);
+  if (!await access(userId, roomId)) {
+    return new Error('Deny');
+  }
 
   await RoomFollower.follow(roomId, userId);
   return RoomFollower.getCount(roomId);

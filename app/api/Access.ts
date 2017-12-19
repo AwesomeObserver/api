@@ -133,6 +133,12 @@ export class AccessClass {
   ) {
     if (current) {
       current = this.userDataFormatHack(current);
+    } else {
+      current = {
+        id: 0,
+        roles: ['guest'],
+        banned: false
+      }
     }
   
     if (context) {
@@ -140,14 +146,16 @@ export class AccessClass {
     }
   
     if (current.banned) {
-      throw new Error('Banned');
+      return false;
     }
   
     const accessByRolesData = this.checkAccessByRolesData(action, current.roles);
-    if (!accessByRolesData) throw new Error('Deny');
+    if (!accessByRolesData) return false;
   
     const accessByActionData = this.checkAccessByActionData(action, current, context);
-    if (!accessByActionData) throw new Error('Deny');
+    if (!accessByActionData) return false;
+
+    return true;
   }
 } 
 

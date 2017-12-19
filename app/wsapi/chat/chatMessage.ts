@@ -12,10 +12,6 @@ import { RoomUser } from 'app/api/room/RoomUser';
 
 const { CHAT_SECRET } = process.env;
 
-export const schema = `
-  sendMessage(roomId: Int!, message: String!): Boolean
-`;
-
 async function access(roomId: number, current) {
   const room = await Room.getOnePure({ id: roomId });
   const userId = current.site.id;
@@ -66,34 +62,34 @@ async function access(roomId: number, current) {
   }
 }
 
-export async function resolver(
-  root: any,
-  args: {
-    roomId: number,
-    message: string
-  },
-  ctx: any
-) {
-  const { roomId, message } = args;
+export async function chatMessage(message: string, cdata) {
+  const { roomId, userId } = cdata;
 
-  const userId = ctx.userId;
-  const user = await RoomUser.getOneFull(userId, args.roomId);
+  if (!roomId) {
+    throw new Error('Outside room');
+  }
+
+  const user = await RoomUser.getOneFull(userId, roomId);
 
   await access(roomId, user);
 
   ActionTime.set(userId, `sendMessage:${roomId}`);
   
-  const messageId = crypto.randomBytes(10).toString('hex');
-  
-  await PubSub.publish('chatMessageAdded', {
-    chatMessageAdded: {
-      id: messageId,
-      user,
-      text: message,
-      authorSign: jwt.sign({ userId: user.site.id, messageId }, CHAT_SECRET)
-    },
-    roomId
-  });
+  const messageId = crypto.randomBytes(4).toString('hex');
 
-  return true;
+  const userData = [
+    [
+      user.site.id,
+      user.site.name,
+      user.site.role,
+      // user.site.avatar
+    ],
+    [
+      user.room.role
+    ]
+  ];
+
+  const messageData = [messageId, userData, message];
+
+  PubSub.publish('chatMessage', messageData, { roomId });
 }

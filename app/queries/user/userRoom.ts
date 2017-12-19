@@ -16,7 +16,7 @@ export async function resolver(
   let userId = args.userId;
 
   if (!userId) {
-    userId = await Connection.getUserId(ctx.connectionId);
+    userId = ctx.userId;
   }
   
   return await RoomUser.getOne(userId, args.roomId);

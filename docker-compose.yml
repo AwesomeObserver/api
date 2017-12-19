@@ -4,7 +4,9 @@ services:
   proxy:
     build: 
       context: ../proxy-dev
-    command: "nginx -g 'daemon off;'"
+    command: [nginx-debug, '-g', 'daemon off;']
+    logging:
+      driver: none
     depends_on:
       - "client"
       - "api"

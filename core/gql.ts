@@ -4,10 +4,8 @@ import { makeExecutableSchema } from 'graphql-tools';
 const typeDefs = [];
 let isQueries = false;
 let isMutations = false;
-let isSubscriptions = false;
 const queriesResolvers = {};
 const mutationsResolvers = {};
-const subscriptionsResolvers = {};
 
 const gqlDir = __dirname + '/../app/';
 
@@ -18,7 +16,6 @@ const gqlDir = __dirname + '/../app/';
   for (const name of Object.keys(data)) {
     typeDefs.push(data[name].type);
   }
-
 }
 
 // Queries
@@ -53,22 +50,6 @@ const gqlDir = __dirname + '/../app/';
   }
 }
 
-// Subscriptions
-{
-  const data = getFolderData(`${gqlDir}subscriptions/`);
-  const schema = [];
-
-  for (const name of Object.keys(data)) {
-    schema.push(data[name].schema);
-    subscriptionsResolvers[name] = data[name].resolver;
-  }
-
-  if (schema.length > 0) {
-    isSubscriptions = true;
-    typeDefs.push(`type Subscription { ${schema.join(' ')} }`);
-  }
-}
-
 if (!isQueries && !isMutations) {
   throw new Error('Must be queries or mutations in schema');
 }
@@ -77,7 +58,6 @@ typeDefs.push(`
   schema {
     ${isQueries ? 'query: Query' : ''}
     ${isMutations ? 'mutation: Mutation': ''}
-    ${isSubscriptions ? 'subscription: Subscription' : ''}    
   }
 `);
 
@@ -91,8 +71,4 @@ if (isMutations) {
   resolvers['Mutation'] = mutationsResolvers;
 }
 
-if (isSubscriptions) {
-  resolvers['Subscription'] = subscriptionsResolvers;
-}
-
-export default makeExecutableSchema({ typeDefs, resolvers });
+export const schema = makeExecutableSchema({ typeDefs, resolvers });
