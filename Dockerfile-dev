@@ -7,4 +7,4 @@ COPY package.json .
 
 RUN yarn
 
-EXPOSE 8000 8500
+EXPOSE 8000 8200 8500

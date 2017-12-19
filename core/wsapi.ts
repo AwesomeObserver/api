@@ -7,10 +7,12 @@ const actionCode = {
 export class WSAPI {
 
   public PORT: number;
+  public PING_INTERVAL: number;
   private server: any;
 
   constructor() {
     this.PORT = 8000;
+    this.PING_INTERVAL = 25000;
   }
 
   private onConnection = (socket) => {
@@ -48,7 +50,7 @@ export class WSAPI {
           socket.send();
         }
       });
-    }, 5000);
+    }, this.PING_INTERVAL);
     
   }
 }
