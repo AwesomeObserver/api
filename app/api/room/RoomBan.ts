@@ -34,10 +34,10 @@ export class RoomBanClass {
         banDate: format(+new Date())
       });
 
-      PubSub.publish('userBannedInRoom', {
-        userBannedInRoom: userId,
-        roomId
-      });
+      // PubSub.publish('userBannedInRoom', {
+      //   userBannedInRoom: userId,
+      //   roomId
+      // });
 
       return res;
     }
@@ -49,10 +49,10 @@ export class RoomBanClass {
       banDate: format(+new Date()),
     });
 
-    PubSub.publish('userBannedInRoom', {
-      userBannedInRoom: userId,
-      roomId
-    });
+    // PubSub.publish('userBannedInRoom', {
+    //   userBannedInRoom: userId,
+    //   roomId
+    // });
 
     return res;
   }

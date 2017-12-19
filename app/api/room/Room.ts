@@ -108,12 +108,12 @@ export class RoomClass {
       slowMode: isActive
     });
 
-    const payload = {
-      slowModeChanged: isActive,
-      roomId
-    };
+    // const payload = {
+    //   slowModeChanged: isActive,
+    //   roomId
+    // };
     
-    PubSub.publish('slowModeChanged', payload);
+    // PubSub.publish('slowModeChanged', payload);
 
     return true;
   }
@@ -130,7 +130,7 @@ export class RoomClass {
       roomId
     };
     
-    PubSub.publish('followerModeChanged', payload);
+    // PubSub.publish('followerModeChanged', payload);
 
     return true;
   }
