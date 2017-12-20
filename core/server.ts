@@ -24,6 +24,7 @@ export class RPServer {
     const router = new koaRouter();
 
     app.use(koaBody());
+    app.use(cors());
 
     router.post('/graphql', graphqlKoa(function(req) {
       const token = req.request.header.token;
