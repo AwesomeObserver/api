@@ -16,26 +16,26 @@ export class RoomRoleClass {
         lastRole: data.role
       });
 
-      PubSub.publish('userRoleRoomChanged', {
-        userRoleRoomChanged: {
-          userId,
-          role: roleData.role
-        },
-        roomId
-      });
+      // PubSub.publish('userRoleRoomChanged', {
+      //   userRoleRoomChanged: {
+      //     userId,
+      //     role: roleData.role
+      //   },
+      //   roomId
+      // });
 
       return res;
     }
 
     const res = await RoomUser.create(roleData);
 
-    PubSub.publish('userRoleRoomChanged', {
-      userRoleRoomChanged: {
-        userId,
-        role: roleData.role
-      },
-      roomId
-    });
+    // PubSub.publish('userRoleRoomChanged', {
+    //   userRoleRoomChanged: {
+    //     userId,
+    //     role: roleData.role
+    //   },
+    //   roomId
+    // });
 
     return res;
   }
