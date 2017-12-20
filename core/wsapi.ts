@@ -10,7 +10,7 @@ export class WSAPI {
 
   constructor() {
     this.PORT = 8000;
-    this.PING_INTERVAL = 30000;
+    this.PING_INTERVAL = 10000;
   }
 
   private onConnection = (socket) => {
@@ -21,9 +21,9 @@ export class WSAPI {
 
     console.log('Connection open');
     socket.on('message', (data) => this.onMessage(socket, data));
-    socket.on('pong', function() {
-      socket.isAlive = true;
-    });
+    // socket.on('pong', function() {
+    //   socket.isAlive = true;
+    // });
     socket.on('close', (...args) => this.onClose(socket, ...args));
   }
 
@@ -52,8 +52,6 @@ export class WSAPI {
 
   public send = (eventName: string, data: any, filter?: Function) => {
     this.server.clients.forEach((socket) => {
-      if (socket.isAlive === false) return socket.terminate();
-
       if (!filter || filter(socket.cdata)) {
         this.sendMessage(socket, eventName, data);
       }      
@@ -66,10 +64,6 @@ export class WSAPI {
 
     setInterval(() => {
       this.server.clients.forEach((socket) => {
-        if (socket.isAlive === false) return socket.terminate();
-
-        socket.isAlive = false;
-        socket.ping('', false, true);
         socket.send();
       });
     }, this.PING_INTERVAL);
