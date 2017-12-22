@@ -11,16 +11,13 @@ const {
 
 export const Redis = new ioRedis(REDIS_URL);
 
-// try {
-//   const Agenda = new agenda({ db: { address: MONGO_URL } });  
-// } catch (error) {
-//   console.error('Agenda Error');
-// }
+export const Agenda = new agenda({ db: { address: MONGO_URL } });  
 
 export async function setupDB () {
   return createConnection({
     type: "postgres",
     host: "postgres",
+    // logging: true,
     username: POSTGRES_USERNAME,
     database: POSTGRES_DB,
     entities: [

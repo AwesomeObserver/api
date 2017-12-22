@@ -59,7 +59,7 @@ export class RoomUserClass {
 
   async getOne(userId: number, roomId: number) {
     let userRepository = getConnection().getRepository(RoomUserEntity);
-    let data = await userRepository.findOne({ userId, roomId });
+    let data = await userRepository.findOne({ where: { userId, roomId }, cache: true });
 
     if (!data) {
       return this.getDefaultRoomUser(userId, roomId);

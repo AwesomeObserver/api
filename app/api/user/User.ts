@@ -9,7 +9,7 @@ export class UserClass {
 
   async getOne(where) {
     let userRepository = getConnection().getRepository(UserEntity);
-    return userRepository.findOne(where);
+    return userRepository.findOne({ where, cache: true });
   }
 
   async create(userData) {

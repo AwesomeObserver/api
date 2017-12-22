@@ -37,7 +37,7 @@ export class RoomClass {
 
   async getOnePure(where) {
     const roomRepository = getConnection().getRepository(RoomEntity);
-    return roomRepository.findOne(where);
+    return roomRepository.findOne({ where, cache: true });
   }
 
   async get() {
