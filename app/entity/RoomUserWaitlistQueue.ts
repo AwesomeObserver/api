@@ -28,5 +28,5 @@ export class RoomUserWaitlistQueue {
   room: Room;
 
   @Column("simple-array")
-  sources: number[];
+  sources: string[];
 }

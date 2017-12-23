@@ -34,5 +34,5 @@ export class RoomWaitlistQueue {
   end: string;
 
   @Column("simple-array")
-  users: number[];
+  users: string[];
 }

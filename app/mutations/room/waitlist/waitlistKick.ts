@@ -5,7 +5,7 @@ import { User } from 'app/api/user/User';
 import { RoomWaitlistQueue } from 'app/api/room/RoomWaitlistQueue';
 
 export const schema = `
-  waitlistAdd(roomId: Int!, userId: Int): Boolean
+  waitlistKick(roomId: Int!, userId: Int): Boolean
 `;
 
 // async function access(userId: number) {
@@ -31,5 +31,5 @@ export async function resolver(
     return null;
   }
 
-  return RoomWaitlistQueue.add(roomId, currentUserId);
+  return RoomWaitlistQueue.kick(roomId, currentUserId);
 }

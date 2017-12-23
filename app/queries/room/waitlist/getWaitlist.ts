@@ -17,13 +17,23 @@ export async function resolver(
   const { roomId } = args;
 
   let data = await RoomWaitlistQueue.get(roomId);
+
+  if (!data.user) {
+    return null;
+  }
   
-  const source = {
+  const source = data.userId === 1 ? {
     title: 'The Upbeats - Punks',
     cover: null,
     service: 'youtube',
     duration: 4 * 60 + 3,
     serviceId: 'ObEBLsYEgeg'
+  } : {
+    title: 'Sustance - Impulsive',
+    cover: null,
+    service: 'youtube',
+    duration: 4 * 60 + 54,
+    serviceId: 'ZLJ_nEOGwQI'
   };
 
   return {
