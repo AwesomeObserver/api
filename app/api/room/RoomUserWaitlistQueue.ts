@@ -2,6 +2,7 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
+import { Source } from 'app/api/music/Source';
 
 class RoomUserWaitlistQueueClass {
 
@@ -58,7 +59,13 @@ class RoomUserWaitlistQueueClass {
   }
 
   async addFromLink(roomId: number, userId: number, link: string) {
-    console.log(roomId, userId, link);
+    const sourceId = await Source.addFromLink(link);
+
+    if (!sourceId) {
+      return false;
+    }
+
+    this.add(roomId, userId, sourceId);
   }
 
   async add(roomId: number, userId: number, sourceId: number) {

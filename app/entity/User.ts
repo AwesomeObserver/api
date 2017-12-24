@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn, 
+  Column,
+  OneToMany,
+  JoinColumn
+} from "typeorm";
+import { RoomUser } from "./RoomUser";
 
 @Entity()
 export class User {
@@ -25,4 +32,7 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true, unique: true })
   twitchId: string;
+
+  @OneToMany(type => RoomUser, roomUser => roomUser.user)
+  userRooms: RoomUser[];
 }

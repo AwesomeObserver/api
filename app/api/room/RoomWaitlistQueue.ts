@@ -7,28 +7,8 @@ import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
 import { User } from 'app/api/user/User';
+import { Source } from 'app/api/music/Source';
 import { RoomUserWaitlistQueue } from './RoomUserWaitlistQueue';
-
-const getSourceById = async (sourceId) => {
-  const sources = {
-    1: {
-      title: 'The Upbeats - Punks',
-      cover: null,
-      service: 'youtube',
-      duration: 20, //4 * 60 + 3,
-      serviceId: 'ObEBLsYEgeg'
-    },
-    2: {
-      title: 'Sustance - Impulsive',
-      cover: null,
-      service: 'youtube',
-      duration: 20,//4 * 60 + 54,
-      serviceId: 'ZLJ_nEOGwQI'
-    }
-  }
-
-  return sources[sourceId];
-}
 
 class RoomWaitlistQueueClass {
 
@@ -44,7 +24,7 @@ class RoomWaitlistQueueClass {
   async get(roomId: number) {
     return this.repository.findOne({
       where: { roomId },
-      relations: ["user"]
+      relations: ["user", "source"]
     });
   }
 
@@ -67,7 +47,7 @@ class RoomWaitlistQueueClass {
       }
     }
 
-    const source = await getSourceById(sourceId);
+    const source = await Source.getById(sourceId);
 
     const duration = source.duration;
     const start = +new Date();
@@ -79,6 +59,7 @@ class RoomWaitlistQueueClass {
     // Save Current Play Data
     await this.repository.update({ roomId }, {
       userId: user.id,
+      sourceId: source.id,
       start: format(start),
       end: format(end)
     });
@@ -95,6 +76,7 @@ class RoomWaitlistQueueClass {
   // Clear Current Play
   async clearPlay(roomId: number) {
     await this.repository.update({ roomId }, {
+      sourceId: null,
       userId: null,
       start: null,
       end: null

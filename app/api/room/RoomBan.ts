@@ -3,7 +3,6 @@ import * as format from 'date-fns/format';
 import { getConnection } from "typeorm";
 import { PubSub } from 'core/pubsub';
 import { RoomUser } from 'app/api/room/RoomUser';
-import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomBanClass {
 
@@ -12,8 +11,7 @@ export class RoomBanClass {
   }
 
   async getUsers(roomId: number) {
-    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
-    const data = await roomUserRepository
+    const data = await RoomUser.repository
       .createQueryBuilder("roomUser")
       .where("roomUser.roomId = :roomId", { roomId })
       .andWhere("roomUser.banned = :banned", { banned: true })

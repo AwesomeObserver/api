@@ -1,6 +1,6 @@
 {
   "name": "ravepro-api",
-  "version": "0.23.7",
+  "version": "0.23.8",
   "description": "RavePro API",
   "main": "index.js",
   "scripts": {
@@ -49,10 +49,12 @@
     "koa-session": "^5.5.1",
     "koa2-cors": "^2.0.5",
     "lodash": "^4.17.4",
+    "node-fetch": "^1.7.3",
     "passport-google-oauth2": "^0.1.6",
     "passport-twitch": "^1.0.3",
     "passport-vkontakte": "^0.3.2",
     "pg": "^7.4.0",
+    "query-string": "^5.0.1",
     "redis": "^2.8.0",
     "reflect-metadata": "^0.1.10",
     "typeorm": "^0.1.9",

@@ -6,5 +6,6 @@ export const type = `
     role: String
     banned: Boolean
     unbanDate: String
+    room: UserRoom
   }
 `;

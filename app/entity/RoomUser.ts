@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn, 
   Column,
   OneToOne,
+  ManyToOne,
   JoinColumn
 } from "typeorm";
 import { User } from "./User";
@@ -16,8 +17,7 @@ export class RoomUser {
   @Column({ type: 'integer' })
   userId: number;
 
-  @OneToOne(type => User)
-  @JoinColumn()
+  @ManyToOne(type => User, user => user.userRooms)
   user: User;
 
   @Column({ type: 'integer' })

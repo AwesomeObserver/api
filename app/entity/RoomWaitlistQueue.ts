@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { Room } from "./Room";
 import { User } from "./User";
+import { Source } from './Source';
 
 @Entity()
 export class RoomWaitlistQueue {
@@ -26,6 +27,13 @@ export class RoomWaitlistQueue {
   @OneToOne(type => User)
   @JoinColumn()
   user: User;
+
+  @Column({ type: 'integer', nullable: true })
+  sourceId: number;
+
+  @OneToOne(type => Source)
+  @JoinColumn()
+  source: Source;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   start: string;

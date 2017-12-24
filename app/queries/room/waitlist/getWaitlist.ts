@@ -22,24 +22,10 @@ export async function resolver(
     return null;
   }
   
-  const source = data.userId === 1 ? {
-    title: 'The Upbeats - Punks',
-    cover: null,
-    service: 'youtube',
-    duration: 4 * 60 + 3,
-    serviceId: 'ObEBLsYEgeg'
-  } : {
-    title: 'Sustance - Impulsive',
-    cover: null,
-    service: 'youtube',
-    duration: 4 * 60 + 54,
-    serviceId: 'ZLJ_nEOGwQI'
-  };
-
   return {
     users: [],
     playData: {
-      source,
+      source: data.source,
       user: data.user,
       start: getTime(data.start),
       serverTime: +new Date() 
