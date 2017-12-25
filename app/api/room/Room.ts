@@ -8,6 +8,14 @@ import { RoomRole } from './RoomRole';
 import { RoomWaitlistQueue } from './RoomWaitlistQueue';
 import { Room as RoomEntity } from 'app/entity/Room';
 
+import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
+import {
+  RoomWaitlistQueue as WaitlistQueueEntity
+} from 'app/entity/RoomWaitlistQueue';
+import {
+  RoomUserWaitlistQueue as UserWaitlistQueueEntity
+} from 'app/entity/RoomUserWaitlistQueue';
+
 export class RoomClass {
 
   get repository() {
@@ -81,6 +89,31 @@ export class RoomClass {
   }
 
   async remove(roomId) {
+    // Cascade fix
+    await Promise.all([
+      // RoomUser
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(RoomUserEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute(),
+      // RoomWaitlistQueue
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(WaitlistQueueEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute(),
+      // UserWaitlistQueue
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(UserWaitlistQueueEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute()
+    ]);
+
     return this.repository.removeById(roomId);
   }
 
