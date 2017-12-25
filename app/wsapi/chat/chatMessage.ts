@@ -13,7 +13,6 @@ import { RoomUser } from 'app/api/room/RoomUser';
 const { CHAT_SECRET } = process.env;
 
 async function access(roomId: number, current) {
-  const room = await Room.getOnePure({ id: roomId });
   const userId = current.site.id;
 
   await Access.check({
@@ -21,45 +20,47 @@ async function access(roomId: number, current) {
     name: 'sendMessage'
   }, current);
 
-  // Slow Mode
-  if (room.slowMode) {
-    try {
-      Access.check({
-        group: 'room',
-        name: 'sendMessageSlowModeIgnore'
-      }, current);
-    } catch (error) {
+  // const room = await Room.getOnePure({ id: roomId });
+
+  // // Slow Mode
+  // if (room.slowMode) {
+  //   try {
+  //     Access.check({
+  //       group: 'room',
+  //       name: 'sendMessageSlowModeIgnore'
+  //     }, current);
+  //   } catch (error) {
       
-      const actionName = `sendMessage:${roomId}`;
-      const lastMessageDate = await ActionTime.get(userId, actionName);
+  //     const actionName = `sendMessage:${roomId}`;
+  //     const lastMessageDate = await ActionTime.get(userId, actionName);
       
-      const sendMessageDelay = 2;
+  //     const sendMessageDelay = 2;
 
-      if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
-        throw new Error('denyForSlowMode');
-      }
-    } 
-  }
+  //     if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
+  //       throw new Error('denyForSlowMode');
+  //     }
+  //   } 
+  // }
 
-  // Follower Mode
-  if (room.followerMode) {
-    try {
-      Access.check({
-        group: 'room',
-        name: 'sendMessageFollowerModeIgnore'
-      }, current);
-    } catch (error) {
-      const { follower, lastFollowDate } = current.room;
+  // // Follower Mode
+  // if (room.followerMode) {
+  //   try {
+  //     Access.check({
+  //       group: 'room',
+  //       name: 'sendMessageFollowerModeIgnore'
+  //     }, current);
+  //   } catch (error) {
+  //     const { follower, lastFollowDate } = current.room;
 
-      if (!follower) {
-        throw new Error('mustBeFollow');
-      }
+  //     if (!follower) {
+  //       throw new Error('mustBeFollow');
+  //     }
   
-      if (!isBefore(addSeconds(lastFollowDate, 60 * 30), +new Date())) {
-        throw new Error('denyForFollowMode');
-      }
-    } 
-  }
+  //     if (!isBefore(addSeconds(lastFollowDate, 60 * 30), +new Date())) {
+  //       throw new Error('denyForFollowMode');
+  //     }
+  //   } 
+  // }
 }
 
 export async function chatMessage(message: string, cdata) {
@@ -82,7 +83,7 @@ export async function chatMessage(message: string, cdata) {
       user.site.id,
       user.site.name,
       user.site.role,
-      // user.site.avatar
+      user.site.avatar
     ],
     [
       user.room.role
