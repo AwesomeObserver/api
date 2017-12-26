@@ -1,15 +1,13 @@
-import { Access } from 'app/api/Access';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { Room } from 'app/api/room/Room';
+import { accessAPI, roomAPI, roomUserAPI } from 'app/api';
 
 export const schema = `
   removeRoom(roomId: Int!): Boolean
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await RoomUser.getOneFull(userId, roomId);
+  const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'removeRoom'
   }, current);
@@ -28,5 +26,5 @@ export async function resolver(
   await access(userId, roomId);
 
 
-  return Room.remove(args.roomId);
+  return roomAPI.remove(args.roomId);
 }

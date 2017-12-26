@@ -1,22 +1,22 @@
-import { PubSub } from 'core/pubsub';
-import { RoomUser } from 'app/api/room/RoomUser';
+import { pubSub } from 'core/pubsub';
+import { roomUserAPI } from 'app/api';
 
-export class RoomRoleClass {
+export class RoomRoleAPI {
     
   async set(roleData) {
     const { userId, roomId } = roleData;
 
-    const data = await RoomUser.getPure(userId, roomId);
+    const data = await roomUserAPI.getPure(userId, roomId);
 
     if (data) {
       if (data.role == roleData.role) return true;
 
-      const res = await RoomUser.update(data.id, {
+      const res = await roomUserAPI.update(data.id, {
         role: roleData.role,
         lastRole: data.role
       });
 
-      // PubSub.publish('userRoleRoomChanged', {
+      // pubSub.publish('userRoleRoomChanged', {
       //   userRoleRoomChanged: {
       //     userId,
       //     role: roleData.role
@@ -27,9 +27,9 @@ export class RoomRoleClass {
       return res;
     }
 
-    const res = await RoomUser.create(roleData);
+    const res = await roomUserAPI.create(roleData);
 
-    // PubSub.publish('userRoleRoomChanged', {
+    // pubSub.publish('userRoleRoomChanged', {
     //   userRoleRoomChanged: {
     //     userId,
     //     role: roleData.role
@@ -41,5 +41,3 @@ export class RoomRoleClass {
   }
   
 }
-
-export const RoomRole = new RoomRoleClass();

@@ -2,7 +2,7 @@ import * as fetch from 'node-fetch';
 import * as queryString from 'query-string';
 const { SC_KEY } = process.env;
 
-class SoundcloudClass {
+export class SoundcloudAPI {
 
   private parse = (track) => {
     let cover = null;
@@ -57,5 +57,3 @@ class SoundcloudClass {
       .then(res => res.map(track => this.parse(track)));
   }
 }
-
-export const Soundcloud = new SoundcloudClass();

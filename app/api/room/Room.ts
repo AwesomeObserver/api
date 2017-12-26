@@ -1,12 +1,13 @@
-import * as format from 'date-fns/format';
-
+import { format } from 'date-fns';
 import { getConnection } from "typeorm";
-import { PubSub } from 'core/pubsub';
-import { RoomConnection } from './RoomConnection';
-import { RoomFollower } from './RoomFollower';
-import { RoomRole } from './RoomRole';
-import { RoomWaitlistQueue } from './RoomWaitlistQueue';
 import { Room as RoomEntity } from 'app/entity/Room';
+import { pubSub } from 'core/pubsub';
+import {
+  roomConnectionAPI,
+  roomFollowerAPI,
+  roomRoleAPI,
+  roomModeWaitlistAPI
+} from 'app/api';
 
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 import {
@@ -16,7 +17,7 @@ import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
 
-export class RoomClass {
+export class RoomAPI {
 
   get repository() {
     return getConnection().getRepository(RoomEntity);
@@ -28,8 +29,8 @@ export class RoomClass {
 
   async withData(room) {
     const [counts, followersCount] = await Promise.all([
-      RoomConnection.getCount(room.id),
-      RoomFollower.getCount(room.id)
+      roomConnectionAPI.getCount(room.id),
+      roomFollowerAPI.getCount(room.id)
     ]);
 
     const defaultAvatar = 'https://pp.userapi.com/c626221/v626221510/7026b/zKYk5tlr530.jpg';
@@ -76,13 +77,13 @@ export class RoomClass {
     const roomData = await this.manager.save(room);
 
     await Promise.all([
-      RoomRole.set({
+      roomRoleAPI.set({
         roomId: roomData.id,
         userId,
         role: 'owner',
         whoSetRoleId: null
       }),
-      RoomWaitlistQueue.create(roomData.id)
+      roomModeWaitlistAPI.create(roomData.id)
     ]);
 
     return roomData;
@@ -173,5 +174,3 @@ export class RoomClass {
     return true;
   }
 }
-
-export const Room = new RoomClass();

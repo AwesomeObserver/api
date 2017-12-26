@@ -1,9 +1,8 @@
 import { getConnection } from "typeorm";
 import { Source as SourceEntity } from 'app/entity/Source';
-import { Youtube } from 'app/api/music/services/Youtube';
-import { Soundcloud } from 'app/api/music/services/Soundcloud';
+import { youtubeAPI, soundcloudAPI } from 'app/api';
 
-class SourceClass {
+export class SourceAPI {
 
   get repository() {
     return getConnection().getRepository(SourceEntity);
@@ -60,7 +59,7 @@ class SourceClass {
       return source.id;
     }
 
-    const data = await Youtube.getTrackById(videoId);
+    const data = await youtubeAPI.getTrackById(videoId);
 
     if (!data) {
       return false;
@@ -78,7 +77,7 @@ class SourceClass {
       return source.id;
     }
 
-    const data = await Soundcloud.getTrackByUrl(url);
+    const data = await soundcloudAPI.getTrackByUrl(url);
 
     if (!data) {
       return false;
@@ -89,5 +88,3 @@ class SourceClass {
     return newSource.id;
   }
 }
-
-export const Source = new SourceClass();

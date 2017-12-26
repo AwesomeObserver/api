@@ -1,7 +1,5 @@
-// import { checkAccess } from 'access';
-// import { getUserWithRoom } from 'api/room/user';
-import * as getTime from 'date-fns/get_time';
-import { RoomWaitlistQueue } from 'app/api/room/RoomWaitlistQueue';
+import { getTime } from 'date-fns';
+import { roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   getWaitlist(roomId: Int!): WaitlistPlay
@@ -16,7 +14,7 @@ export async function resolver(
 ) {
   const { roomId } = args;
 
-  let data = await RoomWaitlistQueue.get(roomId);
+  let data = await roomModeWaitlistAPI.get(roomId);
 
   if (!data.user) {
     return null;

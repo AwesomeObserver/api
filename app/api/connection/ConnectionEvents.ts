@@ -1,14 +1,13 @@
-import { Connection } from './Connection';
-import { RoomEvents } from '../room/RoomEvents';
+import { connectionAPI, roomEventsAPI } from 'app/api';
 
-export class ConnectionEventsClass {
+export class ConnectionEventsAPI {
 
   async onJoin(connectionId: string) {
-    return Connection.save(connectionId);
+    return connectionAPI.save(connectionId);
   }
 
   async onLeave(connectionId: string) {
-    let connection = await Connection.getOne(connectionId);
+    let connection = await connectionAPI.getOne(connectionId);
 
     if (!connection) {
       console.log('onLeave Error');
@@ -18,16 +17,16 @@ export class ConnectionEventsClass {
     const { roomId } = connection;
 
     if (roomId) {
-      await RoomEvents.onLeave(roomId, connectionId);
+      await roomEventsAPI.onLeave(roomId, connectionId);
     }
     
-    return Connection.del(connectionId);
+    return connectionAPI.del(connectionId);
   }
 
   async onLogin(connectionId: string, userId: number) {
-    await Connection.setUserId(connectionId, userId);
+    await connectionAPI.setUserId(connectionId, userId);
   
-    let connection = await Connection.getOne(connectionId);
+    let connection = await connectionAPI.getOne(connectionId);
     
     if (!connection) {
       console.log('onLogin Error');
@@ -37,14 +36,14 @@ export class ConnectionEventsClass {
     const { roomId } = connection;
   
     if (roomId) {
-      await RoomEvents.onLogin(roomId, connectionId, userId);
+      await roomEventsAPI.onLogin(roomId, connectionId, userId);
     }
   
     return true;
   }
 
   async onLogout(connectionId: string) {
-    let connection = await Connection.getOne(connectionId);
+    let connection = await connectionAPI.getOne(connectionId);
     
     if (!connection) {
       console.log('onLogout Error');
@@ -53,14 +52,12 @@ export class ConnectionEventsClass {
 
     const { roomId, userId } = connection;
 
-    await Connection.setUserId(connectionId, null);
+    await connectionAPI.setUserId(connectionId, null);
     
     if (roomId) {
-      await RoomEvents.onLogout(roomId, connectionId, userId);
+      await roomEventsAPI.onLogout(roomId, connectionId, userId);
     }
   
     return true;
   }
 }
-
-export const ConnectionEvents = new ConnectionEventsClass();

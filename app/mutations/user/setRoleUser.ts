@@ -1,5 +1,4 @@
-import { Access } from 'app/api/Access';
-import { User } from 'app/api/user/User';
+import { accessAPI, userAPI } from 'app/api';
 
 export const schema = `
   setRoleUser(
@@ -10,23 +9,23 @@ export const schema = `
 
 async function access(currentUserId: number, userId: number, role: string) {
   const [current, context] = await Promise.all([
-    User.getById(currentUserId),
-    User.getById(userId)
+    userAPI.getById(currentUserId),
+    userAPI.getById(userId)
   ]);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'global',
     name: 'setRole'
   }, current, context);
 
   switch (role) {
     case 'admin':
-      return Access.check({
+      return accessAPI.check({
         group: 'room',
         name: 'setRoleAdmin'
       }, current, context);
     case 'user':
-      return Access.check({
+      return accessAPI.check({
         group: 'room',
         name: 'setRoleUser'
       }, current, context);
@@ -48,5 +47,5 @@ export async function resolver(
 
   await access(currentUserId, userId, role);
 
-  return User.setRole(userId, role);
+  return userAPI.setRole(userId, role);
 }

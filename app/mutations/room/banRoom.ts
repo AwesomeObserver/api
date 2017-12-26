@@ -1,16 +1,13 @@
-import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
-import { Room } from 'app/api/room/Room';
-import { User } from 'app/api/user/User';
+import { accessAPI, roomAPI, userAPI } from 'app/api';
 
 export const schema = `
   banRoom(roomId: Int!): Boolean
 `;
 
 async function access(userId: number) {
-  const current = await User.getById(userId);
+  const current = await userAPI.getById(userId);
 
-  await Access.check({ group: 'global', name: 'banRoom' }, current);
+  await accessAPI.check({ group: 'global', name: 'banRoom' }, current);
 }
 
 export async function resolver(
@@ -25,7 +22,7 @@ export async function resolver(
 
   await access(userId);
 
-  return Room.ban(roomId, {
+  return roomAPI.ban(roomId, {
     whoSetBanId: userId,
     banReason: null
   });

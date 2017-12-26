@@ -1,7 +1,7 @@
 import { getConnection } from "typeorm";
 import { User as UserEntity } from 'app/entity/User';
 
-export class UserClass {
+export class UserAPI {
 
   async getById(userId: number) {
     return this.getOne({ id: userId });
@@ -44,5 +44,3 @@ export class UserClass {
     
   }
 }
-
-export const User = new UserClass();

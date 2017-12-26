@@ -5,7 +5,7 @@ import * as koaSession from 'koa-session';
 import * as koaBody from 'koa-bodyparser';
 import * as koaRouter from 'koa-router';
 import { getFolderData } from './utils';
-import { Connection } from 'app/api/connection/Connection';
+import { connectionAPI } from 'app/api';
 
 const authDir = __dirname + '/../app/auth/';
 
@@ -34,7 +34,7 @@ export async function setupAuth() {
     const connectionKey = ctx.session.cak;
     const userId = ctx.session.passport.user.userId;
     
-    Connection.auth(connectionKey, userId);
+    connectionAPI.auth(connectionKey, userId);
 
     ctx.type = 'html';
     ctx.body = `

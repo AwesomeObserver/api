@@ -2,7 +2,7 @@ import * as fetch from 'node-fetch';
 import * as queryString from 'query-string';
 const { YT_KEY } = process.env;
 
-class YoutubeClass {
+export class YoutubeAPI {
 
   private toSeconds = (duration) => {
     const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/)
@@ -60,5 +60,3 @@ class YoutubeClass {
   }
 
 }
-
-export const Youtube = new YoutubeClass();

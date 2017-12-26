@@ -1,6 +1,4 @@
-import { Connection } from 'app/api/connection/Connection';
-import { ConnectionEvents } from 'app/api/connection/ConnectionEvents';
-import { User } from 'app/api/user/User';
+import { userAPI } from 'app/api';
 
 export const schema = `
   user: User
@@ -13,7 +11,7 @@ export async function resolver(root: any, args: any, ctx: any) {
     throw new Error('Deny');
   }
 
-  const user = await User.getById(userId);
+  const user = await userAPI.getById(userId);
 
   if (!user) {
     throw new Error('User not found');

@@ -2,9 +2,9 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
-import { Source } from 'app/api/music/Source';
+import { sourceAPI } from 'app/api';
 
-class RoomUserWaitlistQueueClass {
+export class RoomModeWaitlistUserAPI {
 
   get repository() {
     return getConnection().getRepository(UserWaitlistQueueEntity);
@@ -59,7 +59,7 @@ class RoomUserWaitlistQueueClass {
   }
 
   async addFromLink(roomId: number, userId: number, link: string) {
-    const sourceId = await Source.addFromLink(link);
+    const sourceId = await sourceAPI.addFromLink(link);
 
     if (!sourceId) {
       return false;
@@ -115,5 +115,3 @@ class RoomUserWaitlistQueueClass {
   }
 
 }
-
-export const RoomUserWaitlistQueue = new RoomUserWaitlistQueueClass();

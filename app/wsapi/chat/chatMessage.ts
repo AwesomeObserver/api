@@ -2,20 +2,15 @@ import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
-
 import { PubSub } from 'core/pubsub';
-import { Access } from 'app/api/Access';
-import { ActionTime } from 'app/api/ActionTime';
-import { Connection } from 'app/api/connection/Connection';
-import { Room } from 'app/api/room/Room';
-import { RoomUser } from 'app/api/room/RoomUser';
+import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
 
 const { CHAT_SECRET } = process.env;
 
 async function access(roomId: number, current) {
   const userId = current.site.id;
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'sendMessage'
   }, current);
@@ -70,11 +65,11 @@ export async function chatMessage(message: string, cdata) {
     throw new Error('Outside room');
   }
 
-  const user = await RoomUser.getOneFull(userId, roomId);
+  const user = await roomUserAPI.getOneFull(userId, roomId);
 
   await access(roomId, user);
 
-  ActionTime.set(userId, `sendMessage:${roomId}`);
+  actionTimeAPI.set(userId, `sendMessage:${roomId}`);
   
   const messageId = crypto.randomBytes(4).toString('hex');
 

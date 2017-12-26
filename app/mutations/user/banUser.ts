@@ -1,5 +1,4 @@
-import { Access } from 'app/api/Access';
-import { User } from 'app/api/user/User';
+import { accessAPI, userAPI } from 'app/api';
 
 export const schema = `
   banUser(
@@ -10,11 +9,11 @@ export const schema = `
 
 export async function access(currentUserId: number, userId: number) {
   const [current, context] = await Promise.all([
-    User.getById(currentUserId),
-    User.getById(userId)
+    userAPI.getById(currentUserId),
+    userAPI.getById(userId)
   ]);
 
-  await Access.check({ group: 'global', name: 'banRoom' }, current, context);
+  await accessAPI.check({ group: 'global', name: 'banRoom' }, current, context);
 }
 
 export async function resolver(
@@ -30,5 +29,5 @@ export async function resolver(
   
   await access(currentUserId, userId);
 
-  return User.ban(userId);
+  return userAPI.ban(userId);
 }

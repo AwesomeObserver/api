@@ -1,6 +1,4 @@
-import { Access } from 'app/api/Access';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { RoomBan } from 'app/api/room/RoomBan';
+import { accessAPI, roomUserAPI, roomBanAPI } from 'app/api';
 
 export const schema = `
   banUserRoom(
@@ -16,11 +14,11 @@ async function access(
   roomId: number
 ) {
   const [current, context] = await Promise.all([
-    RoomUser.getOneFull(currentUserId, roomId),
-    RoomUser.getOneFull(userId, roomId)
+    roomUserAPI.getOneFull(currentUserId, roomId),
+    roomUserAPI.getOneFull(userId, roomId)
   ]);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'banUserRoom'
   }, current, context);
@@ -40,5 +38,5 @@ export async function resolver(
 
   await access(currentUserId, userId, roomId);
 
-  return RoomBan.ban(roomId, userId);
+  return roomBanAPI.ban(roomId, userId);
 }

@@ -1,15 +1,13 @@
-import { Access } from 'app/api/Access';
-import { Room } from 'app/api/room/Room';
-import { User } from 'app/api/user/User';
+import { accessAPI, roomAPI, userAPI } from 'app/api';
 
 export const schema = `
   unbanRoomByName(roomName: String!): Boolean
 `;
 
 async function access(userId: number) {
-  const current = await User.getById(userId);
+  const current = await userAPI.getById(userId);
 
-  await Access.check({ group: 'global', name: 'unbanRoom' }, current);
+  await accessAPI.check({ group: 'global', name: 'unbanRoom' }, current);
 }
 
 export async function resolver(
@@ -24,5 +22,5 @@ export async function resolver(
   
   await access(userId);
 
-  return Room.unbanByName(roomName);
+  return roomAPI.unbanByName(roomName);
 }

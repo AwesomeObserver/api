@@ -1,16 +1,13 @@
-import * as format from 'date-fns/format';
-import * as addSeconds from 'date-fns/add_seconds';
+import { format, addSeconds } from 'date-fns';
 import { getConnection } from "typeorm";
-import { Agenda } from 'core/db';
-import { PubSub } from 'core/pubsub';
+import { agenda } from 'core/db';
+import { pubSub } from 'core/pubsub';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
-import { User } from 'app/api/user/User';
-import { Source } from 'app/api/music/Source';
-import { RoomUserWaitlistQueue } from './RoomUserWaitlistQueue';
+import { userAPI, sourceAPI, roomModeWaitlistUserAPI } from 'app/api';
 
-class RoomWaitlistQueueClass {
+export class RoomModeWaitlistAPI {
 
   get repository() {
     return getConnection().getRepository(WaitlistQueueEntity);
@@ -31,8 +28,8 @@ class RoomWaitlistQueueClass {
   // Set User to Current Play
   async setPlay(roomId: number, userId: number) {
     const [sourceId, user] = await Promise.all([
-      RoomUserWaitlistQueue.cutFirst(roomId, userId),
-      User.getById(userId)
+      roomModeWaitlistUserAPI.cutFirst(roomId, userId),
+      userAPI.getById(userId)
     ]);
 
     if (!sourceId) {
@@ -47,14 +44,14 @@ class RoomWaitlistQueueClass {
       }
     }
 
-    const source = await Source.getById(sourceId);
+    const source = await sourceAPI.getById(sourceId);
 
     const duration = source.duration;
     const start = +new Date();
     const end = +new Date() + duration * 1000;
 
-    Agenda.create('waitlistPlayEnd', { roomId });
-    Agenda.schedule(addSeconds(new Date(), duration), 'waitlistPlayEnd', { roomId });
+    agenda.create('waitlistPlayEnd', { roomId });
+    agenda.schedule(addSeconds(new Date(), duration), 'waitlistPlayEnd', { roomId });
 
     // Save Current Play Data
     await this.repository.update({ roomId }, {
@@ -65,7 +62,7 @@ class RoomWaitlistQueueClass {
     });
     
     // Publish New Play Data in Room
-    PubSub.publish('waitlistPlayData', {
+    pubSub.publish('waitlistPlayData', {
       start,
       serverTime: +new Date(),
       source,
@@ -82,12 +79,12 @@ class RoomWaitlistQueueClass {
       end: null
     });
 
-    PubSub.publish('waitlistPlayData', null, { roomId });
+    pubSub.publish('waitlistPlayData', null, { roomId });
   }
 
   async cancelPlay(roomId: number) {
     return new Promise(resolve => {
-      Agenda.cancel({ name: 'waitlistPlayEnd', data: { roomId } }, resolve);
+      agenda.cancel({ name: 'waitlistPlayEnd', data: { roomId } }, resolve);
     });
   }
 
@@ -135,7 +132,7 @@ class RoomWaitlistQueueClass {
 
   // Add User to Queue
   async add(roomId: number, userId: number) {
-    const userQueue = await RoomUserWaitlistQueue.getWithCreate(roomId, userId);
+    const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
 
     if (userQueue.sources.length == 0) {
       console.log(`User ${userId} dont have sources`);
@@ -195,5 +192,3 @@ class RoomWaitlistQueueClass {
   }
 
 }
-
-export const RoomWaitlistQueue = new RoomWaitlistQueueClass();

@@ -1,11 +1,10 @@
-import * as isAfter from 'date-fns/is_after';
-
+import { isAfter } from 'date-fns';
 import { getConnection } from "typeorm";
-import { Redis } from 'core/db';
-import { User } from 'app/api/user/User';
+import { redis } from 'core/db';
+import { userAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
-export class RoomUserClass {
+export class RoomUserAPI {
 
   get repository() {
     return getConnection().getRepository(RoomUserEntity);
@@ -79,14 +78,14 @@ export class RoomUserClass {
     }
 
     return Promise.all([
-      User.getById(userId),
+      userAPI.getById(userId),
       this.getOne(userId, roomId)
     ]).then(([ site, room ]) => ({ site, room }));
   }
 
   async getOnline(roomId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const usersOnline = await Redis.hgetall(key);
+    const usersOnline = await redis.hgetall(key);
     
     const users = [];
   
@@ -100,5 +99,3 @@ export class RoomUserClass {
     return users;
   }
 }
-
-export const RoomUser = new RoomUserClass();

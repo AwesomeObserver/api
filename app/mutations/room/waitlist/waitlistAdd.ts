@@ -1,8 +1,4 @@
-import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
-import { Room } from 'app/api/room/Room';
-import { User } from 'app/api/user/User';
-import { RoomWaitlistQueue } from 'app/api/room/RoomWaitlistQueue';
+import { accessAPI, roomAPI, userAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   waitlistAdd(roomId: Int!, userId: Int): Boolean
@@ -31,5 +27,5 @@ export async function resolver(
     return null;
   }
 
-  return RoomWaitlistQueue.add(roomId, currentUserId);
+  return roomModeWaitlistAPI.add(roomId, currentUserId);
 }

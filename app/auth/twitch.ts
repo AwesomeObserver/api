@@ -1,7 +1,7 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-twitch';
 
-import { User } from 'app/api/user/User';
+import { userAPI } from 'app/api';
 
 const {
   TWITCH_CLIENT_ID,
@@ -19,7 +19,7 @@ export default function(router, authEnd) {
   }, (request, accessToken, refreshToken, profile, done) => {
     process.nextTick(async function() {
 
-      const user = await User.getOrCreate({
+      const user = await userAPI.getOrCreate({
         twitchId: profile.id
       }, {
         name: profile.displayName,

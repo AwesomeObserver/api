@@ -11,7 +11,7 @@ import rolesWeight from 'app/access/weight';
 
 const isBoolean = (val) => typeof val === 'boolean';
 
-export class AccessClass {
+export class AccessAPI {
 
   actionMask = {
     // Нужна ли инфа о пользователе в контексте
@@ -157,6 +157,4 @@ export class AccessClass {
 
     return true;
   }
-} 
-
-export const Access = new AccessClass();
+}

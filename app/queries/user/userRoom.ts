@@ -1,5 +1,4 @@
-import { Connection } from 'app/api/connection/Connection';
-import { RoomUser } from 'app/api/room/RoomUser';
+import { roomUserAPI } from 'app/api';
 
 export const schema = `
   userRoom(roomId: Int!, userId: Int): UserRoom
@@ -19,5 +18,5 @@ export async function resolver(
     userId = ctx.userId;
   }
   
-  return await RoomUser.getOne(userId, args.roomId);
+  return await roomUserAPI.getOne(userId, args.roomId);
 }

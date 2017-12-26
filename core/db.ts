@@ -1,5 +1,5 @@
-import * as agenda from 'agenda';
-import * as ioRedis from 'ioredis';
+import * as Agenda from 'agenda';
+import * as IoRedis from 'ioredis';
 import { createConnection } from "typeorm";
 
 const {
@@ -9,9 +9,8 @@ const {
   MONGO_URL
 } = process.env;
 
-export const Redis = new ioRedis(REDIS_URL);
-
-export const Agenda = new agenda({ db: { address: MONGO_URL } });  
+export const redis = new IoRedis(REDIS_URL);
+export const agenda = new Agenda({ db: { address: MONGO_URL } });  
 
 export async function setupDB () {
   return createConnection({
