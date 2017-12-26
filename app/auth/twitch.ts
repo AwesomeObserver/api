@@ -1,7 +1,7 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-twitch';
 
-import { UserSocial } from 'app/api/user/UserSocial';
+import { User } from 'app/api/user/User';
 
 const {
   TWITCH_CLIENT_ID,
@@ -19,17 +19,15 @@ export default function(router, authEnd) {
   }, (request, accessToken, refreshToken, profile, done) => {
     process.nextTick(async function() {
 
-      let user = await UserSocial.getByTwitchId(profile.id)
-      
-      if (!user) {
-        user = await UserSocial.createFromTwitch({
-          name: profile.displayName,
-          twitchId: profile.id,
-          email: profile._json.email,
-          avatar: profile._json.logo,
-          role: profile.id === 52703474 ? 'founder' : 'user'
-        });
-      }
+      const user = await User.getOrCreate({
+        twitchId: profile.id
+      }, {
+        name: profile.displayName,
+        twitchId: profile.id,
+        email: profile._json.email,
+        avatar: profile._json.logo,
+        role: profile.id === 52703474 ? 'founder' : 'user'
+      });
 
       done(null, { userId: user.id });
     });

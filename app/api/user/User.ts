@@ -22,6 +22,16 @@ export class UserClass {
     return getConnection().manager.save(user);
   }
 
+  async getOrCreate(where, data) {
+    let user = await this.getOne(where);
+
+    if (!user) {
+      user = await this.create(data);
+    }
+
+    return user;
+  }
+
   async ban(userId: number) {
 
   }
