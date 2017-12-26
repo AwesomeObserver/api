@@ -1,6 +1,4 @@
-import { Connection } from 'app/api/connection/Connection';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { Room } from 'app/api/room/Room';
+import { roomAPI, roomUserAPI } from 'app/api';
 
 export const schema = `
   getRoomByName(roomName: String!): Room
@@ -13,7 +11,7 @@ export async function resolver(
   },
   ctx: any
 ) {
-  const room = await Room.getByName(args.roomName);
+  const room = await roomAPI.getByName(args.roomName);
 
   if (!room) {
     throw new Error('NotFound');
@@ -23,7 +21,7 @@ export async function resolver(
     throw new Error('RoomBanned');
   }
 
-  const user = await RoomUser.getOneFull(ctx.userId, room.id);
+  const user = await roomUserAPI.getOneFull(ctx.userId, room.id);
 
   if (!user) {
     return room;

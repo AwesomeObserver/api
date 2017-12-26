@@ -1,19 +1,16 @@
-import * as format from 'date-fns/format';
-
+import { format } from 'date-fns';
 import { getConnection } from "typeorm";
-import { PubSub } from 'core/pubsub';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
+import { pubSub } from 'core/pubsub';
+import { roomUserAPI } from 'app/api';
 
-export class RoomBanClass {
+export class RoomBanAPI {
 
   async getCount(roomId: number) {
-    return RoomUser.count({ roomId, banned: true });
+    return roomUserAPI.count({ roomId, banned: true });
   }
 
   async getUsers(roomId: number) {
-    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
-    const data = await roomUserRepository
+    const data = await roomUserAPI.repository
       .createQueryBuilder("roomUser")
       .where("roomUser.roomId = :roomId", { roomId })
       .andWhere("roomUser.banned = :banned", { banned: true })
@@ -24,12 +21,12 @@ export class RoomBanClass {
   }
 
   async ban(roomId: number, userId: number) {
-    const data = await RoomUser.getPure(userId, roomId);
+    const data = await roomUserAPI.getPure(userId, roomId);
 
     if (data) {
       if (data.banned) return true;
 
-      const res = await RoomUser.update(data.id, {
+      const res = await roomUserAPI.update(data.id, {
         banned: true,
         banDate: format(+new Date())
       });
@@ -42,7 +39,7 @@ export class RoomBanClass {
       return res;
     }
 
-    const res = await RoomUser.create({
+    const res = await roomUserAPI.create({
       roomId,
       userId,
       banned: true,
@@ -58,15 +55,13 @@ export class RoomBanClass {
   }
 
   async unban(roomId: number, userId: number) {
-    const data = await RoomUser.getPure(userId, roomId);
+    const data = await roomUserAPI.getPure(userId, roomId);
 
     if (!data.banned) return true;
 
-    return RoomUser.update(data.id, {
+    return roomUserAPI.update(data.id, {
       banned: false
     });
   }
 
 }
-
-export const RoomBan = new RoomBanClass();

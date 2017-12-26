@@ -1,20 +1,25 @@
-import * as isAfter from 'date-fns/is_after';
-
+import { isAfter } from 'date-fns';
 import { getConnection } from "typeorm";
-import { Redis } from 'core/db';
-import { User } from 'app/api/user/User';
+import { redis } from 'core/db';
+import { userAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
-export class RoomUserClass {
+export class RoomUserAPI {
+
+  get repository() {
+    return getConnection().getRepository(RoomUserEntity);
+  }
+
+  get manager() {
+    return getConnection().manager;
+  }
 
   async count(options: Object) {
-    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
-    return roomUserRepository.count(options);
+    return this.repository.count(options);
   }
 
   async get(options: Object) {
-    let roomUserRepository = getConnection().getRepository(RoomUserEntity);
-    return roomUserRepository.find(options);
+    return this.repository.find(options);
   }
 
   async create(data) {
@@ -24,13 +29,11 @@ export class RoomUserClass {
       roomUser[name] = data[name];
     }
 
-    return getConnection().manager.save(roomUser);
+    return this.manager.save(roomUser);
   }
 
   async update(id, data) {
-    const roomUserRepository = getConnection().getRepository(RoomUserEntity);
-
-    return roomUserRepository.updateById(id, data);
+    return this.repository.updateById(id, data);
   }
 
   getDefaultRoomUser(userId: number, roomId: number) {
@@ -53,13 +56,14 @@ export class RoomUserClass {
   }
 
   async getPure(userId: number, roomId: number) {
-    let userRepository = getConnection().getRepository(RoomUserEntity);
-    return userRepository.findOne({ userId, roomId });
+    return this.repository.findOne({ userId, roomId });
   }
 
   async getOne(userId: number, roomId: number) {
-    let userRepository = getConnection().getRepository(RoomUserEntity);
-    let data = await userRepository.findOne({ userId, roomId });
+    let data = await this.repository.findOne({
+      where: { userId, roomId },
+      cache: true
+    });
 
     if (!data) {
       return this.getDefaultRoomUser(userId, roomId);
@@ -74,14 +78,14 @@ export class RoomUserClass {
     }
 
     return Promise.all([
-      User.getById(userId),
+      userAPI.getById(userId),
       this.getOne(userId, roomId)
     ]).then(([ site, room ]) => ({ site, room }));
   }
 
   async getOnline(roomId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const usersOnline = await Redis.hgetall(key);
+    const usersOnline = await redis.hgetall(key);
     
     const users = [];
   
@@ -95,5 +99,3 @@ export class RoomUserClass {
     return users;
   }
 }
-
-export const RoomUser = new RoomUserClass();

@@ -1,6 +1,4 @@
-import { Access } from 'app/api/Access';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { RoomRole } from 'app/api/room/RoomRole';
+import { accessAPI, roomUserAPI, roomRoleAPI } from 'app/api';
 
 export const schema = `
   setRoleUserRoom(
@@ -17,28 +15,28 @@ async function access(
   role: string
 ) {
   const [current, context] = await Promise.all([
-    RoomUser.getOneFull(currentUserId, roomId),
-    RoomUser.getOneFull(userId, roomId)
+    roomUserAPI.getOneFull(currentUserId, roomId),
+    roomUserAPI.getOneFull(userId, roomId)
   ]);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'setRoleRoom'
   }, current, context);
 
   switch (role) {
     case 'manager':
-      return Access.check({
+      return accessAPI.check({
         group: 'room',
         name: 'setRoleRoomManager'
       }, current, context);
     case 'mod':
-      return Access.check({
+      return accessAPI.check({
         group: 'room',
         name: 'setRoleRoomMod'
       }, current, context);
     case 'user':
-      return Access.check({
+      return accessAPI.check({
         group: 'room',
         name: 'setRoleRoomUser'
       }, current, context);
@@ -61,7 +59,7 @@ export async function resolver(
 
   await access(currentUserId, userId, roomId, role);
 
-  return RoomRole.set({
+  return roomRoleAPI.set({
     roomId,
     userId,
     role,

@@ -1,7 +1,7 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-google-oauth2';
 
-import { UserSocial } from 'app/api/user/UserSocial';
+import { userAPI } from 'app/api';
 
 const {
   GOOGLE_CLIENT_ID,
@@ -19,16 +19,14 @@ export default function(router, authEnd) {
   }, (request, accessToken, refreshToken, profile, done) => {
     process.nextTick(async function() {
 
-      let user = await UserSocial.getByGoogleId(profile._json.id)
-
-      if (!user) {
-        user = await UserSocial.createFromGoogle({
-          name: profile.displayName,
-          googleId: profile.id,
-          email: profile.email,
-          avatar: profile._json.image.url
-        });
-      }
+      const user = await userAPI.getOrCreate({
+        googleId: profile._json.id
+      }, {
+        name: profile.displayName,
+        googleId: profile.id,
+        email: profile.email,
+        avatar: profile._json.image.url
+      });
       
       done(null, { userId: user.id });
     });

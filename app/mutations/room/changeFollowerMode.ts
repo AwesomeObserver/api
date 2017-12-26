@@ -1,7 +1,4 @@
-import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { Room } from 'app/api/room/Room';
+import { accessAPI, roomAPI, roomUserAPI } from 'app/api';
 
 export const schema = `
   changeFollowerMode(
@@ -11,9 +8,9 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await RoomUser.getOneFull(userId, roomId);
+  const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'changeFollowerMode'
   }, current);
@@ -32,5 +29,5 @@ export async function resolver(
 
   await access(userId, roomId);
 
-  return Room.setFollowerMode(roomId, isActive);
+  return roomAPI.setFollowerMode(roomId, isActive);
 }

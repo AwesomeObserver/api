@@ -1,7 +1,4 @@
-import { Access } from 'app/api/Access';
-import { Connection } from 'app/api/connection/Connection';
-import { RoomUser } from 'app/api/room/RoomUser';
-import { RoomBan } from 'app/api/room/RoomBan';
+import { accessAPI, roomUserAPI, roomBanAPI } from 'app/api';
 
 export const schema = `
   unbanUserRoom(
@@ -11,9 +8,9 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await RoomUser.getOneFull(userId, roomId);
+  const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  await Access.check({
+  await accessAPI.check({
     group: 'room',
     name: 'unbanUserRoom'
   }, current);
@@ -28,9 +25,9 @@ export async function resolver(
   ctx: any
 ) {
   const { userId, roomId } = args;
-  const contextUserId = await Connection.getUserId(ctx.connectionId);
+  const contextUserId = ctx.userId;
 
   await access(contextUserId, roomId);
 
-  return RoomBan.unban(roomId, userId);
+  return roomBanAPI.unban(roomId, userId);
 }

@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn, 
   Column,
   OneToOne,
+  ManyToOne,
   JoinColumn
 } from "typeorm";
 import { User } from "./User";
@@ -16,15 +17,13 @@ export class RoomUser {
   @Column({ type: 'integer' })
   userId: number;
 
-  @OneToOne(type => User)
-  @JoinColumn()
+  @ManyToOne(type => User, user => user.userRooms, { cascadeAll: true })
   user: User;
 
   @Column({ type: 'integer' })
   roomId: number;
 
-  @OneToOne(type => Room)
-  @JoinColumn()
+  @ManyToOne(type => Room, room => room.users, { cascadeAll: true })
   room: Room;
 
   @Column({ type: 'boolean', default: false })

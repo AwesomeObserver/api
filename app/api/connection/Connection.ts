@@ -1,9 +1,9 @@
 import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 
-import { Redis } from 'core/db';
-import { PubSub } from 'core/pubsub';
-import { ConnectionEvents } from './ConnectionEvents';
+import { redis } from 'core/db';
+import { pubSub } from 'core/pubsub';
+import { connectionEventsAPI } from 'app/api';
 
 const {
   TOKEN_SECRET,
@@ -21,7 +21,7 @@ function transformerArray(array) {
   return obj;
 }
 
-export class ConnectionClass {
+export class ConnectionAPI {
 
   genToken(userId: number): string {
     return jwt.sign(`${userId}`, TOKEN_SECRET);
@@ -41,26 +41,26 @@ export class ConnectionClass {
     const connectionId = jwt.verify(connectionKey, AUTH_KEY_SECRET);
     const token = this.genToken(userId);
     
-    PubSub.publish('token', token, { connectionId });
+    pubSub.publish('token', token, { connectionId });
   }
 
   onConnect(connectionParams, webSocket) {
     const connectionId = crypto.randomBytes(20).toString('hex');
     webSocket['connectionId'] = connectionId;
 
-    ConnectionEvents.onJoin(connectionId);
+    connectionEventsAPI.onJoin(connectionId);
 
     return { connectionId };
   }
 
   onDisconnect(webSocket) {
-    ConnectionEvents.onLeave(webSocket.connectionId);
+    connectionEventsAPI.onLeave(webSocket.connectionId);
   }
 
   async save(connectionId: string) {
     const key = `connections:${connectionId}`;
   
-    return Redis.multi()
+    return redis.multi()
       .hset(key, 'userId', null)
       .hset(key, 'roomId', null)
       .exec();
@@ -68,7 +68,7 @@ export class ConnectionClass {
 
   async getOne(connectionId: string) {
     const key = `connections:${connectionId}`;
-    const connection = await Redis.hgetall(key);
+    const connection = await redis.hgetall(key);
   
     if (!Object.keys(connection).length) {
       return null;
@@ -83,15 +83,15 @@ export class ConnectionClass {
   }
 
   async get(connectionIds: string[]) {
-    Redis.multi({ pipeline: false });
+    redis.multi({ pipeline: false });
   
     for (let connectionId of connectionIds) {
-      Redis.hgetall(`connections:${connectionId}`);
+      redis.hgetall(`connections:${connectionId}`);
     }
   
     let connectionsWithData = [];
   
-    let connectionsData = await Redis.exec();
+    let connectionsData = await redis.exec();
   
     for (let i = 0; i < connectionIds.length; i++) {
       connectionsWithData.push({
@@ -104,17 +104,17 @@ export class ConnectionClass {
   }
 
   async del(connectionId: string) {
-    return Redis.del(`connections:${connectionId}`);
+    return redis.del(`connections:${connectionId}`);
   }
 
   async setRoomId(connectionId: string, roomId?: number) {
     const key = `connections:${connectionId}`;
-    return Redis.hset(key, 'roomId', roomId);
+    return redis.hset(key, 'roomId', roomId);
   }
 
   async setUserId(connectionId: string, userId?: number) {
     const key = `connections:${connectionId}`;
-    return Redis.hset(key, 'userId', userId);
+    return redis.hset(key, 'userId', userId);
   }
 
   async getUserId(connectionId: string): Promise<number|null> {
@@ -124,19 +124,17 @@ export class ConnectionClass {
 
   async getCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    const count = await Redis.hget(key, `${userId}`);
+    const count = await redis.hget(key, `${userId}`);
     return parseInt(count, 10) || 0;
   }
 
   async incCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return Redis.hincrby(key, `${userId}`, 1);
+    return redis.hincrby(key, `${userId}`, 1);
   }
 
   async decCCountUserRoom(roomId: number, userId: number) {
     const key = `rooms:${roomId}:users:connections`;
-    return Redis.hincrby(key, `${userId}`, -1);
+    return redis.hincrby(key, `${userId}`, -1);
   }
 }
-
-export const Connection = new ConnectionClass();

@@ -1,11 +1,10 @@
-import { PubSub } from 'core/pubsub';
-import { Connection } from '../connection/Connection';
-import { RoomConnection } from './RoomConnection';
+import { pubSub } from 'core/pubsub';
+import { connectionAPI, roomConnectionAPI } from 'app/api';
 
-export class RoomEventsClass {
+export class RoomEventsAPI {
 
   async onJoin(roomId: number, connectionId: string) {
-    const connection = await Connection.getOne(connectionId);
+    const connection = await connectionAPI.getOne(connectionId);
   
     if (!connection) {
       throw new Error('Connection not found');
@@ -13,13 +12,13 @@ export class RoomEventsClass {
   
     const { userId } = connection;
 
-    const isNotExist = await RoomConnection.set(roomId, connectionId);
+    const isNotExist = await roomConnectionAPI.set(roomId, connectionId);
 
     if (!isNotExist) {
       return false;
     }
   
-    await Connection.setRoomId(connectionId, roomId);
+    await connectionAPI.setRoomId(connectionId, roomId);
   
     if (userId) {
       return this.onUserJoin(roomId, connectionId, userId);
@@ -29,13 +28,13 @@ export class RoomEventsClass {
   }
 
   async onGuestJoin(roomId: number, connectionId: string) {
-    return RoomConnection.incGuestsCount(roomId);
+    return roomConnectionAPI.incGuestsCount(roomId);
   }
 
   async onUserJoin(roomId: number, connectionId: string, userId: number) {
-    const cCount = await Connection.getCCountUserRoom(roomId, userId);
+    const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
   
-    await Connection.incCCountUserRoom(roomId, userId);
+    await connectionAPI.incCCountUserRoom(roomId, userId);
   
     if (cCount > 0) {
       return this.onUserJoinAgain(roomId, connectionId, userId);
@@ -49,11 +48,11 @@ export class RoomEventsClass {
   }
 
   async onUserJoinFirst(roomId: number, connectionId: string, userId: number) {
-    return RoomConnection.incUsersCount(roomId);
+    return roomConnectionAPI.incUsersCount(roomId);
   }
 
   async onLeave(roomId: number, connectionId: string) {
-    const connection = await Connection.getOne(connectionId);
+    const connection = await connectionAPI.getOne(connectionId);
   
     if (!connection) {
       throw new Error('Connection not found');
@@ -61,13 +60,13 @@ export class RoomEventsClass {
 
     const { userId } = connection;
   
-    const isNotExist = await RoomConnection.del(roomId, connectionId);
+    const isNotExist = await roomConnectionAPI.del(roomId, connectionId);
     
     if (!isNotExist) {
       return false;
     }
   
-    await Connection.setRoomId(connectionId, null);
+    await connectionAPI.setRoomId(connectionId, null);
   
     if (userId) {
       return this.onUserLeave(roomId, connectionId, userId);
@@ -77,13 +76,13 @@ export class RoomEventsClass {
   }
 
   async onGuestLeave(roomId: number, connectionId: string) {
-    return RoomConnection.decGuestsCount(roomId);
+    return roomConnectionAPI.decGuestsCount(roomId);
   }
 
   async onUserLeave(roomId: number, connectionId: string, userId: number) {
-    const cCount = await Connection.getCCountUserRoom(roomId, userId);
+    const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
   
-    await Connection.decCCountUserRoom(roomId, userId);
+    await connectionAPI.decCCountUserRoom(roomId, userId);
   
     if (cCount > 1) {
       return this.onUserLeaveSome(roomId, connectionId, userId);
@@ -97,7 +96,7 @@ export class RoomEventsClass {
   }
 
   async onUserLeaveLast(roomId: number, connectionId: string, userId: number) {
-    RoomConnection.decUsersCount(roomId);
+    roomConnectionAPI.decUsersCount(roomId);
   }
 
   async onLogin(roomId: number, connectionId: string, userId: number) {
@@ -111,7 +110,7 @@ export class RoomEventsClass {
   }
 
   async onConnectionsCountChanged(roomId: number) {
-    const counts = await RoomConnection.getCount(roomId);
+    const counts = await roomConnectionAPI.getCount(roomId);
     
     const payload = {
       connectionsCountChanged: counts,
@@ -121,5 +120,3 @@ export class RoomEventsClass {
     // PubSub.publish('connectionsCountChanged', payload);
   }
 }
-
-export const RoomEvents = new RoomEventsClass();

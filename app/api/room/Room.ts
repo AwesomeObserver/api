@@ -1,18 +1,36 @@
-import * as format from 'date-fns/format';
-
+import { format } from 'date-fns';
 import { getConnection } from "typeorm";
-import { PubSub } from 'core/pubsub';
-import { RoomConnection } from './RoomConnection';
-import { RoomFollower } from './RoomFollower';
-import { RoomRole } from './RoomRole';
 import { Room as RoomEntity } from 'app/entity/Room';
+import { pubSub } from 'core/pubsub';
+import {
+  roomConnectionAPI,
+  roomFollowerAPI,
+  roomRoleAPI,
+  roomModeWaitlistAPI
+} from 'app/api';
 
-export class RoomClass {
+import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
+import {
+  RoomWaitlistQueue as WaitlistQueueEntity
+} from 'app/entity/RoomWaitlistQueue';
+import {
+  RoomUserWaitlistQueue as UserWaitlistQueueEntity
+} from 'app/entity/RoomUserWaitlistQueue';
+
+export class RoomAPI {
+
+  get repository() {
+    return getConnection().getRepository(RoomEntity);
+  }
+
+  get manager() {
+    return getConnection().manager;
+  }
 
   async withData(room) {
     const [counts, followersCount] = await Promise.all([
-      RoomConnection.getCount(room.id),
-      RoomFollower.getCount(room.id)
+      roomConnectionAPI.getCount(room.id),
+      roomFollowerAPI.getCount(room.id)
     ]);
 
     const defaultAvatar = 'https://pp.userapi.com/c626221/v626221510/7026b/zKYk5tlr530.jpg';
@@ -36,13 +54,11 @@ export class RoomClass {
   }
 
   async getOnePure(where) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
-    return roomRepository.findOne(where);
+    return this.repository.findOne({ where, cache: true });
   }
 
   async get() {
-    const roomRepository = getConnection().getRepository(RoomEntity);
-    const rooms = await roomRepository.find();
+    const rooms = await this.repository.find();
 
     return rooms.map(room => this.withData(room));
   }
@@ -58,27 +74,53 @@ export class RoomClass {
       room[name] = data[name];
     }
 
-    const roomData = await getConnection().manager.save(room);
+    const roomData = await this.manager.save(room);
 
-    await RoomRole.set({
-      roomId: roomData.id,
-      userId,
-      role: 'owner',
-      whoSetRoleId: null
-    });
+    await Promise.all([
+      roomRoleAPI.set({
+        roomId: roomData.id,
+        userId,
+        role: 'owner',
+        whoSetRoleId: null
+      }),
+      roomModeWaitlistAPI.create(roomData.id)
+    ]);
 
     return roomData;
   }
 
   async remove(roomId) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
-    return roomRepository.removeById(roomId);
+    // Cascade fix
+    await Promise.all([
+      // RoomUser
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(RoomUserEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute(),
+      // RoomWaitlistQueue
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(WaitlistQueueEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute(),
+      // UserWaitlistQueue
+      getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(UserWaitlistQueueEntity)
+      .where("roomId = :roomId", { roomId })
+      .execute()
+    ]);
+
+    return this.repository.removeById(roomId);
   }
 
   async ban(roomId, data) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
     
-    await roomRepository.updateById(roomId, {
+    await this.repository.updateById(roomId, {
       banned: true,
       banDate: format(+new Date()),
       whoSetBanId: data.whoSetBanId,
@@ -89,9 +131,8 @@ export class RoomClass {
   }
 
   async unbanByName(roomName) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
     
-    await roomRepository.update({ name: roomName }, {
+    await this.repository.update({ name: roomName }, {
       banned: false,
       banDate: null,
       whoSetBanId: null,
@@ -102,9 +143,8 @@ export class RoomClass {
   }
 
   async setSlowMode(roomId: number, isActive: boolean) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
     
-    await roomRepository.updateById(roomId, {
+    await this.repository.updateById(roomId, {
       slowMode: isActive
     });
 
@@ -119,9 +159,8 @@ export class RoomClass {
   }
 
   async setFollowerMode(roomId: number, isActive: boolean) {
-    const roomRepository = getConnection().getRepository(RoomEntity);
     
-    await roomRepository.updateById(roomId, {
+    await this.repository.updateById(roomId, {
       followerMode: isActive
     });
 
@@ -135,5 +174,3 @@ export class RoomClass {
     return true;
   }
 }
-
-export const Room = new RoomClass();

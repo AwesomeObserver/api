@@ -7,7 +7,7 @@ import { schema } from './gql';
 import { setupAuth } from './auth';
 import { setupDB } from './db';
 import { wsAPI } from './wsapi';
-import { Connection } from 'app/api/connection/Connection';
+import { connectionAPI } from 'app/api';
 
 export class RPServer {
 
@@ -31,7 +31,7 @@ export class RPServer {
       let userId = null;
 
       if (token) {
-        userId = Connection.checkToken(token);
+        userId = connectionAPI.checkToken(token);
       }
 
       return {

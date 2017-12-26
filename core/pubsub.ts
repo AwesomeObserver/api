@@ -22,7 +22,7 @@ export function objFilter(dataObj: Object, filterObj?: Object): boolean {
   return pass;
 }
 
-class PS {
+class PubSub {
 
   public publish(eventName, payload, filterData) {
     // console.log({ eventName, payload, filterData });
@@ -31,4 +31,4 @@ class PS {
 
 }
 
-export const PubSub = new PS();
+export const pubSub = new PubSub();

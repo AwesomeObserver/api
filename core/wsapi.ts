@@ -19,11 +19,7 @@ export class WSAPI {
       roomId: null
     };
 
-    console.log('Connection open');
     socket.on('message', (data) => this.onMessage(socket, data));
-    // socket.on('pong', function() {
-    //   socket.isAlive = true;
-    // });
     socket.on('close', (...args) => this.onClose(socket, ...args));
   }
 
@@ -32,12 +28,7 @@ export class WSAPI {
 
     if (actions[type]) {
       actions[type](data, socket.cdata).catch((data) => {
-        // console.log(data);
       });
-    }
-
-    if (type) {
-      // console.log(socket.cdata.connectionId, { type, data });
     }
   }
 

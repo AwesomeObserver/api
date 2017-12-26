@@ -1,7 +1,7 @@
 import { getConnection } from "typeorm";
 import { User as UserEntity } from 'app/entity/User';
 
-export class UserClass {
+export class UserAPI {
 
   async getById(userId: number) {
     return this.getOne({ id: userId });
@@ -9,7 +9,7 @@ export class UserClass {
 
   async getOne(where) {
     let userRepository = getConnection().getRepository(UserEntity);
-    return userRepository.findOne(where);
+    return userRepository.findOne({ where, cache: true });
   }
 
   async create(userData) {
@@ -20,6 +20,16 @@ export class UserClass {
     }
 
     return getConnection().manager.save(user);
+  }
+
+  async getOrCreate(where, data) {
+    let user = await this.getOne(where);
+
+    if (!user) {
+      user = await this.create(data);
+    }
+
+    return user;
   }
 
   async ban(userId: number) {
@@ -34,5 +44,3 @@ export class UserClass {
     
   }
 }
-
-export const User = new UserClass();

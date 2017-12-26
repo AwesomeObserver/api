@@ -1,7 +1,7 @@
 import * as passport from 'koa-passport';
 import { Strategy } from 'passport-vkontakte';
 
-import { UserSocial } from 'app/api/user/UserSocial';
+import { userAPI } from 'app/api';
 
 const {
   VK_CLIENT_ID,
@@ -18,15 +18,13 @@ export default function(router, authEnd) {
   }, (request, accessToken, refreshToken, profile, done) => {
     process.nextTick(async function() {
       
-      let user = await UserSocial.getByVKId(profile.id);
-
-      if (!user) {
-        user = await UserSocial.createFromVK({
-          name: profile.displayName,
-          vkId: profile.id,
-          avatar: profile._json.photo
-        });
-      }
+      const user = await userAPI.getOrCreate({
+        vkId: profile.id 
+      }, {
+        name: profile.displayName,
+        vkId: profile.id,
+        avatar: profile._json.photo
+      });
       
       done(null, { userId: user.id });
     });

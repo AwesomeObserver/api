@@ -2,7 +2,7 @@ export * from './chat';
 
 import * as jwt from 'jsonwebtoken';
 import { PubSub } from 'core/pubsub';
-import { Connection } from 'app/api/connection/Connection';
+import { connectionAPI } from 'app/api';
 const { AUTH_KEY_SECRET } = process.env;
 
 export async function auth(service: string, cdata) {
@@ -12,7 +12,7 @@ export async function auth(service: string, cdata) {
 }
 
 export async function login(token: string, cdata) {
-  const userId = Connection.checkToken(token);
+  const userId = connectionAPI.checkToken(token);
   console.log('login', userId);
   cdata.userId = userId;
 }

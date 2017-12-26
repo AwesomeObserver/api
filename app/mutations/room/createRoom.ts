@@ -1,6 +1,4 @@
-import { Access } from 'app/api/Access';
-import { Room } from 'app/api/room/Room';
-import { User } from 'app/api/user/User';
+import { accessAPI, roomAPI, userAPI } from 'app/api';
 
 export const schema = `
   createRoom(
@@ -10,9 +8,9 @@ export const schema = `
 `;
 
 async function access(userId: number) {
-  const current = await User.getById(userId);
+  const current = await userAPI.getById(userId);
   
-  await Access.check({ group: 'global', name: 'createRoom' }, current);
+  await accessAPI.check({ group: 'global', name: 'createRoom' }, current);
 }
 
 export async function resolver(
@@ -28,5 +26,5 @@ export async function resolver(
   
   await access(userId);
 
-  return Room.create({ name, title }, userId);
+  return roomAPI.create({ name, title }, userId);
 }

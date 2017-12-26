@@ -46,7 +46,6 @@ export const room = {
   sendMessage: {},
   replyMessage: {},
   removeMessage: {
-    context: true,
     self: true
   },
   sendMessageSlowModeIgnore: {},

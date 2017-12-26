@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn, 
+  Column,
+  OneToMany,
+  JoinColumn
+} from "typeorm";
+import { RoomUser } from "./RoomUser";
 
 @Entity()
 export class Room {
@@ -31,4 +38,7 @@ export class Room {
 
   @Column({ type: 'boolean', default: false })
   slowMode: boolean;
+
+  @OneToMany(type => RoomUser, roomUser => roomUser.room)
+  users: RoomUser[];
 }
