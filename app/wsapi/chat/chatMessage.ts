@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
-import { PubSub } from 'core/pubsub';
+import { pubSub } from 'core/pubsub';
 import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
 
 const { CHAT_SECRET } = process.env;
@@ -87,5 +87,5 @@ export async function chatMessage(message: string, cdata) {
 
   const messageData = [messageId, userData, message];
 
-  PubSub.publish('chatMessage', messageData, { roomId });
+  pubSub.publish('chatMessage', messageData, { roomId });
 }
