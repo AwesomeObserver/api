@@ -77,8 +77,7 @@ export async function chatMessage(message: string, cdata) {
     [
       user.site.id,
       user.site.name,
-      user.site.role,
-      user.site.avatar
+      user.site.role
     ],
     [
       user.room.role
