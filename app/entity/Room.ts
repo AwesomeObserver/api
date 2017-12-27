@@ -12,10 +12,10 @@ export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar', unique: true, length: 32 })
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 48 })
   title: string;
 
   @Column({ type: 'varchar', nullable: true })
