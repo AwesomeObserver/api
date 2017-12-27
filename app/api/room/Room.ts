@@ -70,10 +70,10 @@ export class RoomAPI {
   async create(name: string, title: string, userId: number) {
     let room = new RoomEntity();
 
-    name = name.trim();
+    name = name.trim().toLowerCase();
     title = title.trim();
 
-    if (!name.match(/^[a-zA-Z0-9_]+$/)) {
+    if (!name.match(/^[a-z0-9_]+$/)) {
       throw new Error('Invalid name');
     }
     
