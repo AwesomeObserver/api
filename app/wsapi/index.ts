@@ -1,14 +1,14 @@
 export * from './chat';
 
 import * as jwt from 'jsonwebtoken';
-import { PubSub } from 'core/pubsub';
+import { pubSub } from 'core/pubsub';
 import { connectionAPI } from 'app/api';
 const { AUTH_KEY_SECRET } = process.env;
 
 export async function auth(service: string, cdata) {
   const { connectionId } = cdata;
   const atoken:string = jwt.sign(connectionId, AUTH_KEY_SECRET);
-  return PubSub.publish('atoken', [service, atoken], { connectionId });
+  return pubSub.publish('atoken', [service, atoken], { connectionId });
 }
 
 export async function login(token: string, cdata) {
