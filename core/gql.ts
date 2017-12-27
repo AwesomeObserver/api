@@ -1,54 +1,34 @@
-import { getFolderData } from './utils';
 import { makeExecutableSchema } from 'graphql-tools';
-
-const typeDefs = [];
-let isQueries = false;
-let isMutations = false;
-const queriesResolvers = {};
-const mutationsResolvers = {};
+import { getFolderData } from './utils';
 
 const gqlDir = __dirname + '/../app/';
+const typeDefs = [];
+const resolvers = {};
 
-// Types
-{
-  const data = getFolderData(`${gqlDir}types/`);
+const typesData = getFolderData(`${gqlDir}types/`);
+Object.keys(typesData).forEach(name => typeDefs.push(typesData[name].type));
 
-  for (const name of Object.keys(data)) {
-    typeDefs.push(data[name].type);
+function makeSType(tname, path) {
+  const data = getFolderData(path);
+  const tschema = [];
+  const tresolvers = {};
+
+  Object.keys(data).forEach(name => {
+    tschema.push(data[name].schema);
+    tresolvers[name] = data[name].resolver;
+  });
+
+  if (tschema.length > 0) {
+    typeDefs.push(`type ${tname} { ${tschema.join(' ')} }`);
+    resolvers[tname] = tresolvers;
   }
 }
 
-// Queries
-{
-  const data = getFolderData(`${gqlDir}queries/`);
-  const schema = [];
+makeSType('Query', `${gqlDir}queries/`);
+makeSType('Mutation', `${gqlDir}mutations/`);
 
-  for (const name of Object.keys(data)) {
-    schema.push(data[name].schema);
-    queriesResolvers[name] = data[name].resolver;
-  }
-
-  if (schema.length > 0) {
-    isQueries = true;
-    typeDefs.push(`type Query { ${schema.join(' ')} }`);
-  }
-}
-
-// Mutations
-{
-  const data = getFolderData(`${gqlDir}mutations/`);
-  const schema = [];
-
-  for (const name of Object.keys(data)) {
-    schema.push(data[name].schema);
-    mutationsResolvers[name] = data[name].resolver;
-  }
-
-  if (schema.length > 0) {
-    isMutations = true;
-    typeDefs.push(`type Mutation { ${schema.join(' ')} }`);
-  }
-}
+const isQueries = Object.keys(resolvers['Query']).length > 0;
+const isMutations = Object.keys(resolvers['Mutation']).length > 0;
 
 if (!isQueries && !isMutations) {
   throw new Error('Must be queries or mutations in schema');
@@ -60,15 +40,5 @@ typeDefs.push(`
     ${isMutations ? 'mutation: Mutation': ''}
   }
 `);
-
-let resolvers = {};
-
-if (isQueries) {
-  resolvers['Query'] = queriesResolvers;
-}
-
-if (isMutations) {
-  resolvers['Mutation'] = mutationsResolvers;
-}
 
 export const schema = makeExecutableSchema({ typeDefs, resolvers });
