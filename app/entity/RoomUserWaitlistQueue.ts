@@ -13,14 +13,14 @@ export class RoomUserWaitlistQueue {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer', unique: true })
+  @Column({ type: 'integer' })
   userId: number;
 
   @OneToOne(type => User)
   @JoinColumn()
   user: User;
 
-  @Column({ type: 'integer', unique: true })
+  @Column({ type: 'integer' })
   roomId: number;
 
   @OneToOne(type => Room)
