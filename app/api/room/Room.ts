@@ -67,12 +67,18 @@ export class RoomAPI {
     return this.getOne({ name });
   }
 
-  async create(data, userId) {
+  async create(name: string, title: string, userId: number) {
     let room = new RoomEntity();
 
-    for (const name of Object.keys(data) ) {
-      room[name] = data[name];
+    name = name.trim().toLowerCase();
+    title = title.trim();
+
+    if (!name.match(/^[a-z0-9_]+$/)) {
+      throw new Error('Invalid name');
     }
+    
+    room.name = name;
+    room.title = title;
 
     const roomData = await this.manager.save(room);
 

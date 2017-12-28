@@ -3,7 +3,7 @@ import * as cors from 'koa2-cors';
 import * as koaBody from 'koa-bodyparser';
 import * as koaRouter from 'koa-router';
 import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
-import { schema } from './gql';
+import { buildSchema } from './schema';
 import { setupAuth } from './auth';
 import { setupDB } from './db';
 import { wsAPI } from './wsapi';
@@ -20,6 +20,7 @@ export class RPServer {
   }
 
   async setupGQL() {
+    const schema = buildSchema();
     const app = new koa();
     const router = new koaRouter();
 

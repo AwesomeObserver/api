@@ -26,5 +26,5 @@ export async function resolver(
   
   await access(userId);
 
-  return roomAPI.create({ name, title }, userId);
+  return roomAPI.create(name, title, userId);
 }
