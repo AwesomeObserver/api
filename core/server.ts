@@ -37,6 +37,7 @@ export class RPServer {
 
       return {
         schema,
+        debug: false,
         context: {
           userId
         }
