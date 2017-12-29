@@ -13,31 +13,29 @@ export class WSAPI {
     this.PING_INTERVAL = 10000;
   }
 
-  private onConnection = (socket) => {
+  private onConnection(socket) {
     socket.cdata = {
       connectionId: crypto.randomBytes(16).toString("hex"),
       roomId: null
     };
 
-    socket.on('message', (data) => this.onMessage(socket, data));
-    socket.on('close', (...args) => this.onClose(socket, ...args));
-  }
+    socket.on('message', function(d) {
+      const [type, data] = JSON.parse(d);
 
-  private onMessage = (socket, d) => {
-    const [type, data] = JSON.parse(d);
+      if (actions[type]) {
+        actions[type](data, socket.cdata).catch((data) => {
+          console.log(data);
+        });
+      }
+    });
 
-    if (actions[type]) {
-      actions[type](data, socket.cdata).catch((data) => {
-      });
-    }
-  }
-
-  private onClose = (socket) => {
-    console.log('Connection close');
+    socket.on('close', function() {
+      console.log('Connection close');
+    });
   }
 
   private sendMessage = (socket, type, data?) => {
-    let messageData = typeof data == 'undefined' ? [type] : [type, data];
+    const messageData = typeof data == 'undefined' ? [type] : [type, data];
     socket.send(JSON.stringify(messageData));
   }
 
@@ -45,20 +43,21 @@ export class WSAPI {
     this.server.clients.forEach((socket) => {
       if (!filter || filter(socket.cdata)) {
         this.sendMessage(socket, eventName, data);
-      }      
+      }
     });
   }
 
   public async run() {
-    this.server = new ws.Server({ port: this.PORT });
-    this.server.on('connection', this.onConnection);
+    const server = new ws.Server({ port: this.PORT });
+    server.on('connection', this.onConnection);
 
-    setInterval(() => {
-      this.server.clients.forEach((socket) => {
-        socket.send();
+    setInterval(function() {
+      server.clients.forEach(function(socket) {
+        socket.send(undefined);
       });
     }, this.PING_INTERVAL);
-    
+
+    this.server = server;
   }
 }
 
