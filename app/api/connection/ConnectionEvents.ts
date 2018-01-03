@@ -1,3 +1,4 @@
+import { logger } from 'core/logger';
 import { connectionAPI, roomEventsAPI } from 'app/api';
 
 export class ConnectionEventsAPI {
@@ -10,7 +11,7 @@ export class ConnectionEventsAPI {
     let connection = await connectionAPI.getOne(connectionId);
 
     if (!connection) {
-      console.log('onLeave Error');
+      logger.error('onLeave Error');
       return false;
     }
 
@@ -29,7 +30,7 @@ export class ConnectionEventsAPI {
     let connection = await connectionAPI.getOne(connectionId);
     
     if (!connection) {
-      console.log('onLogin Error');
+      logger.error('onLogin Error');
       return false;
     }
 
@@ -46,7 +47,7 @@ export class ConnectionEventsAPI {
     let connection = await connectionAPI.getOne(connectionId);
     
     if (!connection) {
-      console.log('onLogout Error');
+      logger.error('onLogout Error');
       return false;
     }
 

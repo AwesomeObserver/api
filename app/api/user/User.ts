@@ -3,13 +3,20 @@ import { User as UserEntity } from 'app/entity/User';
 
 export class UserAPI {
 
+  get repository() {
+    return getConnection().getRepository(UserEntity);
+  }
+
+  get manager() {
+    return getConnection().manager;
+  }
+
   async getById(userId: number) {
     return this.getOne({ id: userId });
   }
 
   async getOne(where) {
-    let userRepository = getConnection().getRepository(UserEntity);
-    return userRepository.findOne({ where, cache: true });
+    return this.repository.findOne({ where, cache: true });
   }
 
   async create(userData) {
@@ -19,7 +26,7 @@ export class UserAPI {
       user[name] = userData[name];
     }
 
-    return getConnection().manager.save(user);
+    return this.manager.save(user);
   }
 
   async getOrCreate(where, data) {

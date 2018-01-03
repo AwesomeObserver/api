@@ -2,6 +2,7 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
+import { logger } from 'core/logger';
 import { sourceAPI } from 'app/api';
 
 export class RoomModeWaitlistUserAPI {
@@ -72,7 +73,7 @@ export class RoomModeWaitlistUserAPI {
     const userQueue = await this.getWithCreate(roomId, userId);
 
     if (userQueue.sources.findIndex(sId => parseInt(sId, 10) == sourceId) >= 0) {
-      console.log(`User ${userId} have source ${sourceId} now`);
+      logger.info(`User ${userId} have source ${sourceId} now`);
       return false;
     }
 

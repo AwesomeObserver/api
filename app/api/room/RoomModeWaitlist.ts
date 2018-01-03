@@ -2,6 +2,7 @@ import { format, addSeconds } from 'date-fns';
 import { getConnection } from "typeorm";
 import { agenda } from 'core/db';
 import { pubSub } from 'core/pubsub';
+import { logger } from 'core/logger';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
@@ -92,7 +93,7 @@ export class RoomModeWaitlistAPI {
     const waitlistQueue = await this.get(roomId);
 
     if (userId != waitlistQueue.userId) {
-      console.log(`User ${userId} not playing now`);
+      logger.info(`User ${userId} not playing now`);
       return false;
     }
 
@@ -135,14 +136,14 @@ export class RoomModeWaitlistAPI {
     const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
 
     if (userQueue.sources.length == 0) {
-      console.log(`User ${userId} dont have sources`);
+      logger.info(`User ${userId} dont have sources`);
       return false;
     }
 
     const waitlistQueue = await this.get(roomId);
     
     if (waitlistQueue.userId === userId) {
-      console.log(`User ${userId} palying now`);
+      logger.info(`User ${userId} palying now`);
       return false;
     }
 
@@ -152,7 +153,7 @@ export class RoomModeWaitlistAPI {
     }
 
     if (waitlistQueue.users.findIndex(uId => parseInt(uId, 10) == userId) >= 0) {
-      console.log(`User ${userId} wait now`);
+      logger.info(`User ${userId} wait now`);
       return false;
     }
 
