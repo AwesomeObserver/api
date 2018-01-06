@@ -135,6 +135,10 @@ export class RoomModeWaitlistAPI {
   async add(roomId: number, userId: number) {
     const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
 
+    if (!userQueue) {
+      return false;
+    }
+
     if (userQueue.sources.length == 0) {
       logger.info(`User ${userId} dont have sources`);
       return false;

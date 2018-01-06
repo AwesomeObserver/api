@@ -23,7 +23,7 @@ export class RoomModeWaitlistUserAPI {
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
-    if (userQueue.sources.length == 0) {
+    if (!userQueue || userQueue.sources.length == 0) {
       return false;
     }
 
@@ -34,6 +34,8 @@ export class RoomModeWaitlistUserAPI {
     });
 
     await this.repository.updateById(userQueue.id, { sources });
+
+    pubSub.publish('waitlistRemoveSource', firstSourceId, { userId, roomId });
 
     return firstSourceId;
   }
@@ -97,6 +99,10 @@ export class RoomModeWaitlistUserAPI {
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
+    if (!userQueue) {
+      return null;
+    }
+
     if ((userQueue.sources.length + 1) > 50) {
       logger.info(`User ${userId} get waitlist sources limit`);
       return false;
@@ -125,13 +131,21 @@ export class RoomModeWaitlistUserAPI {
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
+    if (!userQueue) {
+      return false;
+    }
+
     if (userQueue.sources.length == 0) {
       return false;
     }
 
-    return this.repository.updateById(userQueue.id, {
+    const res = await this.repository.updateById(userQueue.id, {
       sources: userQueue.sources.filter(sId => parseInt(sId, 10) != sourceId)
     });
+
+    pubSub.publish('waitlistRemoveSource', sourceId, { userId, roomId });
+
+    return res;
   }
 
   async move(
@@ -142,6 +156,10 @@ export class RoomModeWaitlistUserAPI {
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
+    if (!userQueue) {
+      return false;
+    }
+
     let sources = userQueue.sources;
 
     if (sources.length < newPos + 1) {
@@ -150,7 +168,11 @@ export class RoomModeWaitlistUserAPI {
 
     sources = reorder(userQueue.sources, lastPos, newPos);
 
-    return this.repository.updateById(userQueue.id, { sources });
+    const res = await this.repository.updateById(userQueue.id, { sources });
+
+    pubSub.publish('waitlistMoveSource', { lastPos, newPos }, { userId, roomId });
+
+    return res;
   }
 
 }
