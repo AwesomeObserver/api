@@ -20,6 +20,8 @@ export class WSAPI {
       roomId: null
     };
 
+    logger.info('Connection open');
+
     socket.on('message', function(d) {
       const [type, data] = JSON.parse(d);
 
