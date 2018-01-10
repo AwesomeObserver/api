@@ -1,7 +1,7 @@
-import { accessAPI, roomAPI, userAPI, roomModeWaitlistUserAPI } from 'app/api';
+import { accessAPI, roomAPI, userAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
-  waitlistMoveSource(
+  waitlistMoveUser(
     roomId: Int!,
     lastPos: Int!,
     newPos: Int!
@@ -20,5 +20,5 @@ export async function resolver(
   const { roomId, lastPos, newPos } = args;
   const userId = ctx.userId;
   
-  return roomModeWaitlistUserAPI.move(roomId, userId, lastPos, newPos);
+  return roomModeWaitlistAPI.move(roomId, lastPos, newPos);
 }

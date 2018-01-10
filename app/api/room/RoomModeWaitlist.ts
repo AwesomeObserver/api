@@ -2,6 +2,7 @@ import { format, addSeconds } from 'date-fns';
 import { getConnection } from "typeorm";
 import { agenda } from 'core/db';
 import { pubSub } from 'core/pubsub';
+import { reorder } from 'core/utils';
 import { logger } from 'core/logger';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
@@ -161,9 +162,15 @@ export class RoomModeWaitlistAPI {
       return false;
     }
 
-    return this.repository.updateById(waitlistQueue.id, {
+    const res = await this.repository.updateById(waitlistQueue.id, {
       users: [...waitlistQueue.users, userId]
     });
+
+    const user = await userAPI.getById(userId);
+
+    pubSub.publish('waitlistAddUser', user, { roomId });
+    
+    return res;
   }
 
   // Remove User from Queue
@@ -172,7 +179,11 @@ export class RoomModeWaitlistAPI {
 
     const users = waitlistQueue.users.filter(uId => parseInt(uId, 10) != userId);
 
-    return this.repository.updateById(waitlistQueue.id, { users });
+    const res = await this.repository.updateById(waitlistQueue.id, { users });
+
+    pubSub.publish('waitlistRemoveUser', userId, { roomId });
+
+    return res;
   }
 
   async clear(roomId: number) {
@@ -183,17 +194,23 @@ export class RoomModeWaitlistAPI {
   async move(roomId: number, lastPos: number, newPos: number) {
     const waitlistQueue = await this.get(roomId);
 
+    if (!waitlistQueue) {
+      return false;
+    }
+
     let users = waitlistQueue.users;
 
     if (users.length < newPos + 1) {
       return false;
     }
 
-    const lastUser = users[lastPos];
-    users[lastPos] = users[newPos];
-    users[newPos] = lastUser;
+    users = reorder(waitlistQueue.users, lastPos, newPos);
 
-    return this.repository.updateById(waitlistQueue.id, { users });
+    const res = await this.repository.updateById(waitlistQueue.id, { users });
+    
+    pubSub.publish('waitlistMoveUser', { lastPos, newPos }, { roomId });
+
+    return res;
   }
 
 }

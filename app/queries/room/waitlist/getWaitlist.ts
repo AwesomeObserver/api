@@ -1,6 +1,7 @@
 import { getTime } from 'date-fns';
 import {
   sourceAPI,
+  userAPI,
   roomModeWaitlistAPI,
   roomModeWaitlistUserAPI
 } from 'app/api';
@@ -17,11 +18,10 @@ export async function resolver(
   ctx: any
 ) {
   const { roomId } = args;
-  const { userId } = ctx;
 
   const [data, playlist] = await Promise.all([
     roomModeWaitlistAPI.get(roomId),
-    roomModeWaitlistUserAPI.getWithCreate(roomId, userId)
+    roomModeWaitlistUserAPI.getWithCreate(roomId, ctx.userId)
   ]);
 
   let sourcesIds = [];
@@ -32,6 +32,10 @@ export async function resolver(
 
   const sources = await Promise.all(sourcesIds.map(sourceId => {
     return sourceAPI.getById(sourceId);
+  }));
+
+  const users = await Promise.all(data.users.map(userId => {
+    return userAPI.getById(parseInt(userId, 10));
   }));
 
   let playData = null;
@@ -47,7 +51,7 @@ export async function resolver(
 
   return {
     userPlaylist: sources,
-    users: [],
+    users,
     playData
   };
 }

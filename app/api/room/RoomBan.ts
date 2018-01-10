@@ -31,10 +31,8 @@ export class RoomBanAPI {
         banDate: format(+new Date())
       });
 
-      // PubSub.publish('userBannedInRoom', {
-      //   userBannedInRoom: userId,
-      //   roomId
-      // });
+      pubSub.publish('roomUserBanned', null, { userId, roomId });
+      pubSub.publish('removeUserMessages', userId, { roomId });
 
       return res;
     }
@@ -46,10 +44,8 @@ export class RoomBanAPI {
       banDate: format(+new Date()),
     });
 
-    // PubSub.publish('userBannedInRoom', {
-    //   userBannedInRoom: userId,
-    //   roomId
-    // });
+    pubSub.publish('roomUserBanned', null, { userId, roomId });
+    pubSub.publish('removeUserMessages', userId, { roomId });
 
     return res;
   }

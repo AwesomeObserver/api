@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
 import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
+import { accessAPI, actionTimeAPI, roomUserAPI, roomAPI } from 'app/api';
 
 const { CHAT_SECRET } = process.env;
 
@@ -15,47 +15,47 @@ async function access(roomId: number, current) {
     name: 'sendMessage'
   }, current);
 
-  // const room = await Room.getOnePure({ id: roomId });
+  const room = await roomAPI.getOnePure({ id: roomId });
 
-  // // Slow Mode
-  // if (room.slowMode) {
-  //   try {
-  //     Access.check({
-  //       group: 'room',
-  //       name: 'sendMessageSlowModeIgnore'
-  //     }, current);
-  //   } catch (error) {
+  // Slow Mode
+  if (room.slowMode) {
+    try {
+      accessAPI.check({
+        group: 'room',
+        name: 'sendMessageSlowModeIgnore'
+      }, current);
+    } catch (error) {
       
-  //     const actionName = `sendMessage:${roomId}`;
-  //     const lastMessageDate = await ActionTime.get(userId, actionName);
+      const actionName = `sendMessage:${roomId}`;
+      const lastMessageDate = await actionTimeAPI.get(userId, actionName);
       
-  //     const sendMessageDelay = 2;
+      const sendMessageDelay = 2;
 
-  //     if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
-  //       throw new Error('denyForSlowMode');
-  //     }
-  //   } 
-  // }
+      if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
+        throw new Error('denyForSlowMode');
+      }
+    } 
+  }
 
-  // // Follower Mode
-  // if (room.followerMode) {
-  //   try {
-  //     Access.check({
-  //       group: 'room',
-  //       name: 'sendMessageFollowerModeIgnore'
-  //     }, current);
-  //   } catch (error) {
-  //     const { follower, lastFollowDate } = current.room;
+  // Follower Mode
+  if (room.followerMode) {
+    try {
+      accessAPI.check({
+        group: 'room',
+        name: 'sendMessageFollowerModeIgnore'
+      }, current);
+    } catch (error) {
+      const { follower, lastFollowDate } = current.room;
 
-  //     if (!follower) {
-  //       throw new Error('mustBeFollow');
-  //     }
+      if (!follower) {
+        throw new Error('mustBeFollow');
+      }
   
-  //     if (!isBefore(addSeconds(lastFollowDate, 60 * 30), +new Date())) {
-  //       throw new Error('denyForFollowMode');
-  //     }
-  //   } 
-  // }
+      if (!isBefore(addSeconds(lastFollowDate, 60 * 30), +new Date())) {
+        throw new Error('denyForFollowMode');
+      }
+    } 
+  }
 }
 
 export async function chatMessage(message: string, cdata) {

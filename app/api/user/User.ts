@@ -1,5 +1,6 @@
 import { getConnection } from "typeorm";
 import { User as UserEntity } from 'app/entity/User';
+import { pubSub } from 'core/pubsub';
 
 export class UserAPI {
 
@@ -16,7 +17,7 @@ export class UserAPI {
   }
 
   async getOne(where) {
-    return this.repository.findOne({ where, cache: true });
+    return this.repository.findOne({ where });
   }
 
   async create(userData) {
@@ -27,6 +28,10 @@ export class UserAPI {
     }
 
     return this.manager.save(user);
+  }
+
+  async update(id, data) {
+    return this.repository.updateById(id, data);
   }
 
   async getOrCreate(where, data) {
@@ -40,14 +45,32 @@ export class UserAPI {
   }
 
   async ban(userId: number) {
+    const data = await this.getById(userId);
 
+    if (!data) return false;
+
+    const res = await this.update(data.id, { banned: true });
+
+    pubSub.publish('userBanned', null, { userId });
+
+    return res;
   }
 
-  async unban(userId: number) {
+  // async unban(userId: number) {
 
-  }
+  // }
 
   async setRole(userId: number, role: string) {
-    
+    console.log(userId, role);
+
+    const data = await this.getById(userId);
+
+    if (!data) return false;
+
+    const res = await this.update(data.id, { role });
+
+    pubSub.publish('userRoleChanged', role, { userId });
+
+    return res;
   }
 }

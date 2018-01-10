@@ -22,6 +22,8 @@ export const global = {
 
 export const room = {
   manageRoom: {},
+  follow: {},
+  unfollow: {},
   // User
   banUserRoom: {
     context: true
@@ -45,14 +47,17 @@ export const room = {
   manageMessage: {},
   sendMessage: {},
   replyMessage: {},
-  removeMessage: {
-    self: true
-  },
+  removeMessage: {},
   sendMessageSlowModeIgnore: {},
   sendMessageFollowerModeIgnore: {},
   removeAllMessages: {},
   changeFollowerMode: {},
   changeSlowMode: {},
-  follow: {},
-  unfollow: {}
+  // Waitlist Mode
+  waitlistAdd: {},
+  waitlistMoveUser: {},
+  waitlistRemoveUser: {},
+  waitlistAddSource: {},
+  waitlistMoveSource: {},
+  waitlistRemoveSource: {}
 };
