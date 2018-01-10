@@ -37,6 +37,7 @@ export class RPServer {
 
       return {
         schema,
+        debug: false,
         context: {
           userId
         }
@@ -49,10 +50,6 @@ export class RPServer {
 
     app.use(router.routes());
     app.use(router.allowedMethods());
-
-    app.on('error', function(err) {
-      // console.log(err);
-    });
 
     app.listen(this.API_PORT);
   }

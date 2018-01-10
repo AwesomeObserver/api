@@ -2,6 +2,9 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
+import { logger } from 'core/logger';
+import { pubSub } from 'core/pubsub';
+import { reorder } from 'core/utils';
 import { sourceAPI } from 'app/api';
 
 export class RoomModeWaitlistUserAPI {
@@ -14,10 +17,13 @@ export class RoomModeWaitlistUserAPI {
     return getConnection().manager;
   }
 
-  async cutFirst(roomId: number, userId: number) {
+  async cutFirst(
+    roomId: number,
+    userId: number
+  ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
-    if (userQueue.sources.length == 0) {
+    if (!userQueue || userQueue.sources.length == 0) {
       return false;
     }
 
@@ -29,10 +35,17 @@ export class RoomModeWaitlistUserAPI {
 
     await this.repository.updateById(userQueue.id, { sources });
 
+    pubSub.publish('waitlistRemoveSource', firstSourceId, { userId, roomId });
+
     return firstSourceId;
   }
 
-  async getWithCreate(roomId: number, userId: number) {
+  async getWithCreate(
+    roomId: number,
+    userId: number
+  ) {
+    if (!userId) return false;
+
     let userQueue = await this.get(roomId, userId);
 
     if (!userQueue) {
@@ -42,13 +55,19 @@ export class RoomModeWaitlistUserAPI {
     return userQueue;
   }
 
-  async get(roomId: number, userId: number) {
+  async get(
+    roomId: number,
+    userId: number
+  ) {
     return this.repository.findOne({
       where: { roomId, userId }
     });
   }
 
-  async create(roomId: number, userId: number) {
+  async create(
+    roomId: number,
+    userId: number
+  ) {
     let userQueue = new UserWaitlistQueueEntity();
 
     userQueue.roomId = roomId;
@@ -58,39 +77,75 @@ export class RoomModeWaitlistUserAPI {
     return this.manager.save(userQueue);
   }
 
-  async addFromLink(roomId: number, userId: number, link: string) {
-    const sourceId = await sourceAPI.addFromLink(link);
+  async addFromLink(
+    roomId: number,
+    userId: number,
+    link: string
+  ) {
+    const source = await sourceAPI.addFromLink(link);
 
-    if (!sourceId) {
+    if (!source) {
       return false;
     }
 
-    this.add(roomId, userId, sourceId);
+    this.add(roomId, userId, source.id, source);
   }
 
-  async add(roomId: number, userId: number, sourceId: number) {
+  async add(
+    roomId: number,
+    userId: number,
+    sourceId: number,
+    source?
+  ) {
     const userQueue = await this.getWithCreate(roomId, userId);
+
+    if (!userQueue) {
+      return null;
+    }
+
+    if ((userQueue.sources.length + 1) > 50) {
+      logger.info(`User ${userId} get waitlist sources limit`);
+      return false;
+    }
 
     if (userQueue.sources.findIndex(sId => parseInt(sId, 10) == sourceId) >= 0) {
-      console.log(`User ${userId} have source ${sourceId} now`);
+      logger.info(`User ${userId} have source ${sourceId} now`);
       return false;
     }
 
-    return this.repository.updateById(userQueue.id, {
+    const res = await this.repository.updateById(userQueue.id, {
       sources: [...userQueue.sources, sourceId]
     });
+
+    if (source) {
+      pubSub.publish('waitlistAddSource', source, { userId, roomId });
+    }
+
+    return res;
   }
 
-  async remove(roomId: number, userId: number, sourceId: number) {
+  async remove(
+    roomId: number,
+    userId: number,
+    sourceId: number
+  ) {
     const userQueue = await this.getWithCreate(roomId, userId);
+
+    if (!userQueue) {
+      return false;
+    }
 
     if (userQueue.sources.length == 0) {
       return false;
     }
 
-    return this.repository.updateById(userQueue.id, {
+    const res = await this.repository.updateById(userQueue.id, {
       sources: userQueue.sources.filter(sId => parseInt(sId, 10) != sourceId)
     });
+
+    pubSub.publish('waitlistRemoveSource', sourceId, { userId, roomId });
+
+    return res;
   }
 
   async move(
@@ -101,17 +156,23 @@ export class RoomModeWaitlistUserAPI {
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
 
+    if (!userQueue) {
+      return false;
+    }
+
     let sources = userQueue.sources;
 
     if (sources.length < newPos + 1) {
       return false;
     }
 
-    const lastUser = sources[lastPos];
-    sources[lastPos] = sources[newPos];
-    sources[newPos] = lastUser;
+    sources = reorder(userQueue.sources, lastPos, newPos);
 
-    return this.repository.updateById(userQueue.id, { sources });
+    const res = await this.repository.updateById(userQueue.id, { sources });
+
+    pubSub.publish('waitlistMoveSource', { lastPos, newPos }, { userId, roomId });
+
+    return res;
   }
 
 }

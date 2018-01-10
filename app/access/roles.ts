@@ -23,7 +23,11 @@ export const user = {
         replyMessage: true,
         sendMessage: true,
         follow: true,
-        unfollow: true
+        unfollow: true,
+        waitlistAdd: true,
+        waitlistAddSource: true,
+        waitlistMoveSource: true,
+        waitlistRemoveSource: true
       }
     }
   }
@@ -75,7 +79,9 @@ export const mod = {
         changeFollowerMode: true,
         changeSlowMode: true,
         sendMessageSlowModeIgnore: true,
-        sendMessageFollowerModeIgnore: true
+        sendMessageFollowerModeIgnore: true,
+        waitlistMoveUser: true,
+        waitlistRemoveUser: true
       }
     }
   }
@@ -87,6 +93,7 @@ export const manager = {
     room: {
       actions: {
         manageRoom: true,
+        setRoomTitle: true,
         setRoleRoom: true,
         setRoleRoomMod: true,
         setRoleRoomUser: true

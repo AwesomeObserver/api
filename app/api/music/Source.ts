@@ -56,7 +56,7 @@ export class SourceAPI {
     });
 
     if (source) {
-      return source.id;
+      return source;
     }
 
     const data = await youtubeAPI.getTrackById(videoId);
@@ -67,14 +67,14 @@ export class SourceAPI {
 
     const newSource = await this.save(data);
 
-    return newSource.id;
+    return newSource;
   }
 
   addFromSoundcloudByUrl = async (url: string) => {
     const source = await this.getOne({ service: 'soundcloud', url });
 
     if (source) {
-      return source.id;
+      return source;
     }
 
     const data = await soundcloudAPI.getTrackByUrl(url);
@@ -85,6 +85,6 @@ export class SourceAPI {
 
     const newSource = await this.save(data);
 
-    return newSource.id;
+    return newSource;
   }
 }

@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import * as ws from 'uws';
 import * as actions from 'app/wsapi';
+import { logger } from 'core/logger';
 
 export class WSAPI {
 
@@ -19,18 +20,20 @@ export class WSAPI {
       roomId: null
     };
 
+    actions['connect'](socket.cdata);
+
     socket.on('message', function(d) {
       const [type, data] = JSON.parse(d);
 
       if (actions[type]) {
         actions[type](data, socket.cdata).catch((data) => {
-          console.log(data);
+          logger.error(data);
         });
       }
     });
 
     socket.on('close', function() {
-      console.log('Connection close');
+      actions['disconnect'](socket.cdata);
     });
   }
 

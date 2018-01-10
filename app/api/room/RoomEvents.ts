@@ -110,13 +110,10 @@ export class RoomEventsAPI {
   }
 
   async onConnectionsCountChanged(roomId: number) {
+    roomId = parseInt(`${roomId}`, 10);
+
     const counts = await roomConnectionAPI.getCount(roomId);
     
-    const payload = {
-      connectionsCountChanged: counts,
-      roomId
-    };
-    
-    // PubSub.publish('connectionsCountChanged', payload);
+    pubSub.publish('connectionsCountChanged', counts, { roomId });
   }
 }

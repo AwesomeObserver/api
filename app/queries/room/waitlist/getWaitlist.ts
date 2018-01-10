@@ -1,5 +1,10 @@
 import { getTime } from 'date-fns';
-import { roomModeWaitlistAPI } from 'app/api';
+import {
+  sourceAPI,
+  userAPI,
+  roomModeWaitlistAPI,
+  roomModeWaitlistUserAPI
+} from 'app/api';
 
 export const schema = `
   getWaitlist(roomId: Int!): WaitlistPlay
@@ -14,19 +19,39 @@ export async function resolver(
 ) {
   const { roomId } = args;
 
-  let data = await roomModeWaitlistAPI.get(roomId);
+  const [data, playlist] = await Promise.all([
+    roomModeWaitlistAPI.get(roomId),
+    roomModeWaitlistUserAPI.getWithCreate(roomId, ctx.userId)
+  ]);
 
-  if (!data.user) {
-    return null;
+  let sourcesIds = [];
+
+  if (playlist) {
+    sourcesIds = playlist.sources;
   }
-  
-  return {
-    users: [],
-    playData: {
+
+  const sources = await Promise.all(sourcesIds.map(sourceId => {
+    return sourceAPI.getById(sourceId);
+  }));
+
+  const users = await Promise.all(data.users.map(userId => {
+    return userAPI.getById(parseInt(userId, 10));
+  }));
+
+  let playData = null;
+
+  if (data.user) {
+    playData = {
       source: data.source,
       user: data.user,
       start: getTime(data.start),
       serverTime: +new Date() 
     }
+  }
+
+  return {
+    userPlaylist: sources,
+    users,
+    playData
   };
 }

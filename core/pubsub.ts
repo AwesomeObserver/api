@@ -25,7 +25,6 @@ export function objFilter(dataObj: Object, filterObj?: Object): boolean {
 class PubSub {
 
   public publish(eventName, payload, filterData) {
-    // console.log({ eventName, payload, filterData });
     wsAPI.send(eventName, payload, (cdata) => objFilter(cdata, filterData));
   }
 

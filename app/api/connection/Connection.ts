@@ -44,19 +44,6 @@ export class ConnectionAPI {
     pubSub.publish('token', token, { connectionId });
   }
 
-  onConnect(connectionParams, webSocket) {
-    const connectionId = crypto.randomBytes(20).toString('hex');
-    webSocket['connectionId'] = connectionId;
-
-    connectionEventsAPI.onJoin(connectionId);
-
-    return { connectionId };
-  }
-
-  onDisconnect(webSocket) {
-    connectionEventsAPI.onLeave(webSocket.connectionId);
-  }
-
   async save(connectionId: string) {
     const key = `connections:${connectionId}`;
   

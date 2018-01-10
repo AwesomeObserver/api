@@ -1,8 +1,18 @@
-import { accessAPI, roomAPI, userAPI, roomModeWaitlistUserAPI } from 'app/api';
+import {
+  userAPI,
+  accessAPI,
+  roomModeWaitlistUserAPI
+} from 'app/api';
 
 export const schema = `
   waitlistAddSource(roomId: Int!, link: String!): Boolean
 `;
+
+async function access(userId: number) {
+  const current = await userAPI.getById(userId);
+
+  await accessAPI.check({ group: 'room', name: 'waitlistAddSource' }, current);
+}
 
 export async function resolver(
   root: any,
@@ -14,6 +24,8 @@ export async function resolver(
 ) {
   const { roomId, link } = args;
   const userId = ctx.userId;
+
+  await access(userId);
   
   return roomModeWaitlistUserAPI.addFromLink(roomId, userId, link);
 }

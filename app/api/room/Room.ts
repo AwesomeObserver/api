@@ -148,18 +148,21 @@ export class RoomAPI {
     return true;
   }
 
+  async setTitle(roomId: number, title: string) {
+    await this.repository.updateById(roomId, { title });
+    
+    pubSub.publish('roomTitleChanged', title, { roomId });
+
+    return true;
+  }
+
   async setSlowMode(roomId: number, isActive: boolean) {
     
     await this.repository.updateById(roomId, {
       slowMode: isActive
     });
-
-    // const payload = {
-    //   slowModeChanged: isActive,
-    //   roomId
-    // };
     
-    // PubSub.publish('slowModeChanged', payload);
+    pubSub.publish('slowModeChanged', isActive, { roomId });
 
     return true;
   }
@@ -169,13 +172,8 @@ export class RoomAPI {
     await this.repository.updateById(roomId, {
       followerMode: isActive
     });
-
-    const payload = {
-      followerModeChanged: isActive,
-      roomId
-    };
     
-    // PubSub.publish('followerModeChanged', payload);
+    pubSub.publish('followerModeChanged', isActive, { roomId });
 
     return true;
   }
