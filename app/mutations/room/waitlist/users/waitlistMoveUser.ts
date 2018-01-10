@@ -1,4 +1,4 @@
-import { accessAPI, roomAPI, userAPI, roomModeWaitlistAPI } from 'app/api';
+import { accessAPI, roomUserAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   waitlistMoveUser(
@@ -7,6 +7,12 @@ export const schema = `
     newPos: Int!
   ): Boolean
 `;
+
+async function access(userId: number, roomId: number) {
+  const current = await roomUserAPI.getOneFull(userId, roomId);
+
+  await accessAPI.check({ group: 'room', name: 'waitlistMoveUser' }, current);
+}
 
 export async function resolver(
   root: any,
@@ -19,6 +25,8 @@ export async function resolver(
 ) {
   const { roomId, lastPos, newPos } = args;
   const userId = ctx.userId;
+
+  await access(userId, roomId);
   
   return roomModeWaitlistAPI.move(roomId, lastPos, newPos);
 }

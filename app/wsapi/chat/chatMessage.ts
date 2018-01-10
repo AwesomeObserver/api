@@ -5,8 +5,6 @@ import * as isBefore from 'date-fns/is_before';
 import { pubSub } from 'core/pubsub';
 import { accessAPI, actionTimeAPI, roomUserAPI, roomAPI } from 'app/api';
 
-const { CHAT_SECRET } = process.env;
-
 async function access(roomId: number, current) {
   const userId = current.site.id;
 

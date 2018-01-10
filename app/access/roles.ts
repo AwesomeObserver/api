@@ -25,7 +25,9 @@ export const user = {
         follow: true,
         unfollow: true,
         waitlistAdd: true,
-        waitlistAddSource: true
+        waitlistAddSource: true,
+        waitlistMoveSource: true,
+        waitlistRemoveSource: true
       }
     }
   }
@@ -79,9 +81,7 @@ export const mod = {
         sendMessageSlowModeIgnore: true,
         sendMessageFollowerModeIgnore: true,
         waitlistMoveUser: true,
-        waitlistRemoveUser: true,
-        waitlistMoveSource: true,
-        waitlistRemoveSource: true
+        waitlistRemoveUser: true
       }
     }
   }
