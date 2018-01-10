@@ -93,6 +93,7 @@ export const manager = {
     room: {
       actions: {
         manageRoom: true,
+        setRoomTitle: true,
         setRoleRoom: true,
         setRoleRoomMod: true,
         setRoleRoomUser: true

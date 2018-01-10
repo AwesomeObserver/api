@@ -21,6 +21,7 @@ export const global = {
 };
 
 export const room = {
+  setRoomTitle: {},
   manageRoom: {},
   follow: {},
   unfollow: {},

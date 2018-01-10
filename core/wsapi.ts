@@ -20,7 +20,7 @@ export class WSAPI {
       roomId: null
     };
 
-    logger.info('Connection open');
+    actions['connect'](socket.cdata);
 
     socket.on('message', function(d) {
       const [type, data] = JSON.parse(d);
@@ -33,7 +33,7 @@ export class WSAPI {
     });
 
     socket.on('close', function() {
-      logger.info('Connection close');
+      actions['disconnect'](socket.cdata);
     });
   }
 

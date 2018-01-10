@@ -148,6 +148,14 @@ export class RoomAPI {
     return true;
   }
 
+  async setTitle(roomId: number, title: string) {
+    await this.repository.updateById(roomId, { title });
+    
+    pubSub.publish('roomTitleChanged', title, { roomId });
+
+    return true;
+  }
+
   async setSlowMode(roomId: number, isActive: boolean) {
     
     await this.repository.updateById(roomId, {
