@@ -9,7 +9,7 @@ const {
   TWITCH_CALLBACK_URL
 } = process.env;
 
-export default function(router, authEnd) {
+export default function(router) {
   passport.use(new Strategy({
     clientID: TWITCH_CLIENT_ID,
     clientSecret: TWITCH_SECRET,
@@ -33,16 +33,11 @@ export default function(router, authEnd) {
     });
   }));
   
-  router.get('/auth/twitch/:connectionAuthKey',
-    (ctx, next) => {
-      ctx.session.cak = ctx.params.connectionAuthKey;
-      next();
-    },
+  router.get('/auth/twitch',
     passport.authenticate('twitch')
   );
 
   router.get('/authend/twitch',
-    passport.authenticate('twitch', { failureRedirect: '/' }),
-    authEnd
+    passport.authenticate('twitch', { failureRedirect: '/' })
   );
 }
