@@ -1,127 +1,96 @@
 import * as crypto from 'crypto';
-import * as jwt from 'jsonwebtoken';
 
 import { redis } from 'core/db';
 import { pubSub } from 'core/pubsub';
 import { connectionEventsAPI } from 'app/api';
 
-const {
-  TOKEN_SECRET,
-  AUTH_KEY_SECRET
-} = process.env;
-
 // Utils
 function transformerArray(array) {
-  let obj = {};
+	let obj = {};
 
-  for (var i = 0; i < array.length; i += 2) {
-    obj[array[i]] = array[i + 1];
-  }
+	for (var i = 0; i < array.length; i += 2) {
+		obj[array[i]] = array[i + 1];
+	}
 
-  return obj;
+	return obj;
 }
 
 export class ConnectionAPI {
+	async save(connectionId: string) {
+		const key = `connections:${connectionId}`;
 
-  genToken(userId: number): string {
-    return jwt.sign(`${userId}`, TOKEN_SECRET);
-  }
+		return redis.multi().hset(key, 'userId', null).hset(key, 'roomId', null).exec();
+	}
 
-  checkToken(token: string): number {
-    const userIdStr = jwt.verify(token, TOKEN_SECRET);
+	async getOne(connectionId: string) {
+		const key = `connections:${connectionId}`;
+		const connection = await redis.hgetall(key);
 
-    if (typeof userIdStr != 'string') {
-      throw new Error('Bad format');
-    }
+		if (!Object.keys(connection).length) {
+			return null;
+		}
 
-    return parseInt(userIdStr, 10);
-  }
+		const connectionObj = {
+			userId: connection.userId,
+			roomId: connection.roomId
+		};
 
-  auth(connectionKey, userId) {
-    const connectionId = jwt.verify(connectionKey, AUTH_KEY_SECRET);
-    const token = this.genToken(userId);
-    
-    pubSub.publish('token', token, { connectionId });
-  }
+		return connectionObj;
+	}
 
-  async save(connectionId: string) {
-    const key = `connections:${connectionId}`;
-  
-    return redis.multi()
-      .hset(key, 'userId', null)
-      .hset(key, 'roomId', null)
-      .exec();
-  }
+	async get(connectionIds: string[]) {
+		redis.multi({ pipeline: false });
 
-  async getOne(connectionId: string) {
-    const key = `connections:${connectionId}`;
-    const connection = await redis.hgetall(key);
-  
-    if (!Object.keys(connection).length) {
-      return null;
-    }
-  
-    const connectionObj = {
-      userId: connection.userId,
-      roomId: connection.roomId
-    };
-  
-    return connectionObj;
-  }
+		for (let connectionId of connectionIds) {
+			redis.hgetall(`connections:${connectionId}`);
+		}
 
-  async get(connectionIds: string[]) {
-    redis.multi({ pipeline: false });
-  
-    for (let connectionId of connectionIds) {
-      redis.hgetall(`connections:${connectionId}`);
-    }
-  
-    let connectionsWithData = [];
-  
-    let connectionsData = await redis.exec();
-  
-    for (let i = 0; i < connectionIds.length; i++) {
-      connectionsWithData.push({
-        connectionId: connectionIds[i],
-        ...transformerArray(connectionsData[i][1])
-      });
-    }
-    
-    return connectionsWithData;
-  }
+		let connectionsWithData = [];
 
-  async del(connectionId: string) {
-    return redis.del(`connections:${connectionId}`);
-  }
+		let connectionsData = await redis.exec();
 
-  async setRoomId(connectionId: string, roomId?: number) {
-    const key = `connections:${connectionId}`;
-    return redis.hset(key, 'roomId', roomId);
-  }
+		for (let i = 0; i < connectionIds.length; i++) {
+			connectionsWithData.push({
+				connectionId: connectionIds[i],
+				...transformerArray(connectionsData[i][1])
+			});
+		}
 
-  async setUserId(connectionId: string, userId?: number) {
-    const key = `connections:${connectionId}`;
-    return redis.hset(key, 'userId', userId);
-  }
+		return connectionsWithData;
+	}
 
-  async getUserId(connectionId: string): Promise<number|null> {
-    const cData = await this.getOne(connectionId);
-    return (cData && cData.userId) ? cData.userId : null;
-  }
+	async del(connectionId: string) {
+		return redis.del(`connections:${connectionId}`);
+	}
 
-  async getCCountUserRoom(roomId: number, userId: number) {
-    const key = `rooms:${roomId}:users:connections`;
-    const count = await redis.hget(key, `${userId}`);
-    return parseInt(count, 10) || 0;
-  }
+	async setRoomId(connectionId: string, roomId?: number) {
+		const key = `connections:${connectionId}`;
+		return redis.hset(key, 'roomId', roomId);
+	}
 
-  async incCCountUserRoom(roomId: number, userId: number) {
-    const key = `rooms:${roomId}:users:connections`;
-    return redis.hincrby(key, `${userId}`, 1);
-  }
+	async setUserId(connectionId: string, userId?: number) {
+		const key = `connections:${connectionId}`;
+		return redis.hset(key, 'userId', userId);
+	}
 
-  async decCCountUserRoom(roomId: number, userId: number) {
-    const key = `rooms:${roomId}:users:connections`;
-    return redis.hincrby(key, `${userId}`, -1);
-  }
+	async getUserId(connectionId: string): Promise<number | null> {
+		const cData = await this.getOne(connectionId);
+		return cData && cData.userId ? cData.userId : null;
+	}
+
+	async getCCountUserRoom(roomId: number, userId: number) {
+		const key = `rooms:${roomId}:users:connections`;
+		const count = await redis.hget(key, `${userId}`);
+		return parseInt(count, 10) || 0;
+	}
+
+	async incCCountUserRoom(roomId: number, userId: number) {
+		const key = `rooms:${roomId}:users:connections`;
+		return redis.hincrby(key, `${userId}`, 1);
+	}
+
+	async decCCountUserRoom(roomId: number, userId: number) {
+		const key = `rooms:${roomId}:users:connections`;
+		return redis.hincrby(key, `${userId}`, -1);
+	}
 }

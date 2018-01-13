@@ -21,6 +21,5 @@ export async function removeMessage(messageId: string, cdata) {
 
   await access(roomId, user);
 
-  console.log(roomId, messageId);
   pubSub.publish('removeMessage', messageId, { roomId });
 }
