@@ -20,7 +20,6 @@ export async function clearChat(data: any, cdata) {
   const user = await roomUserAPI.getOneFull(userId, roomId);
 
   await access(roomId, user);
-
-  console.log(roomId);
+  
   pubSub.publish('clearChat', null, { roomId });
 }

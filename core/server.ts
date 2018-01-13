@@ -8,19 +8,47 @@ import * as RedisStore from 'koa-redis';
 import koaCookie from 'koa-cookie';
 import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
 import { buildSchema } from './schema';
-import { setupAuth } from './auth';
 import { setupDB } from './db';
 import { wsAPI } from './wsapi';
-import { connectionAPI } from 'app/api';
+import { connectionAPI, userAPI } from 'app/api';
 import { getFolderData } from './utils';
 
 const authDir = __dirname + '/../app/auth/';
 
-function setupServices(...args) {
+function setupServices(router) {
   const AuthServices = getFolderData(authDir);
   
   for (const APIName of Object.keys(AuthServices)) {
-    AuthServices[APIName].default(...args);
+    const serviceData = AuthServices[APIName].default;
+
+    passport.use(new serviceData.Strategy(
+      serviceData.strategyOptions,
+      (request, accessToken, refreshToken, profile, done) => {
+      process.nextTick(async function() {
+  
+        const user = await userAPI.getOrCreate(
+          serviceData.whereUser(profile),
+          serviceData.createUser(profile)
+        );
+        
+        done(null, { userId: user.id });
+      });
+    }));
+    
+    router.get(`/auth/${serviceData.name}/`,
+      (ctx, next) => {
+        ctx.session.redirectTo = ctx.headers.referer;
+        next();
+      },
+      passport.authenticate(serviceData.name, serviceData.authOptions)
+    );
+  
+    router.get(`/authend/${serviceData.name}/`,
+      passport.authenticate(serviceData.name, { failureRedirect: '/' }),
+      (ctx, next) => {
+        ctx.redirect(ctx.session.redirectTo || '/');
+      }
+    );
   }
 }
 
@@ -71,7 +99,10 @@ export class RPServer {
     passport.serializeUser((user, cb) => cb(null, user));
     passport.deserializeUser((obj, cb) => cb(null, obj));
     
-    this.router.get('/logout', ctx => ctx.logout());
+    this.router.get('/logout', ctx => {
+      ctx.logout();
+      ctx.redirect('/');
+    });
   }
 
   async setupGQL() {

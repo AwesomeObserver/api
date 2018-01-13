@@ -1,6 +1,7 @@
 export * from './chat';
 
 import * as jwt from 'jsonwebtoken';
+import { redis } from 'core/db';
 import { pubSub } from 'core/pubsub';
 import { logger } from 'core/logger';
 import { connectionAPI, connectionEventsAPI, roomEventsAPI } from 'app/api';
@@ -27,7 +28,16 @@ export async function auth(service: string, cdata) {
 }
 
 export async function login(token: string, cdata) {
-  const userId = connectionAPI.checkToken(token);
+  const tokenData = await redis.get(`connectionToken:${token}`);
+
+  if (!tokenData) {
+    logger.error('Invalid token');
+    return;
+  }
+
+  redis.del(`connectionToken:${token}`);
+
+  const userId = parseInt(tokenData, 10);
   // logger.info('login', userId);
   cdata.userId = userId;
 
