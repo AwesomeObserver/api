@@ -13,13 +13,13 @@ export async function setupDB() {
 		username: process.env.POSTGRES_USERNAME,
 		database: process.env.POSTGRES_DB,
 		entities: [ __dirname + '/../app/entity/*' ],
-		synchronize: true,
-		cache: {
-			type: 'redis',
-			options: {
-				host: 'redis',
-				port: 6379
-			}
-		}
+		synchronize: true
+		// cache: {
+		// 	type: 'redis',
+		// 	options: {
+		// 		host: 'redis',
+		// 		port: 6379
+		// 	}
+		// }
 	});
 }

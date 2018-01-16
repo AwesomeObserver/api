@@ -54,7 +54,7 @@ export class RoomAPI {
   }
 
   async getOnePure(where) {
-    return this.repository.findOne({ where, cache: true });
+    return this.repository.findOne({ where });
   }
 
   async get() {
