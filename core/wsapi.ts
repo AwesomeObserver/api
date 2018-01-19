@@ -15,6 +15,8 @@ export class WSAPI {
   }
 
   private onConnection(socket) {
+    console.log(socket._socket.remoteAddress);
+
     socket.cdata = {
       connectionId: crypto.randomBytes(16).toString("hex"),
       roomId: null
