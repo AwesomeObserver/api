@@ -1,5 +1,5 @@
 import { pubSub } from 'core/pubsub';
-import { connectionAPI, roomConnectionAPI } from 'app/api';
+import { connectionAPI } from 'app/api';
 
 export class RoomEventsAPI {
 
@@ -12,12 +12,6 @@ export class RoomEventsAPI {
   
     const { userId } = connection;
 
-    const isNotExist = await roomConnectionAPI.set(roomId, connectionId);
-
-    if (!isNotExist) {
-      return false;
-    }
-  
     await connectionAPI.setRoomId(connectionId, roomId);
   
     if (userId) {
@@ -28,19 +22,21 @@ export class RoomEventsAPI {
   }
 
   async onGuestJoin(roomId: number, connectionId: string) {
-    return roomConnectionAPI.incGuestsCount(roomId);
+    // return roomConnectionAPI.incGuestsCount(roomId);
+    return this.onConnectionsCountChanged(roomId);
   }
 
   async onUserJoin(roomId: number, connectionId: string, userId: number) {
-    const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
+    return this.onConnectionsCountChanged(roomId);
+    // const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
   
-    await connectionAPI.incCCountUserRoom(roomId, userId);
+    // await connectionAPI.incCCountUserRoom(roomId, userId);
   
-    if (cCount > 0) {
-      return this.onUserJoinAgain(roomId, connectionId, userId);
-    } else {
-      return this.onUserJoinFirst(roomId, connectionId, userId);
-    }
+    // if (cCount > 0) {
+    //   return this.onUserJoinAgain(roomId, connectionId, userId);
+    // } else {
+    //   return this.onUserJoinFirst(roomId, connectionId, userId);
+    // }
   }
 
   async onUserJoinAgain(roomId: number, connectionId: string, userId: number) {
@@ -48,7 +44,7 @@ export class RoomEventsAPI {
   }
 
   async onUserJoinFirst(roomId: number, connectionId: string, userId: number) {
-    return roomConnectionAPI.incUsersCount(roomId);
+    // return roomConnectionAPI.incUsersCount(roomId);
   }
 
   async onLeave(roomId: number, connectionId: string) {
@@ -60,11 +56,11 @@ export class RoomEventsAPI {
 
     const { userId } = connection;
   
-    const isNotExist = await roomConnectionAPI.del(roomId, connectionId);
+    // const isNotExist = await roomConnectionAPI.del(roomId, connectionId);
     
-    if (!isNotExist) {
-      return false;
-    }
+    // if (!isNotExist) {
+    //   return false;
+    // }
   
     await connectionAPI.setRoomId(connectionId, null);
   
@@ -76,19 +72,21 @@ export class RoomEventsAPI {
   }
 
   async onGuestLeave(roomId: number, connectionId: string) {
-    return roomConnectionAPI.decGuestsCount(roomId);
+    return this.onConnectionsCountChanged(roomId);
+    // return roomConnectionAPI.decGuestsCount(roomId);
   }
 
   async onUserLeave(roomId: number, connectionId: string, userId: number) {
-    const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
+    return this.onConnectionsCountChanged(roomId);
+    // const cCount = await connectionAPI.getCCountUserRoom(roomId, userId);
   
-    await connectionAPI.decCCountUserRoom(roomId, userId);
+    // await connectionAPI.decCCountUserRoom(roomId, userId);
   
-    if (cCount > 1) {
-      return this.onUserLeaveSome(roomId, connectionId, userId);
-    } else {
-      return this.onUserLeaveLast(roomId, connectionId, userId);
-    }
+    // if (cCount > 1) {
+    //   return this.onUserLeaveSome(roomId, connectionId, userId);
+    // } else {
+    //   return this.onUserLeaveLast(roomId, connectionId, userId);
+    // }
   }
 
   async onUserLeaveSome(roomId: number, connectionId: string, userId: number) {
@@ -96,7 +94,7 @@ export class RoomEventsAPI {
   }
 
   async onUserLeaveLast(roomId: number, connectionId: string, userId: number) {
-    roomConnectionAPI.decUsersCount(roomId);
+    // roomConnectionAPI.decUsersCount(roomId);
   }
 
   async onLogin(roomId: number, connectionId: string, userId: number) {
@@ -112,7 +110,7 @@ export class RoomEventsAPI {
   async onConnectionsCountChanged(roomId: number) {
     roomId = parseInt(`${roomId}`, 10);
 
-    const counts = await roomConnectionAPI.getCount(roomId);
+    const counts = await connectionAPI.getRoomCounts(roomId);
     
     pubSub.publish('connectionsCountChanged', counts, { roomId });
   }

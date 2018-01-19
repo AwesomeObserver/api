@@ -1,96 +1,89 @@
 import * as crypto from 'crypto';
-
-import { redis } from 'core/db';
+import * as config from 'core/config';
 import { pubSub } from 'core/pubsub';
-import { connectionEventsAPI } from 'app/api';
-
-// Utils
-function transformerArray(array) {
-	let obj = {};
-
-	for (var i = 0; i < array.length; i += 2) {
-		obj[array[i]] = array[i + 1];
-	}
-
-	return obj;
-}
+import { ConnectionModel } from 'app/models/Connection';
+import { connectionEventsAPI, roomEventsAPI } from 'app/api';
 
 export class ConnectionAPI {
-	async save(connectionId: string) {
-		const key = `connections:${connectionId}`;
-
-		return redis.multi().hset(key, 'userId', null).hset(key, 'roomId', null).exec();
+	get Model() {
+		return ConnectionModel;
 	}
 
 	async getOne(connectionId: string) {
-		const key = `connections:${connectionId}`;
-		const connection = await redis.hgetall(key);
-
-		if (!Object.keys(connection).length) {
-			return null;
-		}
-
-		const connectionObj = {
-			userId: connection.userId,
-			roomId: connection.roomId
-		};
-
-		return connectionObj;
+		return this.Model.findOne({ connectionId });
 	}
 
-	async get(connectionIds: string[]) {
-		redis.multi({ pipeline: false });
-
-		for (let connectionId of connectionIds) {
-			redis.hgetall(`connections:${connectionId}`);
-		}
-
-		let connectionsWithData = [];
-
-		let connectionsData = await redis.exec();
-
-		for (let i = 0; i < connectionIds.length; i++) {
-			connectionsWithData.push({
-				connectionId: connectionIds[i],
-				...transformerArray(connectionsData[i][1])
-			});
-		}
-
-		return connectionsWithData;
+  async getRoomConnections(roomId: number) {
+		return this.Model.find({ roomId });
+  }
+  
+  async getUserConnections(userId: number) {
+		return this.Model.find({ userId });
 	}
 
-	async del(connectionId: string) {
-		return redis.del(`connections:${connectionId}`);
+	async getRoomCounts(roomId: number) {
+		const connections = await this.getRoomConnections(roomId);
+		let users = new Map();
+		let guestsCount = 0;
+
+		connections.forEach(connection => {
+			if (connection.userId) {
+				users.set(connection.userId, 1);
+			} else {
+				guestsCount++;
+			}
+		});
+
+		const usersCount = users.size;
+
+		return { 
+      connectionsCount: usersCount + guestsCount, 
+      usersCount, 
+      guestsCount, 
+    };  
+	}
+	
+	async save(connectionId: string) {
+		return new this.Model({
+			connectionId,
+			instanceId: config.instanceId
+		}).save();
 	}
 
 	async setRoomId(connectionId: string, roomId?: number) {
-		const key = `connections:${connectionId}`;
-		return redis.hset(key, 'roomId', roomId);
+		return this.Model.findOneAndUpdate({
+			connectionId
+		}, {
+			$set: { roomId }
+		});
 	}
 
 	async setUserId(connectionId: string, userId?: number) {
-		const key = `connections:${connectionId}`;
-		return redis.hset(key, 'userId', userId);
+		return this.Model.findOneAndUpdate({
+			connectionId
+		}, {
+			$set: { userId }
+		});
 	}
 
-	async getUserId(connectionId: string): Promise<number | null> {
-		const cData = await this.getOne(connectionId);
-		return cData && cData.userId ? cData.userId : null;
+	async del(connectionId: string) {
+		return this.Model.remove({ connectionId });
 	}
 
-	async getCCountUserRoom(roomId: number, userId: number) {
-		const key = `rooms:${roomId}:users:connections`;
-		const count = await redis.hget(key, `${userId}`);
-		return parseInt(count, 10) || 0;
-	}
+	async removeInstanceConnections(instanceId: string) {
+		const instanceConnections = await this.Model.find({ instanceId });
 
-	async incCCountUserRoom(roomId: number, userId: number) {
-		const key = `rooms:${roomId}:users:connections`;
-		return redis.hincrby(key, `${userId}`, 1);
-	}
+		const roomsIds = new Map();
 
-	async decCCountUserRoom(roomId: number, userId: number) {
-		const key = `rooms:${roomId}:users:connections`;
-		return redis.hincrby(key, `${userId}`, -1);
-	}
+		instanceConnections.forEach(({ roomId }) => {
+			if (roomId) {
+				if (!roomsIds.has(roomId)) {
+					roomsIds.set(roomId, roomId);
+					roomEventsAPI.onConnectionsCountChanged(roomId);
+				}
+			}
+		});
+
+		return this.Model.remove({ instanceId });
+  }
 }

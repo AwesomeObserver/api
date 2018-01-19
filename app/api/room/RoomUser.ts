@@ -1,7 +1,7 @@
 import { isAfter } from 'date-fns';
 import { getConnection } from 'typeorm';
 import { redis } from 'core/db';
-import { userAPI } from 'app/api';
+import { userAPI, connectionAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserAPI {
@@ -82,17 +82,18 @@ export class RoomUserAPI {
 	}
 
 	async getOnline(roomId: number) {
-		const key = `rooms:${roomId}:users:connections`;
-		const usersOnline = await redis.hgetall(key);
+		const connections = await connectionAPI.getRoomConnections(roomId);
+		const usersIds = new Map();
+		let users = [];
 
-		const users = [];
-
-		for (const userId of Object.keys(usersOnline)) {
-			if (usersOnline[userId] > 0) {
-				const userIdInt = parseInt(userId, 10);
-				users.push(this.getOneFull(userIdInt, roomId));
+		connections.forEach(({ userId }) => {
+			if (userId) {
+				if (!usersIds.has(userId)) {
+					usersIds.set(userId, userId);
+					users.push(this.getOneFull(userId, roomId));
+				}
 			}
-		}
+		});
 
 		return users;
 	}

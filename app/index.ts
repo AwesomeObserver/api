@@ -1,6 +1,7 @@
-import { agenda } from 'core/db';
+import * as config from 'core/config';
+import { agenda, redis } from 'core/db';
 import { logger } from 'core/logger';
-import { roomModeWaitlistAPI } from 'app/api';
+import { roomModeWaitlistAPI, connectionAPI } from 'app/api';
 
 export async function startup() {
   logger.info(`API Server is ready`);
@@ -10,4 +11,25 @@ export async function startup() {
   });
 
   agenda.start();
+
+  const hcTimeout = 2000;
+
+  setInterval(() => {
+    redis.hset('ihc', config.instanceId, +new Date());
+  }, 2000);
+
+  setInterval(async () => {
+    const instances = await redis.hgetall(`ihc`);
+
+    Object.keys(instances).forEach(instanceName => {
+      const diff = +new Date() - instances[instanceName];
+
+      if (diff > (hcTimeout + 1000)) {
+        console.log(instanceName, 'down');
+
+        redis.hdel('ihc', instanceName);
+        connectionAPI.removeInstanceConnections(instanceName);
+      }
+    });
+  }, 5000);
 }
