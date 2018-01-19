@@ -2,8 +2,13 @@ import * as Agenda from 'agenda';
 import * as IoRedis from 'ioredis';
 import * as mongoose from 'mongoose';
 import { createConnection } from 'typeorm';
+import { logger } from 'core/logger';
 
-export const redis = new IoRedis(process.env.REDIS_URL);
+export const setupRedis = () => {
+	return new IoRedis(process.env.REDIS_URL);
+}
+
+export const redis = setupRedis();
 export const agenda = new Agenda({ db: { address: process.env.MONGO_URL } });
 
 mongoose.connect(process.env.MONGO_URL);
