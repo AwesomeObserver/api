@@ -3,7 +3,7 @@ import { getConnection } from "typeorm";
 import { Room as RoomEntity } from 'app/entity/Room';
 import { pubSub } from 'core/pubsub';
 import {
-  roomConnectionAPI,
+  connectionAPI,
   roomFollowerAPI,
   roomRoleAPI,
   roomModeWaitlistAPI
@@ -29,7 +29,7 @@ export class RoomAPI {
 
   async withData(room) {
     const [counts, followersCount] = await Promise.all([
-      roomConnectionAPI.getCount(room.id),
+      connectionAPI.getRoomCounts(room.id),
       roomFollowerAPI.getCount(room.id)
     ]);
 
