@@ -21,6 +21,22 @@ export class AccessAPI {
     // Можно ли применть действие к себе
     self: false,
   };
+
+  roles = {};
+
+  constructor() {
+    Object.keys(allRoles).forEach(roleName => {
+      const roleData = allRoles[roleName];
+    
+      let roleWIP = Object.assign({}, roleData);
+    
+      if (roleData.extend) {
+        roleWIP = this.extendRole(roleData);
+      }
+    
+      this.roles[roleName] = roleWIP;
+    });
+  }
   
   getActionData(action) {
     const actionWithoutMask = allActions[action.group][action.name];
@@ -37,7 +53,7 @@ export class AccessAPI {
   }
   
   mergeRoles(roles) {
-    return this.mergeRolesData(Object.values(this.getRolesData(roles)));
+    return this.mergeRolesData(Object.values(this.getRolesData(roles)));  
   }
   
   mergeRolesData(rolesData) {
@@ -49,15 +65,7 @@ export class AccessAPI {
   }
   
   getRole(role) {
-    const roleData = allRoles[role];
-    
-    let roleWIP = Object.assign({}, roleData);
-  
-    if (roleData.extend) {
-      roleWIP = this.extendRole(roleData);
-    }
-  
-    return roleWIP;
+    return this.roles[role];
   }
   
   getRolesWeight(roles) {

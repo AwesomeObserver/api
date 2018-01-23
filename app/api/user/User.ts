@@ -1,6 +1,8 @@
 import { getConnection } from "typeorm";
+import { pgClient, redis } from 'core/db';
 import { User as UserEntity } from 'app/entity/User';
 import { pubSub } from 'core/pubsub';
+import { cacheAPI } from 'app/api';
 
 export class UserAPI {
 
@@ -12,8 +14,34 @@ export class UserAPI {
     return getConnection().manager;
   }
 
+  async getByIdFromDB(userId: number) {
+    if (!userId) {
+      return null;
+    }
+
+    const res = await pgClient.query(`
+      SELECT *
+      FROM "user" u
+      WHERE u.id = ${userId}
+    `);
+
+    if (res.rows.length === 0) {
+      return null;
+    }
+
+    return res.rows[0];
+  }
+
   async getById(userId: number) {
-    return this.getOne({ id: userId });
+    const key = `users:${userId}`;
+    let [inCache, res] = await cacheAPI.get(key);
+
+    if (!inCache) {
+      res = await this.getByIdFromDB(userId);
+      cacheAPI.set(key, res);
+    }
+
+    return res;
   }
 
   async getOne(where) {
@@ -31,7 +59,14 @@ export class UserAPI {
   }
 
   async update(id, data) {
-    return this.repository.updateById(id, data);
+    await this.repository.updateById(id, data);
+    
+    const res = await this.getByIdFromDB(id);
+
+		const key = `users:${id}`;
+		cacheAPI.set(key, res);
+
+		return res;
   }
 
   async getOrCreate(where, data) {

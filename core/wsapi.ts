@@ -15,8 +15,6 @@ export class WSAPI {
   }
 
   private onConnection(socket) {
-    console.log(socket._socket.remoteAddress);
-
     socket.cdata = {
       connectionId: crypto.randomBytes(16).toString("hex"),
       roomId: null
@@ -45,9 +43,12 @@ export class WSAPI {
   }
 
   public send = (eventName: string, data: any, filter?: Function) => {
-    this.server.clients.forEach((socket) => {
+    this.server.clients.forEach(function(socket)  {
       if (!filter || filter(socket.cdata)) {
-        this.sendMessage(socket, eventName, data);
+        setImmediate(function() {
+          const messageData = typeof data == 'undefined' ? [eventName] : [eventName, data];
+          socket.send(JSON.stringify(messageData));
+        });
       }
     });
   }
@@ -58,7 +59,9 @@ export class WSAPI {
 
     setInterval(function() {
       server.clients.forEach(function(socket) {
-        socket.send(undefined);
+        setImmediate(function () {
+          socket.send(undefined);
+        });
       });
     }, this.PING_INTERVAL);
 

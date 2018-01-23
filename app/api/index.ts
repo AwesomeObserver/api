@@ -14,6 +14,7 @@ import { RoomModeWaitlistUserAPI } from 'app/api/room/RoomModeWaitlistUser';
 import { UserAPI } from 'app/api/user/User';
 import { AccessAPI } from 'app/api/Access';
 import { ActionTimeAPI } from 'app/api/ActionTime';
+import { CacheAPI } from 'app/api/Cache';
 
 export const connectionAPI = new ConnectionAPI();
 export const connectionEventsAPI = new ConnectionEventsAPI();
@@ -31,3 +32,4 @@ export const roomModeWaitlistUserAPI = new RoomModeWaitlistUserAPI();
 export const userAPI = new UserAPI();
 export const accessAPI = new AccessAPI();
 export const actionTimeAPI = new ActionTimeAPI();
+export const cacheAPI = new CacheAPI();

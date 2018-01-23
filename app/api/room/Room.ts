@@ -1,8 +1,10 @@
 import { format } from 'date-fns';
+import { pgClient, redis } from 'core/db';
 import { getConnection } from "typeorm";
 import { Room as RoomEntity } from 'app/entity/Room';
 import { pubSub } from 'core/pubsub';
 import {
+  cacheAPI,
   connectionAPI,
   roomFollowerAPI,
   roomRoleAPI,
@@ -41,6 +43,36 @@ export class RoomAPI {
       avatar: room.avatar ? room.avatar : defaultAvatar,
       followersCount
     };
+  }
+
+  async getByIdFromDB(roomId: number) {
+    if (!roomId) {
+      return null;
+    }
+
+    const res = await pgClient.query(`
+      SELECT *
+      FROM "room" r
+      WHERE r.id = ${roomId}
+    `);
+
+    if (res.rows.length === 0) {
+      return null;
+    }
+
+    return res.rows[0];
+  }
+
+  async getById(roomId: number) {    
+    const key = `rooms:${roomId}`;
+    let [inCache, res] = await cacheAPI.get(key);
+
+    if (!inCache) {
+      res = await this.getByIdFromDB(roomId);
+      cacheAPI.set(key, res);
+    }
+
+    return res;
   }
 
   async getOne(where) {
@@ -95,6 +127,18 @@ export class RoomAPI {
     return roomData;
   }
 
+  async update(roomId: number, data) {
+    await this.repository.updateById(roomId, data);
+    
+    const res = await this.getByIdFromDB(roomId);
+
+		const key = `rooms:${roomId}`;
+
+		cacheAPI.set(key, res);
+
+		return res;
+  }
+
   async remove(roomId) {
     // Cascade fix
     await Promise.all([
@@ -126,7 +170,7 @@ export class RoomAPI {
 
   async ban(roomId, data) {
     
-    await this.repository.updateById(roomId, {
+    await this.update(roomId, {
       banned: true,
       banDate: format(+new Date()),
       whoSetBanId: data.whoSetBanId,
@@ -137,8 +181,10 @@ export class RoomAPI {
   }
 
   async unbanByName(roomName) {
+
+    const room = await this.getOnePure({ name: roomName });
     
-    await this.repository.update({ name: roomName }, {
+    await this.update(room.id, {
       banned: false,
       banDate: null,
       whoSetBanId: null,
@@ -149,7 +195,7 @@ export class RoomAPI {
   }
 
   async setTitle(roomId: number, title: string) {
-    await this.repository.updateById(roomId, { title });
+    await this.update(roomId, { title });
     
     pubSub.publish('roomTitleChanged', title, { roomId });
 
@@ -158,7 +204,7 @@ export class RoomAPI {
 
   async setSlowMode(roomId: number, isActive: boolean) {
     
-    await this.repository.updateById(roomId, {
+    await this.update(roomId, {
       slowMode: isActive
     });
     
@@ -169,7 +215,7 @@ export class RoomAPI {
 
   async setFollowerMode(roomId: number, isActive: boolean) {
     
-    await this.repository.updateById(roomId, {
+    await this.update(roomId, {
       followerMode: isActive
     });
     

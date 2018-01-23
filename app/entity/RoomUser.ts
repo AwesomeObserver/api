@@ -4,7 +4,8 @@ import {
   Column,
   OneToOne,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  Index
 } from "typeorm";
 import { User } from "./User";
 import { Room } from "./Room";
@@ -14,12 +15,14 @@ export class RoomUser {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ type: 'integer' })
   userId: number;
 
   @ManyToOne(type => User, user => user.userRooms, { cascadeAll: true })
   user: User;
 
+  @Index()
   @Column({ type: 'integer' })
   roomId: number;
 
