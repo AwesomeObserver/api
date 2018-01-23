@@ -1,6 +1,7 @@
 import * as Agenda from 'agenda';
 import * as IoRedis from 'ioredis';
 import * as mongoose from 'mongoose';
+import { Client as PGClient } from 'pg';
 import { createConnection } from 'typeorm';
 import { logger } from 'core/logger';
 
@@ -10,6 +11,14 @@ export const setupRedis = () => {
 
 export const redis = setupRedis();
 export const agenda = new Agenda({ db: { address: process.env.MONGO_URL } });
+export const pgClient = new PGClient({
+  user: process.env.POSTGRES_USERNAME,
+  host: 'postgres',
+  database: process.env.POSTGRES_DB,
+  port: 5432,
+});
+
+pgClient.connect();
 
 mongoose.connect(process.env.MONGO_URL);
 

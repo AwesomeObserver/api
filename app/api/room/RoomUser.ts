@@ -1,7 +1,7 @@
 import { isAfter } from 'date-fns';
 import { getConnection } from 'typeorm';
-import { redis } from 'core/db';
-import { userAPI, connectionAPI } from 'app/api';
+import { pgClient, redis } from 'core/db';
+import { userAPI, connectionAPI, cacheAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserAPI {
@@ -32,42 +32,84 @@ export class RoomUserAPI {
 	}
 
 	async update(id, data) {
-		return this.repository.updateById(id, data);
+		await this.repository.updateById(id, data);
+
+		const query = await pgClient.query(`
+			SELECT *
+			FROM "room_user"
+			WHERE "id" = ${id}
+		`);
+		
+		const res = query.rows[0];
+
+		const key = `rooms:${res.roomId}:users:${res.userId}`;
+
+		cacheAPI.set(key, res);
+
+		return res;
 	}
 
-	getDefaultRoomUser(userId: number, roomId: number) {
-		return {
-			userId,
-			roomId,
-			follower: false,
-			firstFollowDate: null,
-			lastFollowDate: null,
-			lastUnfollowDate: null,
-			role: 'user',
-			whoSetRoleId: null,
-			lastRole: 'user',
-			banned: false,
-			banDate: null,
-			unbanDate: null,
-			whoSetBanId: null,
-			banReason: null
-		};
-	}
+	async getByIdFromDB(userId: number, roomId: number) {
+    if (!userId) {
+      return null;
+		}
+		
+    const res = await pgClient.query(`
+			SELECT *
+			FROM "room_user"
+			WHERE "userId" = ${userId} AND "roomId" = ${roomId}
+    `);
+
+    if (res.rows.length === 0) {
+      return null;
+    }
+
+    return res.rows[0];
+  }
+
+  async getById(userId: number, roomId: number) {
+		const key = `rooms:${roomId}:users:${userId}`;
+    let [inCache, res] = await cacheAPI.get(key);
+
+    if (!inCache) {
+      res = await this.getByIdFromDB(userId, roomId);
+      cacheAPI.set(key, res);
+    }
+
+    return res;
+  }
 
 	async getPure(userId: number, roomId: number) {
 		return this.repository.findOne({ userId, roomId });
 	}
 
 	async getOne(userId: number, roomId: number) {
-		let data = await this.repository.findOne({
-			where: { userId, roomId }
-		});
+		if (!userId || !roomId) {
+      return null;
+    }
 
-		if (!data) {
-			return this.getDefaultRoomUser(userId, roomId);
-		}
+    const res = await this.getById(userId, roomId);
 
-		return data;
+    if (!res) {
+      return {
+				userId,
+				roomId,
+				follower: false,
+				firstFollowDate: null,
+				lastFollowDate: null,
+				lastUnfollowDate: null,
+				role: 'user',
+				whoSetRoleId: null,
+				lastRole: 'user',
+				banned: false,
+				banDate: null,
+				unbanDate: null,
+				whoSetBanId: null,
+				banReason: null
+			};
+    }
+
+    return res;
 	}
 
 	async getOneFull(userId: number, roomId: number) {
@@ -75,7 +117,10 @@ export class RoomUserAPI {
 			return null;
 		}
 
-		return Promise.all([ userAPI.getById(userId), this.getOne(userId, roomId) ]).then(([ site, room ]) => ({
+		return Promise.all([
+			userAPI.getById(userId),
+			this.getOne(userId, roomId)
+		]).then(([ site, room ]) => ({
 			site,
 			room
 		}));

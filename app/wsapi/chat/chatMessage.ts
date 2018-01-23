@@ -15,7 +15,7 @@ async function access(roomId: number, current) {
 		current
 	);
 
-	const room = await roomAPI.getOnePure({ id: roomId });
+	const room = await roomAPI.getById(roomId);
 
 	// Slow Mode
 	if (room.slowMode) {
@@ -77,10 +77,18 @@ export async function chatMessage(message: string, cdata) {
 	actionTimeAPI.set(userId, `sendMessage:${roomId}`);
 
 	const messageId = crypto.randomBytes(4).toString('hex');
-
-	const userData = [ [ user.site.id, user.site.name, user.site.role, user.site.avatar ], [ user.room.role ] ];
-
-	const messageData = [ messageId, userData, message ];
+	const userData = [
+		[
+			user.site.id,
+			user.site.name,
+			user.site.role,
+			user.site.avatar
+		],
+		[
+			user.room.role
+		]
+	];
+	const messageData = [messageId, userData, message];
 
 	pubSub.publish('chatMessage', messageData, { roomId });
 }
