@@ -16,6 +16,10 @@ export default {
 		email: profile.email,
 		avatar: profile._json.image.url
 	}),
+	updateUser: (profile) => ({
+		name: profile.displayName,
+		avatar: profile._json.image.url
+	}),
 	authOptions: {
 		scope: [ 'profile', 'email' ]
 	}
