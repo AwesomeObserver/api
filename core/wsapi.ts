@@ -37,12 +37,11 @@ export class WSAPI {
     });
   }
 
-  private sendMessage = (socket, type, data?) => {
-    const messageData = typeof data == 'undefined' ? [type] : [type, data];
-    socket.send(JSON.stringify(messageData));
-  }
-
   public send = (eventName: string, data: any, filter?: Function) => {
+    if (!this.server || !this.server.clients) {
+      return false;
+    }
+
     this.server.clients.forEach(function(socket)  {
       if (!filter || filter(socket.cdata)) {
         setImmediate(function() {
