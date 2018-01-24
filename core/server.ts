@@ -34,6 +34,21 @@ function setupServices(router) {
 							serviceData.createUser(profile)
 						);
 
+						if (serviceData.updateUser) {
+							const currentData = serviceData.updateUser(profile);
+							const newData = {};
+
+							Object.keys(currentData).forEach(field => {
+								if (user[field] != currentData[field]) {
+									newData[field] = currentData[field];
+								}
+							});
+
+							if (Object.keys(newData).length > 0) {
+								await userAPI.update(user.id, newData);
+							}
+						}
+
 						done(null, { userId: user.id });
 					});
 				}
