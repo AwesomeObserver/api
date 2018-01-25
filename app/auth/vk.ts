@@ -14,5 +14,9 @@ export default {
 		name: profile.displayName,
 		vkId: profile.id,
 		avatar: profile._json.photo
+	}),
+	updateUser: (profile) => ({
+		name: profile.displayName,
+		avatar: profile._json.photo
 	})
 };

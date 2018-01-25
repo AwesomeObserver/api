@@ -17,5 +17,9 @@ export default {
 		email: profile._json.email,
 		avatar: profile._json.logo,
 		role: profile.id === 52703474 ? 'founder' : 'user'
+	}),
+	updateUser: (profile) => ({
+		name: profile.displayName,
+		avatar: profile._json.logo
 	})
 };
