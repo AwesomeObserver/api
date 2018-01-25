@@ -4,6 +4,13 @@ import * as isBefore from 'date-fns/is_before';
 import { pubSub } from 'core/pubsub';
 import { accessAPI, actionTimeAPI, roomUserAPI, roomAPI } from 'app/api';
 
+export const schema = `
+	createRoomMessage(
+    roomId: Int!,
+    message: String!
+  ): Boolean
+`;
+
 async function access(roomId: number, current) {
 	const userId = current.site.id;
 
@@ -63,8 +70,16 @@ async function access(roomId: number, current) {
 	}
 }
 
-export async function chatMessage(message: string, cdata) {
-	const { roomId, userId } = cdata;
+export async function resolver(
+	root: any,
+  args: {
+		roomId: number,
+		message: string
+  },
+	ctx: any
+) {
+	const { roomId, message } = args;
+	const { userId } = ctx;
 
 	if (!roomId) {
 		throw new Error('Outside room');

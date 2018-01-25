@@ -1,6 +1,13 @@
 import { pubSub } from 'core/pubsub';
 import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
 
+export const schema = `
+  removeRoomMessage(
+    roomId: Int!,
+    messageId: String!
+  ): Boolean
+`;
+
 async function access(roomId: number, current) {
   const userId = current.site.id;
 
@@ -10,8 +17,16 @@ async function access(roomId: number, current) {
   }, current);
 }
 
-export async function removeMessage(messageId: string, cdata) {
-  const { roomId, userId } = cdata;
+export async function resolver(
+  root: any,
+  args: {
+		roomId: number,
+		messageId: string
+  },
+	ctx: any
+) {
+  const { roomId, messageId } = args;
+  const { userId } = ctx;
 
   if (!roomId) {
     throw new Error('Outside room');

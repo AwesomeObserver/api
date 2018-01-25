@@ -1,6 +1,10 @@
 import { pubSub } from 'core/pubsub';
 import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
 
+export const schema = `
+  clearRoomChat(roomId: Int!): Boolean
+`;
+
 async function access(roomId: number, current) {
   const userId = current.site.id;
 
@@ -10,8 +14,15 @@ async function access(roomId: number, current) {
   }, current);
 }
 
-export async function clearChat(data: any, cdata) {
-  const { roomId, userId } = cdata;
+export async function resolver(
+  root: any,
+  args: {
+		roomId: number
+  },
+  ctx: any
+) {
+  const { roomId } = args;
+  const { userId } = ctx;
 
   if (!roomId) {
     throw new Error('Outside room');
