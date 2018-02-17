@@ -18,6 +18,9 @@ export class Room {
   @Column({ type: 'varchar', length: 48 })
   title: string;
 
+  @Column({ type: 'varchar', default: 'waitlist' })
+  mode: string;
+
   @Column({ type: 'varchar', nullable: true })
   avatar: string;
 
