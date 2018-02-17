@@ -6,10 +6,10 @@ export function getFolderData(folderPath) {
     return {};
   }
 
-  const files = fs.readdirSync(folderPath, 'utf-8');
+  const files = fs.readdirSync(folderPath);
   let data = {};
-  
-  files.forEach(fileName => {
+
+  files.forEach((fileName) => {
     const fullFileName = `${folderPath}${fileName}`;
     const { ext, name } = path.parse(fullFileName);
     
