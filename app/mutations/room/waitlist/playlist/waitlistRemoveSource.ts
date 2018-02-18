@@ -7,7 +7,7 @@ export const schema = `
 async function access(userId: number) {
   const current = await userAPI.getById(userId);
 
-  await accessAPI.check({ group: 'room', name: 'waitlistRemoveSource' }, current);
+  await accessAPI.check('waitlistRemoveSource', current);
 }
 
 export async function resolver(

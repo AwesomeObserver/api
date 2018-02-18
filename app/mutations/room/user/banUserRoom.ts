@@ -18,10 +18,7 @@ async function access(
     roomUserAPI.getOneFull(userId, roomId)
   ]);
 
-  await accessAPI.check({
-    group: 'room',
-    name: 'banUserRoom'
-  }, current, context);
+  await accessAPI.check('banUserRoom', current, context);
 }
 
 export async function resolver(

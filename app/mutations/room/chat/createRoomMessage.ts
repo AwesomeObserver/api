@@ -14,26 +14,14 @@ export const schema = `
 async function access(roomId: number, current) {
 	const userId = current.site.id;
 
-	await accessAPI.check(
-		{
-			group: 'room',
-			name: 'sendMessage'
-		},
-		current
-	);
+	await accessAPI.check('sendMessage', current);
 
 	const room = await roomAPI.getById(roomId);
 
 	// Slow Mode
 	if (room.slowMode) {
 		try {
-			accessAPI.check(
-				{
-					group: 'room',
-					name: 'sendMessageSlowModeIgnore'
-				},
-				current
-			);
+			accessAPI.check('sendMessageSlowModeIgnore', current);
 		} catch (error) {
 			const actionName = `sendMessage:${roomId}`;
 			const lastMessageDate = await actionTimeAPI.get(userId, actionName);
@@ -49,13 +37,7 @@ async function access(roomId: number, current) {
 	// Follower Mode
 	if (room.followerMode) {
 		try {
-			accessAPI.check(
-				{
-					group: 'room',
-					name: 'sendMessageFollowerModeIgnore'
-				},
-				current
-			);
+			accessAPI.check('sendMessageFollowerModeIgnore', current);
 		} catch (error) {
 			const { follower, lastFollowDate } = current.room;
 

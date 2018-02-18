@@ -13,7 +13,7 @@ export async function access(currentUserId: number, userId: number) {
     userAPI.getById(userId)
   ]);
 
-  await accessAPI.check({ group: 'global', name: 'banRoom' }, current, context);
+  await accessAPI.check('banRoom', current, context);
 }
 
 export async function resolver(

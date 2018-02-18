@@ -11,10 +11,7 @@ export const schema = `
 async function access(roomId: number, current) {
   const userId = current.site.id;
 
-  await accessAPI.check({
-    group: 'room',
-    name: 'removeMessage'
-  }, current);
+  await accessAPI.check('removeMessage', current);
 }
 
 export async function resolver(

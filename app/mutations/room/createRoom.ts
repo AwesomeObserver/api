@@ -10,7 +10,7 @@ export const schema = `
 async function access(userId: number) {
   const current = await userAPI.getById(userId);
   
-  await accessAPI.check({ group: 'global', name: 'createRoom' }, current);
+  await accessAPI.check('createRoom', current);
 }
 
 export async function resolver(

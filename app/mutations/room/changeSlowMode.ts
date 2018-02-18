@@ -10,10 +10,7 @@ export const schema = `
 async function access(userId: number, roomId: number) {
   const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  await accessAPI.check({
-    group: 'room',
-    name: 'changeSlowMode'
-  }, current);
+  await accessAPI.check('changeSlowMode', current);
 }
 
 export async function resolver(

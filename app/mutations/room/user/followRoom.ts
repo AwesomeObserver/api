@@ -7,10 +7,7 @@ export const schema = `
 async function access(userId: number, roomId: number) {
   const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  return accessAPI.check({
-    group: 'room',
-    name: 'follow'
-  }, current);
+  return accessAPI.check('follow', current);
 }
 
 export async function resolver(
