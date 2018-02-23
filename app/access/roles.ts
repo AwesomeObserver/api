@@ -33,7 +33,10 @@ export const accessRoles = [
       'sendMessageSlowModeIgnore',
       'sendMessageFollowerModeIgnore',
       'waitlistMoveUser',
-      'waitlistRemoveUser'
+      'waitlistRemoveUser',
+      'waitlistMenu',
+      'waitlistSkip',
+      'waitlistKick'
     ]
   },
   {

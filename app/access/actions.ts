@@ -99,5 +99,14 @@ export const accessActions = {
   },
   modeWaitlistOpenMyPlaylist: {
     groups: ['room']
-  }
+  },
+  waitlistMenu: {
+    groups: ['room']
+  },
+  waitlistSkip: {
+    groups: ['room']
+  },
+  waitlistKick: {
+    groups: ['room']
+  },
 };
