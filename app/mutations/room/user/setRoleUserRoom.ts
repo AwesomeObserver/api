@@ -19,27 +19,15 @@ async function access(
     roomUserAPI.getOneFull(userId, roomId)
   ]);
 
-  await accessAPI.check({
-    group: 'room',
-    name: 'setRoleRoom'
-  }, current, context);
+  await accessAPI.check('setRoleRoom', current, context);
 
   switch (role) {
     case 'manager':
-      return accessAPI.check({
-        group: 'room',
-        name: 'setRoleRoomManager'
-      }, current, context);
+      return accessAPI.check('setRoleRoomManager', current, context);
     case 'mod':
-      return accessAPI.check({
-        group: 'room',
-        name: 'setRoleRoomMod'
-      }, current, context);
+      return accessAPI.check('setRoleRoomMod', current, context);
     case 'user':
-      return accessAPI.check({
-        group: 'room',
-        name: 'setRoleRoomUser'
-      }, current, context);
+      return accessAPI.check('setRoleRoomUser', current, context);
     default:
       throw new Error('Deny');
   }

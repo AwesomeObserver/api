@@ -1,13 +1,13 @@
-import { accessAPI, roomAPI, roomUserAPI } from 'app/api';
+import { accessAPI, roomUserAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
-  removeRoom(roomId: Int!): Boolean
+  waitlistSkip(roomId: Int!): Boolean
 `;
 
 async function access(userId: number, roomId: number) {
   const current = await roomUserAPI.getOneFull(userId, roomId);
 
-  await accessAPI.check('removeRoom', current);
+  await accessAPI.check('waitlistSkip', current);
 }
 
 export async function resolver(
@@ -18,10 +18,9 @@ export async function resolver(
   ctx: any
 ) {
   const { roomId } = args;
-  const userId = ctx.userId;
+  const currentUserId = ctx.userId;
 
-  await access(userId, roomId);
+  await access(currentUserId, roomId);
 
-
-  return roomAPI.remove(args.roomId);
+  return roomModeWaitlistAPI.skip(roomId);
 }

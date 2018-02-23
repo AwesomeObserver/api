@@ -90,10 +90,10 @@ export class RoomModeWaitlistAPI {
     });
   }
 
-  async kick(roomId: number, userId: number) {
+  async kick(roomId: number, userId?: number) {
     const waitlistQueue = await this.get(roomId);
 
-    if (userId != waitlistQueue.userId) {
+    if (userId && (userId != waitlistQueue.userId)) {
       logger.info(`User ${userId} not playing now`);
       return false;
     }
@@ -109,7 +109,12 @@ export class RoomModeWaitlistAPI {
     return this.setPlay(roomId, nextUserId);
   }
 
-  async endPlay(roomId: number) {
+
+  async skip(roomId: number) {
+    this.endPlay(roomId);
+  }
+
+  endPlay = async (roomId: number) => {
     const waitlistQueue = await this.get(roomId);
 
     if (waitlistQueue.users.length === 0) {

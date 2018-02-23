@@ -1,121 +1,139 @@
-import {
-  merge,
-  mergeWith,
-  assignIn,
-  uniq
-} from 'lodash';
+import { merge, flip, union, uniq } from 'ramda';
+import { accessActions } from 'app/access/actions';
+import { accessRoles } from 'app/access/roles';
 
-import * as allActions from 'app/access/actions';
-import * as allRoles from 'app/access/roles';
-import rolesWeight from 'app/access/weight';
+const actionMask = {
+  // Нужна ли инфа о пользователе в контексте
+  context: false,
+  // Cлабые роли не могут применить действие на более сильные
+  hierarchy: true,
+  // Можно ли применть действие к себе
+  self: false,
+};
 
-const isBoolean = (val) => typeof val === 'boolean';
+const makeActions = (actions) => {
+  const res = {};
+
+  Object.keys(actions).forEach(name => {
+    res[name] = flip(merge)(actions[name], actionMask);
+
+    if (actions[name]['groups']) {
+      res[name].groups = ['global', ...actions[name]['groups']];
+    } else {
+      res[name].groups = ['global'];
+    }
+  });
+
+  return res;
+}
+
+const extendRole = (role) => {
+  const pureExtRole = accessRoles.find(r => r.name === role.extend);
+
+  if (!pureExtRole) {
+    throw new Error('Role for extend not found');
+  }
+
+  const extRole = pureExtRole.extend ? extendRole(pureExtRole) : pureExtRole;
+
+  role.actions = union(role.actions, extRole.actions);
+  role.groups = union(role.groups, extRole.groups);
+  role.extend = undefined;
+
+  return role;
+}
+
+const makeRoles = (roles) => {
+  return roles.map(role => {
+    if (role.extend) {
+      return extendRole(role);
+    } else {
+      role.actions = union(role.actions, []);
+      role.groups = union(role.groups, []);
+      return role;
+    }
+  });
+}
+
+const fullAccessActions = makeActions(accessActions);
+const fullAccessRoles = makeRoles(accessRoles);
+
+const getRolesWeight = (roles) => {
+  let max = -1;
+
+  roles.forEach(role => {
+    const current = fullAccessRoles.findIndex(r => r.name === role);
+
+    if (current > max) {
+      max = current;
+    }
+  });
+
+  return max;
+}
+
+const checkAccessByRolesData = (actionName, actionData, roles) => {
+  let allow = false;
+
+  for (const roleName of roles)  {
+    const roleData = fullAccessRoles.find(r => r.name === roleName);
+
+    if (!roleData) {
+      throw new Error(`Role ${roleName} not found`);
+    }
+
+    const joinGroups = [...roleData.groups, ...actionData.groups];
+
+    if (joinGroups.length != uniq(joinGroups).length) {
+      allow = true;
+      break;
+    }
+
+    if (roleData.actions.includes(actionName)) {
+      allow = true;
+      break;
+    }
+  }
+
+  return allow;
+}
+
+const checkAccessByActionData = (actionData, current, context) => {
+  if (!actionData.context) return true;
+  if (actionData.self && (current.id == context.id)) return true;
+  if (!actionData.self && (current.id == context.id)) return false;
+
+  if (actionData.hierarchy) {
+    const currentWeight = getRolesWeight(current.roles);
+    const contextWeight = getRolesWeight(context.roles);
+    
+    if (currentWeight <= contextWeight) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export const checkAccess = (action, current, context) => {
+  const actionData = fullAccessActions[action];
+
+  if (!actionData) {
+    throw new Error(`Action ${action} not found`);
+  }
+
+  if (!checkAccessByRolesData(action, actionData, current.roles)) {
+    return false;
+  }
+
+  if (!checkAccessByActionData(actionData, current, context)) {
+    return false;
+  }
+
+  return true;
+}
 
 export class AccessAPI {
-
-  actionMask = {
-    // Нужна ли инфа о пользователе в контексте
-    context: false,
-    // Cлабые роли не могут применить действие на более сильные
-    hierarchy: true,
-    // Можно ли применть действие к себе
-    self: false,
-  };
-
-  roles = {};
-
-  constructor() {
-    Object.keys(allRoles).forEach(roleName => {
-      const roleData = allRoles[roleName];
-    
-      let roleWIP = Object.assign({}, roleData);
-    
-      if (roleData.extend) {
-        roleWIP = this.extendRole(roleData);
-      }
-    
-      this.roles[roleName] = roleWIP;
-    });
-  }
-  
-  getActionData(action) {
-    const actionWithoutMask = allActions[action.group][action.name];
-    return assignIn({}, this.actionMask, actionWithoutMask);
-  }
-  
-  extendRole(roleData) {
-    let roleWIP = Object.assign({}, roleData);
-    const mergeRoleData = this.getRole(roleWIP.extend);
-  
-    delete roleWIP.extend;
-  
-    return merge({}, mergeRoleData, roleWIP);
-  }
-  
-  mergeRoles(roles) {
-    return this.mergeRolesData(Object.values(this.getRolesData(roles)));  
-  }
-  
-  mergeRolesData(rolesData) {
-    return mergeWith({}, ...rolesData, function(objValue, srcValue) {
-      if (isBoolean(objValue) || isBoolean(srcValue)) {
-        return objValue || srcValue;
-      }
-    });
-  }
-  
-  getRole(role) {
-    return this.roles[role];
-  }
-  
-  getRolesWeight(roles) {
-    let max = -1;
-  
-    roles.forEach(role => {
-      const current = rolesWeight.findIndex(name => name == role);
-  
-      if (current > max) {
-        max = current;
-      }
-    });
-  
-    return max;
-  }
-
-  getRolesData(roles) {
-    return roles.map(roleName => this.getRole(roleName));
-  }
-
-  checkAccessByRolesData(action, roles) {
-    const rolesData = this.mergeRoles(roles);
-    const groupData = rolesData.rules[action.group];
-  
-    if (!groupData) return false;
-    if (groupData.ignore) return true;
-    if (!groupData.actions) return false
-  
-    return groupData.actions[action.name];
-  }
-
-  checkAccessByActionData(action, current, context) {
-    const actionData = this.getActionData(action);
-  
-    if (!actionData.context) return true;
-    if (actionData.self && (current.id == context.id)) return true;
-    if (!actionData.self && (current.id == context.id)) return false;
-  
-    if (actionData.hierarchy) {
-      const currentWeight = this.getRolesWeight(current.roles);
-      const contextWeight = this.getRolesWeight(context.roles);
-      
-      if (currentWeight <= contextWeight) {
-        return false;
-      }
-    }
-  
-    return true;
-  }
-
   userDataFormatHack(user) {
     if (user.room) {
       return Object.assign({}, user, {
@@ -131,14 +149,7 @@ export class AccessAPI {
     });
   }
 
-  check(
-    action: {
-      group: string,
-      name: string
-    },
-    current,
-    context?
-  ) {
+  check(action: string, current, context?) {
     if (current) {
       current = this.userDataFormatHack(current);
     } else {
@@ -152,17 +163,11 @@ export class AccessAPI {
     if (context) {
       context = this.userDataFormatHack(context);
     }
-  
-    if (current.banned) {
-      return false;
+
+    if (!checkAccess(action, current, context)) {
+      throw new Error('Deny');
     }
   
-    const accessByRolesData = this.checkAccessByRolesData(action, current.roles);
-    if (!accessByRolesData) return false;
-  
-    const accessByActionData = this.checkAccessByActionData(action, current, context);
-    if (!accessByActionData) return false;
-
     return true;
   }
 }

@@ -1,31 +1,35 @@
-import { accessAPI, roomAPI, userAPI, roomModeWaitlistAPI } from 'app/api';
+import { accessAPI, roomUserAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
-  waitlistKick(roomId: Int!, userId: Int): Boolean
+  waitlistKick(roomId: Int!, current: Boolean): Boolean
 `;
 
-// async function access(userId: number) {
-//   const current = await User.getById(userId);
+async function access(userId: number, roomId: number) {
+  const current = await roomUserAPI.getOneFull(userId, roomId);
 
-//   await Access.check({ group: 'global', name: 'banRoom' }, current);
-// }
+  await accessAPI.check('waitlistKick', current);
+}
 
 export async function resolver(
   root: any,
   args: {
     roomId: number,
-    userId: number
+    current: boolean
   },
   ctx: any
 ) {
-  const { roomId, userId } = args;
+  const { roomId, current } = args;
   const currentUserId = ctx.userId;
 
-  // await access(userId);
+  if (current) {
+    await access(currentUserId, roomId);
 
-  if (!currentUserId) {
-    return null;
+    return roomModeWaitlistAPI.kick(roomId);
+  } else {
+    if (!currentUserId) {
+      return null;
+    }
+
+    return roomModeWaitlistAPI.kick(roomId, currentUserId);
   }
-
-  return roomModeWaitlistAPI.kick(roomId, currentUserId);
 }

@@ -11,7 +11,7 @@ export const schema = `
 async function access(userId: number) {
   const current = await userAPI.getById(userId);
 
-  await accessAPI.check({ group: 'room', name: 'waitlistAddSource' }, current);
+  await accessAPI.check('waitlistAddSource', current);
 }
 
 export async function resolver(

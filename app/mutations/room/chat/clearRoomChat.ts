@@ -8,10 +8,7 @@ export const schema = `
 async function access(roomId: number, current) {
   const userId = current.site.id;
 
-  await accessAPI.check({
-    group: 'room',
-    name: 'clearChat'
-  }, current);
+  await accessAPI.check('removeAllMessages', current);
 }
 
 export async function resolver(

@@ -13,22 +13,13 @@ async function access(currentUserId: number, userId: number, role: string) {
     userAPI.getById(userId)
   ]);
 
-  await accessAPI.check({
-    group: 'global',
-    name: 'setRole'
-  }, current, context);
+  await accessAPI.check('setRole', current, context);
 
   switch (role) {
     case 'admin':
-      return accessAPI.check({
-        group: 'room',
-        name: 'setRoleAdmin'
-      }, current, context);
+      return accessAPI.check('setRoleAdmin', current, context);
     case 'user':
-      return accessAPI.check({
-        group: 'room',
-        name: 'setRoleUser'
-      }, current, context);
+      return accessAPI.check('setRoleUser', current, context);
     default:
       throw new Error('Deny');
   }
