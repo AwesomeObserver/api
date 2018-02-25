@@ -10,7 +10,7 @@ export async function resolver(root: any, args: any, ctx: any) {
   const { userId } = ctx;
 
   if (!userId) {
-    throw new Error('Deny');
+    return null;
   }
 
   const user = await userAPI.getById(userId);
