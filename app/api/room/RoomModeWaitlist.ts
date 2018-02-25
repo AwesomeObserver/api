@@ -111,7 +111,8 @@ export class RoomModeWaitlistAPI {
 
 
   async skip(roomId: number) {
-    this.endPlay(roomId);
+    await this.cancelPlay(roomId);
+    return this.endPlay(roomId);
   }
 
   endPlay = async (roomId: number) => {

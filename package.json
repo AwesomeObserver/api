@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.27.1",
+	"version": "0.27.4",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -29,16 +29,16 @@
 		"@types/pg": "^7.4.4",
 		"@types/ramda": "^0.25.18",
 		"@types/uws": "^0.13.1",
-		"jest": "^22.3.0",
-		"nodemon": "^1.15.0",
-		"ts-node": "^4.1.0",
+		"jest": "^22.4.2",
+		"nodemon": "^1.15.1",
+		"ts-node": "^5.0.0",
 		"tsconfig-paths": "^2.7.3",
 		"tslint": "^5.9.1",
 		"typescript": "^2.7.2"
 	},
 	"dependencies": {
 		"agenda": "^1.0.3",
-		"apollo-link": "^1.1.0",
+		"apollo-link": "^1.2.1",
 		"apollo-server-koa": "^1.3.2",
 		"bunyan": "^1.8.12",
 		"date-fns": "^1.29.0",
@@ -52,8 +52,7 @@
 		"koa-router": "^7.4.0",
 		"koa-session": "^5.8.1",
 		"koa2-cors": "^2.0.5",
-		"lodash": "^4.17.5",
-		"mongoose": "^5.0.6",
+		"mongoose": "^5.0.7",
 		"node-fetch": "^2.0.0",
 		"passport-google-oauth2": "^0.1.6",
 		"passport-twitch": "^1.0.3",
