@@ -8,8 +8,7 @@ import * as RedisStore from 'koa-redis';
 import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
 import { buildSchema } from './schema';
 import { setupDB } from './db';
-import { wsAPI } from './wsapi';
-import { connectionAPI, userAPI } from 'app/api';
+import { userAPI } from 'app/api';
 import { getFolderData } from './utils';
 
 const authDir = __dirname + '/../app/auth/';
@@ -76,14 +75,12 @@ function setupServices(router) {
 
 export class RPServer {
 	API_PORT: number;
-	WSAPI_PORT: number;
 	app: any;
 	router;
 	any;
 
 	constructor() {
 		this.API_PORT = 8200;
-		this.WSAPI_PORT = 8000;
 		this.app = null;
 		this.router = null;
 	}
@@ -152,15 +149,9 @@ export class RPServer {
 		this.app.listen(this.API_PORT);
 	}
 
-	async setupWSAPI() {
-		wsAPI.PORT = this.WSAPI_PORT;
-		return wsAPI.run();
-	}
-
 	async run() {
 		this.setupHttp();
 
 		await setupDB();
-		await this.setupWSAPI();
 	}
 }

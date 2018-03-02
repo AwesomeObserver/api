@@ -1,6 +1,4 @@
 import { setupRedis } from 'core/db';
-import { wsAPI } from 'core/wsapi';
-import { objFilter } from 'core/utils';
 import { logger } from 'core/logger';
 
 class PubSub {
@@ -29,9 +27,7 @@ class PubSub {
   }
 
   private onMessage(message) {
-    const { eventName, payload, filterData } = JSON.parse(message);
-
-    wsAPI.send(eventName, payload, (cdata) => objFilter(cdata, filterData));
+    // const { eventName, payload, filterData } = JSON.parse(message);
   }
 
   public publish(eventName, payload, filterData) {
