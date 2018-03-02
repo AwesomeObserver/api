@@ -12,10 +12,7 @@ export const setupRedis = () => {
 export const redis = setupRedis();
 export const agenda = new Agenda({ db: { address: process.env.MONGO_URL } });
 export const pgClient = new PGClient({
-  user: process.env.POSTGRES_USERNAME,
-  host: 'postgres',
-  database: process.env.POSTGRES_DB,
-  port: 5432,
+  connectionString: process.env.POSTGRES_URL
 });
 
 pgClient.connect();
@@ -31,10 +28,8 @@ db.once('open', function() {
 export async function setupDB() {
 	return createConnection({
 		type: 'postgres',
-		host: process.env.POSTGRES_HOST,
+		url: process.env.POSTGRES_URL,
 		// logging: true,
-		username: process.env.POSTGRES_USERNAME,
-		database: process.env.POSTGRES_DB,
 		entities: [ __dirname + '/../app/entity/*' ],
 		synchronize: true
 	});
