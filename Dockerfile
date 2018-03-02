@@ -1,4 +1,4 @@
-FROM node
+FROM node:alpine
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -8,5 +8,5 @@ RUN npm install pm2 -g
 RUN yarn
 RUN yarn build
 
-EXPOSE 8000 8200 8500
+EXPOSE 8200 8500
 CMD ["yarn", "start"]
