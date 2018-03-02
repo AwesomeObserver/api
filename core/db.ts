@@ -31,7 +31,7 @@ db.once('open', function() {
 export async function setupDB() {
 	return createConnection({
 		type: 'postgres',
-		host: 'postgres',
+		host: process.env.POSTGRES_HOST,
 		// logging: true,
 		username: process.env.POSTGRES_USERNAME,
 		database: process.env.POSTGRES_DB,
