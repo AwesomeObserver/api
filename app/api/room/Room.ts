@@ -35,7 +35,7 @@ export class RoomAPI {
       roomFollowerAPI.getCount(room.id)
     ]);
 
-    const defaultAvatar = 'https://pp.userapi.com/c626221/v626221510/7026b/zKYk5tlr530.jpg';
+    const defaultAvatar = 'https://ravepro.ams3.digitaloceanspaces.com/logo.jpg';
 
     return {
       ...room,
