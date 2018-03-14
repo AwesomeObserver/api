@@ -8,7 +8,8 @@
 		"dev": "nodemon",
 		"watch": "ts-node -r tsconfig-paths/register core/index",
 		"build": "tsc",
-		"start": "pm2-docker start ./index.js --node-args='--max-old-space-size=1024'"
+		"start": "pm2-docker start ./index.js --node-args='--max-old-space-size=1024'",
+		"test": "jest"
 	},
 	"repository": {
 		"type": "git",
@@ -21,6 +22,7 @@
 		"@types/agenda": "^1.0.2",
 		"@types/graphql": "^0.12.3",
 		"@types/ioredis": "^3.2.5",
+		"@types/jest": "^22.2.0",
 		"@types/koa": "^2.0.44",
 		"@types/koa-bodyparser": "4.2.0",
 		"@types/koa-router": "7.0.27",
@@ -66,5 +68,18 @@
 		"reflect-metadata": "^0.1.12",
 		"typeorm": "^0.1.16",
 		"uws": "^9.14.0"
+	},
+	"jest": {
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js"
+		],
+		"transform": {
+			"^.+\\.(ts|tsx)$": "<rootDir>/preprocessor.js"
+		},
+		"testMatch": [
+			"**/__tests__/*.+(ts|tsx|js)"
+		]
 	}
 }

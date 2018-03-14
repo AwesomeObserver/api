@@ -96,6 +96,10 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
+"@types/jest@^22.2.0":
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-22.2.0.tgz#55ce83139f7ad1b48b414c3927746614c6963c0f"
+
 "@types/keygrip@*":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/keygrip/-/keygrip-1.0.1.tgz#ff540462d2fb4d0a88441ceaf27d287b01c3d878"
