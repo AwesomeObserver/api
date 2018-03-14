@@ -1,4 +1,6 @@
 import { ConnectionAPI } from 'app/api/connection/Connection';
+import { ConnectionEventsAPI } from 'app/api/connection/ConnectionEvents';
+import { RoomEventsAPI } from 'app/api/room/RoomEvents';
 import { SourceAPI } from 'app/api/music/Source';
 import { YoutubeAPI } from 'app/api/music/services/Youtube';
 import { SoundcloudAPI } from 'app/api/music/services/Soundcloud';
@@ -15,6 +17,8 @@ import { ActionTimeAPI } from 'app/api/ActionTime';
 import { CacheAPI } from 'app/api/Cache';
 
 export const connectionAPI = new ConnectionAPI();
+export const connectionEventsAPI = new ConnectionEventsAPI();
+export const roomEventsAPI = new RoomEventsAPI();
 export const sourceAPI = new SourceAPI();
 export const youtubeAPI = new YoutubeAPI();
 export const soundcloudAPI = new SoundcloudAPI();
