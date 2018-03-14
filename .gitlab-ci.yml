@@ -19,4 +19,4 @@ deploy:
   stage: deploy
   image: cdrx/rancher-gitlab-deploy
   script:
-    - upgrade --stack RavePro --service api --no-finish-upgrade
+    - upgrade --stack RavePro --service api --start-before-stopping
