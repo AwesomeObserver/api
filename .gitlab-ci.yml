@@ -1,10 +1,22 @@
-build_image:
-  image: docker:git
-  services:
+image: docker:latest
+services:
   - docker:dind
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/ravepro/api .
     - docker push registry.gitlab.com/ravepro/api:latest
   only:
     - master
+
+deploy:
+  stage: deploy
+  image: cdrx/rancher-gitlab-deploy
+  script:
+    - upgrade --stack RavePro --service api --no-finish-upgrade
