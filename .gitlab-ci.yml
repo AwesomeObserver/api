@@ -12,8 +12,6 @@ build:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/ravepro/api .
     - docker push registry.gitlab.com/ravepro/api:latest
-  only:
-    - master
 
 deploy:
   stage: deploy
