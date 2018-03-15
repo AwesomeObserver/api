@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.30.0",
+	"version": "0.30.1",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -32,7 +32,7 @@
 		"@types/ramda": "^0.25.20",
 		"@types/uws": "^0.13.2",
 		"jest": "^22.4.2",
-		"nodemon": "^1.17.1",
+		"nodemon": "^1.17.2",
 		"ts-node": "^5.0.1",
 		"tsconfig-paths": "^2.7.3",
 		"tslint": "^5.9.1",
@@ -45,7 +45,7 @@
 		"bunyan": "^1.8.12",
 		"date-fns": "^1.29.0",
 		"graphql": "^0.12.3",
-		"graphql-tools": "^2.22.0",
+		"graphql-tools": "^2.23.0",
 		"ioredis": "^3.2.2",
 		"koa": "^2.5.0",
 		"koa-bodyparser": "^4.2.0",
@@ -72,14 +72,13 @@
 	"jest": {
 		"moduleFileExtensions": [
 			"ts",
-			"tsx",
 			"js"
 		],
 		"transform": {
-			"^.+\\.(ts|tsx)$": "<rootDir>/preprocessor.js"
+			"^.+\\.ts$": "<rootDir>/preprocessor.js"
 		},
 		"testMatch": [
-			"**/__tests__/*.+(ts|tsx|js)"
+			"**/*.test.ts"
 		]
 	}
 }

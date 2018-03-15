@@ -1,9 +1,9 @@
-const { objFilter } = require('../core/utils');
+const { objFilter } = require('./utils');
 
-test('objFilter 1', () => {
+test('objFilter pass', () => {
   expect(objFilter({ a: 1, b: 2 }, { a: 1 })).toBeTruthy();
 });
 
-test('objFilter 2', () => {
+test('objFilter not pass', () => {
   expect(objFilter({ a: 1, b: 2 }, { a: 2 })).toBeFalsy();
 });
