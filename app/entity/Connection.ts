@@ -13,12 +13,6 @@ export class Connection {
   @Column({ type: 'integer', nullable: true })
   userId: number;
 
-  @ManyToOne(type => User, user => user.userRooms, { cascadeAll: true })
-  user: User;
-
   @Column({ type: 'integer', nullable: true })
   roomId: number;
-
-  @ManyToOne(type => Room, room => room.users, { cascadeAll: true })
-  room: Room;
 }
