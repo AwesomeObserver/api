@@ -13,7 +13,7 @@ export class ConnectionAPI {
   }
 
 	async getOne(connectionId: string) {
-		return this.repository.findOne({ id: connectionId });
+		return this.repository.findOne({ connectionId });
 	}
 
   async getRoomConnections(roomId: number) {
@@ -49,22 +49,28 @@ export class ConnectionAPI {
 	async save(connectionId: string, instanceId: string) {
 		let connection = new ConnectionEntity();
 
-		connection.id = connectionId;
+		connection.connectionId = connectionId;
 		connection.instanceId = instanceId;
 
 		return this.manager.save(connection);
 	}
 
 	async setRoomId(connectionId: string, roomId?: number) {
-		return this.repository.updateById(connectionId, { roomId });
+		return this.repository.update({ connectionId }, { roomId });
 	}
 
 	async setUserId(connectionId: string, userId?: number) {
-		return this.repository.updateById(connectionId, { userId });
+		return this.repository.update({ connectionId }, { userId });
 	}
 
 	async del(connectionId: string) {
-		return this.repository.removeById(connectionId);
+		const connection = await this.getOne(connectionId);
+
+		if (!connection) {
+			return  console.error('connection not found');
+		}
+
+		return this.repository.remove(connection);
 	}
 
 	async removeInstanceConnections(instanceId: string) {
