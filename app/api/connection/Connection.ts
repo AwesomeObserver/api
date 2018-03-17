@@ -1,21 +1,27 @@
-import { ConnectionModel } from 'app/models/Connection';
+import { getConnection } from "typeorm";
+import { Connection as ConnectionEntity } from 'app/entity/Connection';
 import { connectionEventsAPI, roomEventsAPI } from 'app/api';
 
 export class ConnectionAPI {
-	get Model() {
-		return ConnectionModel;
-	}
+
+	get repository() {
+    return getConnection().getRepository(ConnectionEntity);
+  }
+
+  get manager() {
+    return getConnection().manager;
+  }
 
 	async getOne(connectionId: string) {
-		return this.Model.findOne({ connectionId });
+		return this.repository.findOne({ id: connectionId });
 	}
 
   async getRoomConnections(roomId: number) {
-		return this.Model.find({ roomId });
+		return this.repository.find({ roomId });
   }
   
   async getUserConnections(userId: number) {
-		return this.Model.find({ userId });
+		return this.repository.find({ userId });
 	}
 
 	async getRoomCounts(roomId: number) {
@@ -41,34 +47,28 @@ export class ConnectionAPI {
 	}
 
 	async save(connectionId: string, instanceId: string) {
-		return new this.Model({
-			connectionId,
-			instanceId
-		}).save();
+		let connection = new ConnectionEntity();
+
+		connection.id = connectionId;
+		connection.instanceId = instanceId;
+
+		return this.manager.save(connection);
 	}
 
 	async setRoomId(connectionId: string, roomId?: number) {
-		return this.Model.findOneAndUpdate({
-			connectionId
-		}, {
-			$set: { roomId }
-		});
+		return this.repository.updateById(connectionId, { roomId });
 	}
 
 	async setUserId(connectionId: string, userId?: number) {
-		return this.Model.findOneAndUpdate({
-			connectionId
-		}, {
-			$set: { userId }
-		});
+		return this.repository.updateById(connectionId, { userId });
 	}
 
 	async del(connectionId: string) {
-		return this.Model.remove({ connectionId });
+		return this.repository.removeById(connectionId);
 	}
 
 	async removeInstanceConnections(instanceId: string) {
-		const instanceConnections = await this.Model.find({ instanceId });
+		const instanceConnections = await this.repository.find({ instanceId });
 
 		const roomsIds = new Map();
 
@@ -81,6 +81,6 @@ export class ConnectionAPI {
 			}
 		});
 
-		return this.Model.remove({ instanceId });
+		return this.repository.remove(instanceConnections);
   }
 }
