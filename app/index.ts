@@ -20,7 +20,6 @@ export async function startup() {
 
   agenda.start();
 
-
   broker.createService({
     name: "connection",
     actions: {
