@@ -5,7 +5,7 @@ import {
 } from 'app/api';
 
 export const schema = `
-  waitlistAddSource(roomId: Int!, link: String!): Boolean
+  waitlistAddSource(roomId: Int!, link: String!, useTimecode: Boolean): Boolean
 `;
 
 async function access(userId: number) {
@@ -18,14 +18,15 @@ export async function resolver(
   root: any,
   args: {
     roomId: number,
-    link: string
+    link: string,
+    useTimecode?: boolean
   },
   ctx: any
 ) {
-  const { roomId, link } = args;
+  const { roomId, link, useTimecode } = args;
   const userId = ctx.userId;
 
   await access(userId);
   
-  return roomModeWaitlistUserAPI.addFromLink(roomId, userId, link);
+  return roomModeWaitlistUserAPI.addFromLink(roomId, userId, link, useTimecode);
 }

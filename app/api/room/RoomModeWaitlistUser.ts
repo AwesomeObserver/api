@@ -85,15 +85,14 @@ export class RoomModeWaitlistUserAPI {
   async addFromLink(
     roomId: number,
     userId: number,
-    link: string
+    link: string,
+    useTimecode: boolean
   ) {
-    const { source, start } = await sourceAPI.addFromLink(link);
+    const { source, start } = await sourceAPI.addFromLink(link, useTimecode);
 
     if (!source) {
       return false;
     }
-
-    console.log(source, start);
 
     this.add(roomId, userId, source.id, start, source);
   }

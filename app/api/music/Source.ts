@@ -11,7 +11,7 @@ export class SourceAPI {
 		return getConnection().manager;
 	}
 
-	addFromLink = async (link: string) => {
+	addFromLink = async (link: string, useTimecode: boolean) => {
 		let start = 0;
 		const ytRegex = /((www\.|)youtube\.com|youtu\.?be)\/(watch\?v=|v|embed\/|)([^\?\&\s]+)/;
 		const scRegex = /(https?:\/\/soundcloud.com\/.+)/;
@@ -22,7 +22,7 @@ export class SourceAPI {
 			const ytTimeCodeRegex = /t=(([0-9]+)h|)(([0-9]+)m|)(([0-9]+)s|)/;
 			const ytTimeCodeRegexRes = link.match(ytTimeCodeRegex);
 
-			if (ytTimeCodeRegexRes) {
+			if (ytTimeCodeRegexRes && useTimecode) {
 				const h = parseInt(ytTimeCodeRegexRes[2], 10) || 0;
 				const m = parseInt(ytTimeCodeRegexRes[4], 10) || 0;
 				const s = parseInt(ytTimeCodeRegexRes[6], 10) || 0;
@@ -40,8 +40,18 @@ export class SourceAPI {
 			const scTimeCodeRegex = /t=(([0-9]+):|)(([0-9]+):|)(([0-9]+)|)$/;
 			const scTimeCodeRegexRes = link.match(scTimeCodeRegex);
 
-			if (scTimeCodeRegexRes) {
-				console.log(scTimeCodeRegexRes);
+			if (scTimeCodeRegexRes && useTimecode) {
+				let h = parseInt(scTimeCodeRegexRes[2], 10) || 0;
+				let m = parseInt(scTimeCodeRegexRes[4], 10) || 0;
+				let s = parseInt(scTimeCodeRegexRes[6], 10) || 0;
+
+				if (typeof scTimeCodeRegexRes[4] === 'undefined') {
+					m = h;
+					h = 0;
+				}
+
+				console.log(scTimeCodeRegexRes, h, m, s);
+				start = h * 3600 + m * 60 + s;
 			}
 
 			const source = await this.addFromSoundcloudByUrl(scRegexRes[0]);
@@ -91,13 +101,14 @@ export class SourceAPI {
 	};
 
 	addFromSoundcloudByUrl = async (url: string) => {
-		const source = await this.getOne({ service: 'soundcloud', url });
+		const pureUrl = url.match(/([^#])+/)[0];
+		const source = await this.getOne({ service: 'soundcloud', url: pureUrl });
 
 		if (source) {
 			return source;
 		}
 
-		const data = await soundcloudAPI.getTrackByUrl(url);
+		const data = await soundcloudAPI.getTrackByUrl(pureUrl);
 
 		if (!data) {
 			return null;
