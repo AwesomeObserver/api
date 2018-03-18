@@ -17,6 +17,13 @@ export class RoomModeWaitlistUserAPI {
     return getConnection().manager;
   }
 
+  parse = (sourceData: string) => {
+    const sourceRegexRes = sourceData.match(/([0-9]+):([0-9]+)/);
+    const sourceId = parseInt(sourceRegexRes[1], 10);
+    const start = parseInt(sourceRegexRes[2], 10);
+    return { sourceId, start };
+  }
+
   async cutFirst(
     roomId: number,
     userId: number
@@ -27,17 +34,15 @@ export class RoomModeWaitlistUserAPI {
       return false;
     }
 
-    const firstSourceId = parseInt(userQueue.sources[0], 10);
-
-    const sources = userQueue.sources.filter(sId => {
-      return parseInt(sId, 10) != firstSourceId;
-    });
+    const firstSource = this.parse(userQueue.sources[0]);
+    
+    const sources = this.removeFromArray(userQueue.sources, firstSource.sourceId)
 
     await this.repository.updateById(userQueue.id, { sources });
 
-    pubSub.publish('waitlistRemoveSource', firstSourceId, { userId, roomId });
+    pubSub.publish('waitlistRemoveSource', firstSource.sourceId, { userId, roomId });
 
-    return firstSourceId;
+    return firstSource;
   }
 
   async getWithCreate(
@@ -82,19 +87,22 @@ export class RoomModeWaitlistUserAPI {
     userId: number,
     link: string
   ) {
-    const source = await sourceAPI.addFromLink(link);
+    const { source, start } = await sourceAPI.addFromLink(link);
 
     if (!source) {
       return false;
     }
 
-    this.add(roomId, userId, source.id, source);
+    console.log(source, start);
+
+    this.add(roomId, userId, source.id, start, source);
   }
 
   async add(
     roomId: number,
     userId: number,
     sourceId: number,
+    start: number,
     source?
   ) {
     const userQueue = await this.getWithCreate(roomId, userId);
@@ -108,20 +116,28 @@ export class RoomModeWaitlistUserAPI {
       return false;
     }
 
-    if (userQueue.sources.findIndex(sId => parseInt(sId, 10) == sourceId) >= 0) {
+    const isExist = userQueue.sources.findIndex(sData => {
+      return this.parse(sData).sourceId == sourceId;
+    }) >= 0;
+
+    if (isExist) {
       logger.info(`User ${userId} have source ${sourceId} now`);
       return false;
     }
 
     const res = await this.repository.updateById(userQueue.id, {
-      sources: [...userQueue.sources, sourceId]
+      sources: [...userQueue.sources, `${sourceId}:${start}`]
     });
 
     if (source) {
-      pubSub.publish('waitlistAddSource', source, { userId, roomId });
+      pubSub.publish('waitlistAddSource', { source, start }, { userId, roomId });
     }
 
     return res;
+  }
+
+  removeFromArray = (array, id) => {
+    return array.filter(sData => this.parse(sData).sourceId != id);
   }
 
   async remove(
@@ -140,7 +156,7 @@ export class RoomModeWaitlistUserAPI {
     }
 
     const res = await this.repository.updateById(userQueue.id, {
-      sources: userQueue.sources.filter(sId => parseInt(sId, 10) != sourceId)
+      sources: this.removeFromArray(userQueue.sources, sourceId)
     });
 
     pubSub.publish('waitlistRemoveSource', sourceId, { userId, roomId });

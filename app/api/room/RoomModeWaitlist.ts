@@ -29,12 +29,12 @@ export class RoomModeWaitlistAPI {
 
   // Set User to Current Play
   async setPlay(roomId: number, userId: number) {
-    const [sourceId, user] = await Promise.all([
+    const [sourceData, user] = await Promise.all([
       roomModeWaitlistUserAPI.cutFirst(roomId, userId),
       userAPI.getById(userId)
     ]);
 
-    if (!sourceId) {
+    if (!sourceData) {
       const waitlistQueue = await this.get(roomId);
 
       if (waitlistQueue.users.length === 0) {
@@ -46,10 +46,10 @@ export class RoomModeWaitlistAPI {
       }
     }
 
-    const source = await sourceAPI.getById(sourceId);
+    const source = await sourceAPI.getById(sourceData.sourceId);
 
-    const duration = source.duration;
-    const start = +new Date();
+    const duration = source.duration - sourceData.start;
+    const start = +new Date() - sourceData.start * 1000;
     const end = +new Date() + duration * 1000;
 
     agenda.create('waitlistPlayEnd', { roomId });
@@ -59,6 +59,7 @@ export class RoomModeWaitlistAPI {
     await this.repository.update({ roomId }, {
       userId: user.id,
       sourceId: source.id,
+      sourceStart: sourceData.start,
       start: format(start),
       end: format(end)
     });
@@ -67,6 +68,7 @@ export class RoomModeWaitlistAPI {
     pubSub.publish('waitlistPlayData', {
       start,
       serverTime: +new Date(),
+      sourceStart: sourceData.start,
       source,
       user
     }, { roomId });
