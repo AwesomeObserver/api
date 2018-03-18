@@ -1,6 +1,6 @@
 export const type = `
   type WaitlistPlay {
-    userPlaylist: [Source]
+    userPlaylist: [WaitlistSource]
     users: [User]
     playData: WaitlistPlayData
   }

@@ -38,6 +38,9 @@ export class RoomWaitlistQueue {
   @Column({ type: 'timestamp with time zone', nullable: true })
   start: string;
 
+  @Column({ type: 'integer', default: 0 })
+  sourceStart: number;
+
   @Column({ type: 'timestamp with time zone', nullable: true })
   end: string;
 

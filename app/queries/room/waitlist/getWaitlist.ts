@@ -30,8 +30,10 @@ export async function resolver(
     sourcesIds = playlist.sources;
   }
 
-  const sources = await Promise.all(sourcesIds.map(sourceId => {
-    return sourceAPI.getById(sourceId);
+  const sources = await Promise.all(sourcesIds.map(async (sourceData) => {
+    const { sourceId, start } = roomModeWaitlistUserAPI.parse(sourceData);
+    const source = await sourceAPI.getById(sourceId);
+    return { source, start };
   }));
 
   const users = await Promise.all(data.users.map(userId => {
