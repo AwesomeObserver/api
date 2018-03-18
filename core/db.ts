@@ -1,6 +1,5 @@
 import * as Agenda from 'agenda';
 import * as IoRedis from 'ioredis';
-import * as mongoose from 'mongoose';
 import { Client as PGClient } from 'pg';
 import { createConnection } from 'typeorm';
 import { logger } from 'core/logger';
@@ -16,14 +15,6 @@ export const pgClient = new PGClient({
 });
 
 pgClient.connect();
-
-mongoose.connect(process.env.MONGO_URL);
-
-const db = mongoose.connection;
-db.on('error', logger.error.bind(logger, 'connection error:'));
-db.once('open', function() {
-  // logger.log('mongo connect');
-});
 
 export async function setupDB() {
 	return createConnection({

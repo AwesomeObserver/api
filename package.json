@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.30.4",
+	"version": "0.30.5",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -26,7 +26,6 @@
 		"@types/koa": "^2.0.44",
 		"@types/koa-bodyparser": "4.2.0",
 		"@types/koa-router": "7.0.27",
-		"@types/mongoose": "^5.0.7",
 		"@types/node": "^9.4.7",
 		"@types/pg": "^7.4.5",
 		"@types/ramda": "^0.25.20",
@@ -55,7 +54,6 @@
 		"koa-session": "^5.8.1",
 		"koa2-cors": "^2.0.5",
 		"moleculer": "^0.12.1",
-		"mongoose": "^5.0.10",
 		"nats": "^0.8.4",
 		"node-fetch": "^2.1.1",
 		"passport-google-oauth2": "^0.1.6",
