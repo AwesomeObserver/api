@@ -49,8 +49,7 @@ export class SourceAPI {
 					m = h;
 					h = 0;
 				}
-
-				console.log(scTimeCodeRegexRes, h, m, s);
+				
 				start = h * 3600 + m * 60 + s;
 			}
 

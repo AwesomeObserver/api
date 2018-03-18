@@ -88,10 +88,14 @@ export class RoomModeWaitlistUserAPI {
     link: string,
     useTimecode: boolean
   ) {
-    const { source, start } = await sourceAPI.addFromLink(link, useTimecode);
+    let { source, start } = await sourceAPI.addFromLink(link, useTimecode);
 
     if (!source) {
       return false;
+    }
+
+    if (source.duration <= start) {
+      start = 0;
     }
 
     this.add(roomId, userId, source.id, start, source);
