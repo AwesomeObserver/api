@@ -26,7 +26,7 @@ async function access(roomId: number, current) {
 			const actionName = `sendMessage:${roomId}`;
 			const lastMessageDate = await actionTimeAPI.get(userId, actionName);
 
-			const sendMessageDelay = 2;
+			const sendMessageDelay = 10;
 
 			if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
 				throw new Error('denyForSlowMode');
@@ -45,7 +45,7 @@ async function access(roomId: number, current) {
 				throw new Error('mustBeFollow');
 			}
 
-			if (!isBefore(addSeconds(lastFollowDate, 60 * 30), +new Date())) {
+			if (!isBefore(addSeconds(lastFollowDate, 60 * 5), +new Date())) {
 				throw new Error('denyForFollowMode');
 			}
 		}
