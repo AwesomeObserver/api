@@ -3,9 +3,9 @@ import { pgClient, redis } from 'core/db';
 import { getConnection } from "typeorm";
 import { Room as RoomEntity } from 'app/entity/Room';
 import { pubSub } from 'core/pubsub';
+import { broker } from 'core/broker';
 import {
   cacheAPI,
-  connectionAPI,
   roomFollowerAPI,
   roomRoleAPI,
   roomModeWaitlistAPI,
@@ -31,8 +31,9 @@ export class RoomAPI {
   }
 
   async withData(room) {
+    const roomId = room.id;
     const [counts, followersCount, collectionCount] = await Promise.all([
-      connectionAPI.getRoomCounts(room.id),
+      broker.call('connection.getRoomCounts',{ roomId }),
       roomFollowerAPI.getCount(room.id),
       roomCollectionAPI.getCount(room.id)
     ]);

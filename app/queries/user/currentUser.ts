@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 import { redis } from 'core/db';
-import { userAPI, connectionAPI } from 'app/api';
+import { userAPI } from 'app/api';
 
 export const schema = `
   currentUser: CurrentUser
@@ -18,8 +18,6 @@ export async function resolver(root: any, args: any, ctx: any) {
   if (!user) {
     throw new Error('User not found');
   }
-
-  // const token = connectionAPI.genToken(userId);
 
   const token = crypto.randomBytes(16).toString('hex');
   const key = `connectionToken:${token}`;

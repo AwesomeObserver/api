@@ -5,12 +5,12 @@ import { broker } from 'core/broker';
 
 export async function connect(cdata) {
 	const { connectionId } = cdata;
-	broker.call("connection.join", { connectionId, instanceId });
+	broker.emit("connection.join", { connectionId, instanceId });
 }
 
 export async function disconnect(cdata) {
 	const { connectionId } = cdata;
-	broker.call("connection.leave", { connectionId });
+	broker.emit("connection.leave", { connectionId });
 }
 
 export async function login(token: string, cdata) {
@@ -30,7 +30,7 @@ export async function login(token: string, cdata) {
 	cdata.token = token;
 	const userId = parseInt(tokenData, 10);
 	cdata.userId = userId;
-	broker.call("connection.login", {
+	broker.emit("connection.login", {
 		connectionId: cdata.connectionId,
 		userId
 	});
@@ -42,7 +42,7 @@ export async function join(roomId: number, cdata) {
 	}
 
 	cdata.roomId = roomId;
-	broker.call("connection.joinRoom", {
+	broker.emit("connection.joinRoom", {
 		connectionId: cdata.connectionId,
 		roomId
 	});
@@ -56,7 +56,7 @@ export async function leave(data: any, cdata) {
 	}
 
 	cdata.roomId = null;
-	broker.call("connection.leaveRoom", {
+	broker.emit("connection.leaveRoom", {
 		connectionId: cdata.connectionId,
 		roomId
 	});
