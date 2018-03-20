@@ -1,7 +1,8 @@
 import { isAfter } from 'date-fns';
 import { getConnection } from 'typeorm';
 import { pgClient, redis } from 'core/db';
-import { userAPI, connectionAPI, cacheAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { userAPI, cacheAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserAPI {
@@ -127,7 +128,7 @@ export class RoomUserAPI {
 	}
 
 	async getOnline(roomId: number) {
-		const connections = await connectionAPI.getRoomConnections(roomId);
+		const connections: any = await broker.call('connection.getRoomConnections', { roomId });
 		const usersIds = new Map();
 		let users = [];
 
