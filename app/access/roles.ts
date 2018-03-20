@@ -36,7 +36,11 @@ export const accessRoles = [
       'waitlistRemoveUser',
       'waitlistMenu',
       'waitlistSkip',
-      'waitlistKick'
+      'waitlistKick',
+      'waitlistClear',
+      'collectionAddSource',
+      'collectionRemoveSource',
+      'collectionStart'
     ]
   },
   {

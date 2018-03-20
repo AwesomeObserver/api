@@ -8,7 +8,8 @@ import {
   connectionAPI,
   roomFollowerAPI,
   roomRoleAPI,
-  roomModeWaitlistAPI
+  roomModeWaitlistAPI,
+  roomCollectionAPI
 } from 'app/api';
 
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
@@ -30,9 +31,10 @@ export class RoomAPI {
   }
 
   async withData(room) {
-    const [counts, followersCount] = await Promise.all([
+    const [counts, followersCount, collectionCount] = await Promise.all([
       connectionAPI.getRoomCounts(room.id),
-      roomFollowerAPI.getCount(room.id)
+      roomFollowerAPI.getCount(room.id),
+      roomCollectionAPI.getCount(room.id)
     ]);
 
     const defaultAvatar = 'https://ravepro.ams3.digitaloceanspaces.com/logo.jpg';
@@ -41,7 +43,8 @@ export class RoomAPI {
       ...room,
       ...counts,
       avatar: room.avatar ? room.avatar : defaultAvatar,
-      followersCount
+      followersCount,
+      collectionCount
     };
   }
 
@@ -125,6 +128,10 @@ export class RoomAPI {
     ]);
 
     return roomData;
+  }
+
+  setContentTitle = async (roomId: number, contentTitle: string) => {
+    return this.update(roomId, { contentTitle });
   }
 
   async update(roomId: number, data) {
