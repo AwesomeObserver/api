@@ -27,6 +27,7 @@ export class RoomCollectionAPI {
 
   getNext = async (roomId: number) => {
     const roomSource = await this.repository.findOne({
+      where: { roomId },
       relations: ["source"],
       order: {
         "lastPlay": "ASC"
