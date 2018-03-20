@@ -3,7 +3,8 @@ import {
   sourceAPI,
   userAPI,
   roomModeWaitlistAPI,
-  roomModeWaitlistUserAPI
+  roomModeWaitlistUserAPI,
+  roomCollectionAPI
 } from 'app/api';
 
 export const schema = `
@@ -36,20 +37,28 @@ export async function resolver(
     return { source, start };
   }));
 
-  const users = await Promise.all(data.users.map(userId => {
+  let users = await Promise.all(data.users.map(userId => {
     return userAPI.getById(parseInt(userId, 10));
   }));
 
   let playData = null;
 
-  if (data.user) {
+  if (data.start) {
     playData = {
       source: data.source,
-      user: data.user,
+      user: data.user || roomCollectionAPI.getBotData(),
       start: getTime(data.start),
       serverTime: +new Date() 
     }
   }
+
+  users = users.map(userData => {
+    if (!userData) {
+      return roomCollectionAPI.getBotData();
+    }
+
+    return userData;
+  });
 
   return {
     userPlaylist: sources,

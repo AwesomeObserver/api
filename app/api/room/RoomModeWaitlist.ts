@@ -7,7 +7,13 @@ import { logger } from 'core/logger';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
-import { userAPI, sourceAPI, roomModeWaitlistUserAPI } from 'app/api';
+import {
+  roomAPI,
+  userAPI,
+  sourceAPI,
+  roomCollectionAPI,
+  roomModeWaitlistUserAPI
+} from 'app/api';
 
 export class RoomModeWaitlistAPI {
 
@@ -28,28 +34,56 @@ export class RoomModeWaitlistAPI {
   }
 
   // Set User to Current Play
-  async setPlay(roomId: number, userId: number) {
-    const [sourceData, user] = await Promise.all([
-      roomModeWaitlistUserAPI.cutFirst(roomId, userId),
-      userAPI.getById(userId)
-    ]);
+  async setPlay(roomId: number, userId?: number) {
+    let source = null;
+    let user = null;
+    let sourceStart = 0;
 
-    if (!sourceData) {
-      const waitlistQueue = await this.get(roomId);
+    if (!userId) {
 
-      if (waitlistQueue.users.length === 0) {
-        return this.clearPlay(roomId);
-      } else {
-        const nextUserId = parseInt(waitlistQueue.users[0], 10);
-        await this.remove(roomId, nextUserId);
-        return this.setPlay(roomId, nextUserId);
+      userId = null;
+      user = roomCollectionAPI.getBotData();
+      const roomSource = await roomCollectionAPI.getNext(roomId);
+
+      if (!roomSource) {
+        const waitlistQueue = await this.get(roomId);
+  
+        if (waitlistQueue.users.length === 0) {
+          return this.clearPlay(roomId);
+        } else {
+          const nextUserId = parseInt(waitlistQueue.users[0], 10);
+          await this.remove(roomId, nextUserId);
+          return this.setPlay(roomId, nextUserId);
+        }
       }
+
+      source = roomSource.source;
+
+    } else {
+      const [sourceData, userData] = await Promise.all([
+        roomModeWaitlistUserAPI.cutFirst(roomId, userId),
+        userAPI.getById(userId)
+      ]);
+  
+      if (!sourceData) {
+        const waitlistQueue = await this.get(roomId);
+  
+        if (waitlistQueue.users.length === 0) {
+          return this.clearPlay(roomId);
+        } else {
+          const nextUserId = parseInt(waitlistQueue.users[0], 10);
+          await this.remove(roomId, nextUserId);
+          return this.setPlay(roomId, nextUserId);
+        }
+      }
+
+      user = userData;
+      sourceStart = sourceData.start;
+      source = await sourceAPI.getById(sourceData.sourceId);
     }
 
-    const source = await sourceAPI.getById(sourceData.sourceId);
-
-    const duration = source.duration - sourceData.start;
-    const start = +new Date() - sourceData.start * 1000;
+    const duration = source.duration - sourceStart;
+    const start = +new Date() - sourceStart * 1000;
     const end = +new Date() + duration * 1000;
 
     agenda.create('waitlistPlayEnd', { roomId });
@@ -57,18 +91,20 @@ export class RoomModeWaitlistAPI {
 
     // Save Current Play Data
     await this.repository.update({ roomId }, {
-      userId: user.id,
+      userId,
       sourceId: source.id,
-      sourceStart: sourceData.start,
+      sourceStart,
       start: format(start),
       end: format(end)
     });
+
+    roomAPI.setContentTitle(roomId, source.title);
     
     // Publish New Play Data in Room
     pubSub.publish('waitlistPlayData', {
       start,
       serverTime: +new Date(),
-      sourceStart: sourceData.start,
+      sourceStart,
       source,
       user
     }, { roomId });
@@ -82,6 +118,8 @@ export class RoomModeWaitlistAPI {
       start: null,
       end: null
     });
+
+    roomAPI.setContentTitle(roomId, '');
 
     pubSub.publish('waitlistPlayData', null, { roomId });
   }
@@ -142,26 +180,38 @@ export class RoomModeWaitlistAPI {
 
   // Add User to Queue
   async add(roomId: number, userId: number) {
-    const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
+    let user = null;
 
-    if (!userQueue) {
-      return false;
-    }
+    if (!userId) {
+      userId = 0;
+      user = roomCollectionAPI.getBotData();
+    } else {
+      const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
 
-    if (userQueue.sources.length == 0) {
-      logger.info(`User ${userId} dont have sources`);
-      return false;
+      if (!userQueue) {
+        return false;
+      }
+
+      if (userQueue.sources.length == 0) {
+        logger.info(`User ${userId} dont have sources`);
+        return false;
+      }
+
+      user = await userAPI.getById(userId);
     }
 
     const waitlistQueue = await this.get(roomId);
     
-    if (waitlistQueue.userId === userId) {
+    if (
+      waitlistQueue.userId === userId ||
+      (waitlistQueue.userId === null && !!waitlistQueue.start && userId === 0)
+    ) {
       logger.info(`User ${userId} palying now`);
       return false;
     }
 
     // If nobody playing now
-    if (!waitlistQueue.userId && waitlistQueue.users.length === 0) {
+    if (!waitlistQueue.start && waitlistQueue.users.length === 0) {
       return this.setPlay(roomId, userId);
     }
 
@@ -174,8 +224,6 @@ export class RoomModeWaitlistAPI {
       users: [...waitlistQueue.users, userId]
     });
 
-    const user = await userAPI.getById(userId);
-
     pubSub.publish('waitlistAddUser', user, { roomId });
     
     return res;
@@ -184,18 +232,18 @@ export class RoomModeWaitlistAPI {
   // Remove User from Queue
   async remove(roomId: number, userId: number) {
     const waitlistQueue = await this.get(roomId);
-
     const users = waitlistQueue.users.filter(uId => parseInt(uId, 10) != userId);
-
     const res = await this.repository.updateById(waitlistQueue.id, { users });
-
     pubSub.publish('waitlistRemoveUser', userId, { roomId });
-
     return res;
   }
 
   async clear(roomId: number) {
-    return this.repository.update({ roomId }, { users: [] });
+    const res = await this.repository.update({ roomId }, { users: [] });
+
+    pubSub.publish('waitlistClear', null, { roomId });
+
+    return res;
   }
   
   // Change User position in Queue
@@ -213,11 +261,8 @@ export class RoomModeWaitlistAPI {
     }
 
     users = reorder(waitlistQueue.users, lastPos, newPos);
-
     const res = await this.repository.updateById(waitlistQueue.id, { users });
-    
     pubSub.publish('waitlistMoveUser', { lastPos, newPos }, { roomId });
-
     return res;
   }
 

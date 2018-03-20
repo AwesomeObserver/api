@@ -7,6 +7,17 @@ export class RoomFollowerAPI {
     return roomUserAPI.count({ roomId, follower: true });
   }
 
+  getRooms = async (userId: number) => {
+    const userRooms = await roomUserAPI.repository.find({
+      where: { userId, follower: true },
+      relations: ['room'],
+      select: ['room']
+    });
+
+    const rooms = userRooms.map(({ room }) => room);
+    return rooms;
+  }
+
   async follow(roomId: number, userId: number) {
     const data = await roomUserAPI.getPure(userId, roomId);
 

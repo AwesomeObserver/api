@@ -109,4 +109,16 @@ export const accessActions = {
   waitlistKick: {
     groups: ['room']
   },
+  waitlistClear: {
+    groups: ['room']
+  },
+  collectionAddSource: {
+    groups: ['room']
+  },
+  collectionRemoveSource: {
+    groups: ['room']
+  },
+  collectionStart: {
+    groups: ['room']
+  }
 };
