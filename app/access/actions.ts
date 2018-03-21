@@ -120,5 +120,11 @@ export const accessActions = {
   },
   collectionStart: {
     groups: ['room']
+  },
+  waitlistLock: {
+    groups: ['room']
+  },
+  waitlistLockIgnore: {
+    groups: ['room']
   }
 };

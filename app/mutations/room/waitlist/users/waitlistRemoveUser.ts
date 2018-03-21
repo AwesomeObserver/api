@@ -21,7 +21,9 @@ export async function resolver(
   const { roomId, userId } = args;
   const contextUserId = ctx.userId;
 
-  await access(contextUserId, roomId);
-  
+  if (userId != contextUserId) {
+    await access(contextUserId, roomId);
+  }
+
   return roomModeWaitlistAPI.remove(roomId, userId);
 }

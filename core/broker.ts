@@ -1,8 +1,10 @@
 import { ServiceBroker } from 'moleculer';
+import { logger } from 'core/logger';
 
 export let broker = new ServiceBroker({
   transporter: "nats://nats:4222",
-  logger: console
+  cacher: process.env.REDIS_URL,
+  logger
 });
 
 broker.start();

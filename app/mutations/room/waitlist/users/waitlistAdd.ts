@@ -1,4 +1,5 @@
 import {
+  roomAPI,
   roomUserAPI,
   accessAPI,
   roomModeWaitlistAPI
@@ -12,6 +13,12 @@ async function access(userId: number, roomId: number) {
   const current = await roomUserAPI.getOneFull(userId, roomId);
 
   await accessAPI.check('waitlistAdd', current);
+
+  const room = await roomAPI.getById(roomId);
+
+  if (room.waitlistLock) {
+    await accessAPI.check('waitlistLockIgnore', current);
+	}
 }
 
 export async function resolver(

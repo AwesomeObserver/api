@@ -22,15 +22,6 @@ export const accessRoles = [
     ]
   },
   {
-    name: 'member',
-    extend: 'user',
-    actions: [
-      'sendMessageSlowModeIgnore',
-      'sendMessageFollowerModeIgnore',
-      'collectionAddSource'
-    ]
-  },
-  {
     name: 'mod',
     extend: 'user',
     actions: [
@@ -49,7 +40,9 @@ export const accessRoles = [
       'waitlistClear',
       'collectionAddSource',
       'collectionRemoveSource',
-      'collectionStart'
+      'collectionStart',
+      'waitlistLock',
+      'waitlistLockIgnore'
     ]
   },
   {
