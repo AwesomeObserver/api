@@ -115,13 +115,20 @@ export class RPServer {
 				{
 					key: 'rpsession',
 					store: new RedisStore({
-						host: 'redis',
+						host: 'sestorage',
 						port: 6379
-					})
+					}),
+					maxAge: 63072000000
 				},
 				this.app
 			)
 		);
+
+		if (process.env.COOKIE_DOMAIN) {
+			this.app.use(async ctx => {
+				ctx.cookies.set('Domain', process.env.COOKIE_DOMAIN);
+			});
+		}
 
 		setupServices(this.router);
 
