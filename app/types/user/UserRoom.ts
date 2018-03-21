@@ -3,6 +3,7 @@ export const type = `
     role: String
     banned: Boolean
     follower: Boolean
+    lastFollowDate: String
     unbanDate: String
   }
 `;
