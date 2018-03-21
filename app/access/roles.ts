@@ -22,6 +22,15 @@ export const accessRoles = [
     ]
   },
   {
+    name: 'member',
+    extend: 'user',
+    actions: [
+      'sendMessageSlowModeIgnore',
+      'sendMessageFollowerModeIgnore',
+      'collectionAddSource'
+    ]
+  },
+  {
     name: 'mod',
     extend: 'user',
     actions: [
