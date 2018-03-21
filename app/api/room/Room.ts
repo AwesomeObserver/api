@@ -231,4 +231,15 @@ export class RoomAPI {
 
     return true;
   }
+
+  async setWaitlistLock(roomId: number, isLock: boolean) {
+    
+    await this.update(roomId, {
+      waitlistLock: isLock
+    });
+    
+    pubSub.publish('waitlistLockChanged', isLock, { roomId });
+
+    return true;
+  }
 }

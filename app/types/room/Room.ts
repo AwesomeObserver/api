@@ -10,6 +10,7 @@ export const type = `
     collectionCount: Int
     followersCount: Int
     connectionsCount: Int
+    waitlistLock: Int
     usersCount: Int
     guestsCount: Int
     contentTitle: String

@@ -43,6 +43,9 @@ export class Room {
   followerMode: boolean;
 
   @Column({ type: 'boolean', default: false })
+  waitlistLock: boolean;
+
+  @Column({ type: 'boolean', default: false })
   slowMode: boolean;
 
   @OneToMany(type => RoomUser, roomUser => roomUser.room)
