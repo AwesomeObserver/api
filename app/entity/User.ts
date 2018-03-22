@@ -2,8 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn, 
   Column,
-  OneToMany,
-  JoinColumn
+  OneToMany
 } from "typeorm";
 import { UserSocial } from "./UserSocial";
 import { RoomUser } from "./RoomUser";
