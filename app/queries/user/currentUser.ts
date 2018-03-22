@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
+import { broker } from 'core/broker';
 import { redis } from 'core/db';
-import { userAPI } from 'app/api';
 
 export const schema = `
   currentUser: CurrentUser
@@ -13,7 +13,7 @@ export async function resolver(root: any, args: any, ctx: any) {
     return null;
   }
 
-  const user = await userAPI.getById(userId);
+  const user = await broker.call('user.getOne', { userId });
 
   if (!user) {
     throw new Error('User not found');

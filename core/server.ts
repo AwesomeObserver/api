@@ -8,7 +8,6 @@ import * as RedisStore from 'koa-redis';
 import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
 import { buildSchema } from './schema';
 import { setupDB } from './db';
-import { userAPI } from 'app/api';
 import { getFolderData } from './utils';
 import { broker } from './broker';
 import { wsAPI } from './wsapi';
@@ -30,27 +29,11 @@ function setupServices(router) {
 				},
 				(request, accessToken, refreshToken, profile, done) => {
 					process.nextTick(async function() {
-						const user = await userAPI.getOrCreate(
-							serviceData.whereUser(profile),
-							serviceData.createUser(profile)
-						);
+						const userId = await broker.call('userSocial.auth', { 
+							serviceData: serviceData.getData(profile)
+						});
 
-						if (serviceData.updateUser) {
-							const currentData = serviceData.updateUser(profile);
-							const newData = {};
-
-							Object.keys(currentData).forEach(field => {
-								if (user[field] != currentData[field]) {
-									newData[field] = currentData[field];
-								}
-							});
-
-							if (Object.keys(newData).length > 0) {
-								await userAPI.update(user.id, newData);
-							}
-						}
-
-						done(null, { userId: user.id });
+						done(null, { userId });
 					});
 				}
 			)
@@ -123,12 +106,6 @@ export class RPServer {
 				this.app
 			)
 		);
-
-		if (process.env.COOKIE_DOMAIN) {
-			this.app.use(async ctx => {
-				ctx.cookies.set('Domain', process.env.COOKIE_DOMAIN);
-			});
-		}
 
 		setupServices(this.router);
 

@@ -1,4 +1,5 @@
-import { accessAPI, userAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   banUser(
@@ -9,8 +10,8 @@ export const schema = `
 
 export async function access(currentUserId: number, userId: number) {
   const [current, context] = await Promise.all([
-    userAPI.getById(currentUserId),
-    userAPI.getById(userId)
+    broker.call('user.getOne', { userId: currentUserId }),
+    broker.call('user.getOne', { userId })
   ]);
 
   await accessAPI.check('banRoom', current, context);
@@ -29,5 +30,5 @@ export async function resolver(
   
   await access(currentUserId, userId);
 
-  return userAPI.ban(userId);
+  return broker.call('user.ban', { userId });
 }

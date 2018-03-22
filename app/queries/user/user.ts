@@ -1,4 +1,4 @@
-import { userAPI } from 'app/api';
+import { broker } from 'core/broker';
 
 export const schema = `
   user: User
@@ -11,7 +11,7 @@ export async function resolver(root: any, args: any, ctx: any) {
     throw new Error('Deny');
   }
 
-  const user = await userAPI.getById(userId);
+  const user = await broker.call('user.getOne', { userId });
 
   if (!user) {
     throw new Error('User not found');

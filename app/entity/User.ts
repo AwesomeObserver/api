@@ -5,6 +5,7 @@ import {
   OneToMany,
   JoinColumn
 } from "typeorm";
+import { UserSocial } from "./UserSocial";
 import { RoomUser } from "./RoomUser";
 
 @Entity()
@@ -12,7 +13,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   name: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -35,4 +36,7 @@ export class User {
 
   @OneToMany(type => RoomUser, roomUser => roomUser.user)
   userRooms: RoomUser[];
+
+  @OneToMany(type => UserSocial, social => social.user)
+  social: UserSocial[];
 }

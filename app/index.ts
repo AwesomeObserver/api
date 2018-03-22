@@ -7,6 +7,8 @@ import { broker } from 'core/broker';
 import { roomModeWaitlistAPI } from 'app/api';
 import { setupConnectionService } from 'app/services/connection';
 import { setupWsService } from 'app/services/wsapi';
+import { setupUserService } from 'app/services/user';
+import { setupUserSocialService } from 'app/services/userSocial';
 
 export async function startup() {
   logger.info(`API Server is ready`);
@@ -41,4 +43,6 @@ export async function startup() {
 
   setupConnectionService();
   setupWsService();
+  setupUserService();
+  setupUserSocialService();
 }

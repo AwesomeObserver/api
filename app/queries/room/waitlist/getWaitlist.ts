@@ -1,7 +1,7 @@
+import { broker } from 'core/broker';
 import { getTime } from 'date-fns';
 import {
   sourceAPI,
-  userAPI,
   roomModeWaitlistAPI,
   roomModeWaitlistUserAPI,
   roomCollectionAPI
@@ -38,7 +38,7 @@ export async function resolver(
   }));
 
   let users = await Promise.all(data.users.map(userId => {
-    return userAPI.getById(parseInt(userId, 10));
+    return broker.call('user.getOne', { userId: parseInt(userId, 10) })
   }));
 
   let playData = null;

@@ -1,11 +1,12 @@
-import { accessAPI, roomAPI, userAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI, roomAPI } from 'app/api';
 
 export const schema = `
   banRoom(roomId: Int!): Boolean
 `;
 
 async function access(userId: number) {
-  const current = await userAPI.getById(userId);
+  const current = await broker.call('user.getOne', { userId });
 
   await accessAPI.check('banRoom', current);
 }
