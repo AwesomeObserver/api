@@ -67,7 +67,7 @@ export async function resolver(
 		throw new Error('Outside room');
 	}
 
-	const user = await roomUserAPI.getOneFull(userId, roomId);
+	const user: any = await roomUserAPI.getOneFull(userId, roomId);
 
 	await access(roomId, user);
 

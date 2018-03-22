@@ -7,17 +7,11 @@ export default {
 		clientID: process.env.GOOGLE_CLIENT_ID,
 		clientSecret: process.env.GOOGLE_SECRET
 	},
-	whereUser: (profile) => ({
-		googleId: profile._json.id
-	}),
-	createUser: (profile) => ({
+	getData: (profile) => ({
+		serviceId: profile._json.id,
+		serviceName: 'google',
 		name: profile.displayName,
-		googleId: profile.id,
 		email: profile.email,
-		avatar: profile._json.image.url
-	}),
-	updateUser: (profile) => ({
-		name: profile.displayName,
 		avatar: profile._json.image.url
 	}),
 	authOptions: {

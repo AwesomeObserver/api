@@ -3,8 +3,14 @@ import { logger } from 'core/logger';
 
 export let broker = new ServiceBroker({
   transporter: "nats://nats:4222",
-  cacher: process.env.REDIS_URL,
-  logger
+  logger,
+  cacher: {
+    type: "Redis",
+    options: {
+      ttl: 86400,
+      redis: process.env.REDIS_URL
+    }
+  }
 });
 
 broker.start();

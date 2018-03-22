@@ -1,15 +1,12 @@
-import {
-  userAPI,
-  accessAPI,
-  roomModeWaitlistUserAPI
-} from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI, roomModeWaitlistUserAPI } from 'app/api';
 
 export const schema = `
   waitlistAddSource(roomId: Int!, link: String!, useTimecode: Boolean): Boolean
 `;
 
 async function access(userId: number) {
-  const current = await userAPI.getById(userId);
+  const current = await broker.call('user.getOne', { userId });
 
   await accessAPI.check('waitlistAddSource', current);
 }

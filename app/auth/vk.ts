@@ -7,15 +7,9 @@ export default {
 		clientID: process.env.VK_CLIENT_ID,
 		clientSecret: process.env.VK_SECRET
 	},
-	whereUser: (profile) => ({
-		vkId: profile.id
-	}),
-	createUser: (profile) => ({
-		name: profile.displayName,
-		vkId: profile.id,
-		avatar: profile._json.photo
-	}),
-	updateUser: (profile) => ({
+	getData: (profile) => ({
+		serviceId: profile.id,
+		serviceName: 'vk',
 		name: profile.displayName,
 		avatar: profile._json.photo
 	})

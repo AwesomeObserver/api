@@ -1,4 +1,5 @@
-import { accessAPI, userAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   setRoleUser(
@@ -9,8 +10,8 @@ export const schema = `
 
 async function access(currentUserId: number, userId: number, role: string) {
   const [current, context] = await Promise.all([
-    userAPI.getById(currentUserId),
-    userAPI.getById(userId)
+    broker.call('user.getOne', { userId: currentUserId }),
+    broker.call('user.getOne', { userId })
   ]);
 
   await accessAPI.check('setRole', current, context);
@@ -38,5 +39,5 @@ export async function resolver(
 
   await access(currentUserId, userId, role);
 
-  return userAPI.setRole(userId, role);
+  return broker.call('user.setRole', { userId, role });
 }

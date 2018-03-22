@@ -1,6 +1,7 @@
 import { format, addSeconds } from 'date-fns';
 import { getConnection } from "typeorm";
 import { agenda } from 'core/db';
+import { broker } from 'core/broker';
 import { pubSub } from 'core/pubsub';
 import { reorder } from 'core/utils';
 import { logger } from 'core/logger';
@@ -9,7 +10,6 @@ import {
 } from 'app/entity/RoomWaitlistQueue';
 import {
   roomAPI,
-  userAPI,
   sourceAPI,
   roomCollectionAPI,
   roomModeWaitlistUserAPI
@@ -62,7 +62,7 @@ export class RoomModeWaitlistAPI {
     } else {
       const [sourceData, userData] = await Promise.all([
         roomModeWaitlistUserAPI.cutFirst(roomId, userId),
-        userAPI.getById(userId)
+        broker.call('user.getOne', { userId })
       ]);
   
       if (!sourceData) {
@@ -197,7 +197,7 @@ export class RoomModeWaitlistAPI {
         return false;
       }
 
-      user = await userAPI.getById(userId);
+      user = broker.call('user.getOne', { userId });
     }
 
     const waitlistQueue = await this.get(roomId);

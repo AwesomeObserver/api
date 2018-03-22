@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.33.1",
+	"version": "0.34.0",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -54,6 +54,7 @@
 		"koa-session": "^5.8.1",
 		"koa2-cors": "^2.0.5",
 		"moleculer": "^0.12.1",
+		"moleculer-decorators": "^1.0.14",
 		"nats": "^0.8.4",
 		"node-fetch": "^2.1.1",
 		"passport-google-oauth2": "^0.1.6",

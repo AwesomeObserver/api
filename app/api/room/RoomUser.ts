@@ -2,7 +2,7 @@ import { isAfter } from 'date-fns';
 import { getConnection } from 'typeorm';
 import { pgClient, redis } from 'core/db';
 import { broker } from 'core/broker';
-import { userAPI, cacheAPI } from 'app/api';
+import { cacheAPI } from 'app/api';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export class RoomUserAPI {
@@ -119,7 +119,7 @@ export class RoomUserAPI {
 		}
 
 		return Promise.all([
-			userAPI.getById(userId),
+			broker.call('user.getOne', { userId }),
 			this.getOne(userId, roomId)
 		]).then(([ site, room ]) => ({
 			site,
