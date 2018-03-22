@@ -27,10 +27,19 @@ export class RoomModeWaitlistAPI {
 
   // Get current waitlist state
   async get(roomId: number) {
-    return this.repository.findOne({
-      where: { roomId },
-      relations: ["user", "source"]
-    });
+    let queue = await this.repository.findOne({ roomId });
+
+    if (queue.userId) {
+      const user: any = await broker.call('user.getOne', { userId: queue.userId });
+      queue.user = user;
+    }
+
+    if (queue.sourceId) {
+      const source: any = await sourceAPI.getById(queue.sourceId);
+      queue.source = source;
+    }
+
+    return queue;
   }
 
   // Set User to Current Play
@@ -197,7 +206,7 @@ export class RoomModeWaitlistAPI {
         return false;
       }
 
-      user = broker.call('user.getOne', { userId });
+      user = await broker.call('user.getOne', { userId });
     }
 
     const waitlistQueue = await this.get(roomId);
