@@ -25,15 +25,6 @@ export class User {
   @Column({ type: 'boolean', default: false })
   banned: boolean;
 
-  @Column({ type: 'varchar', nullable: true, unique: true })
-  vkId: string;
-
-  @Column({ type: 'varchar', nullable: true, unique: true })
-  googleId: string;
-
-  @Column({ type: 'varchar', nullable: true, unique: true })
-  twitchId: string;
-
   @OneToMany(type => RoomUser, roomUser => roomUser.user)
   userRooms: RoomUser[];
 
