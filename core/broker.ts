@@ -4,7 +4,7 @@ import { logger } from 'core/logger';
 export let broker = new ServiceBroker({
   transporter: "nats://nats:4222",
   logger,
-  logLevel: 'debug',
+  logLevel: process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
   cacher: {
     type: "Redis",
     options: {
