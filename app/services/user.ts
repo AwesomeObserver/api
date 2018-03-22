@@ -26,7 +26,7 @@ export const setupUserService = () => {
     async getOne(ctx) {
       const { userId } = ctx.params;
       let user = await repository.findOne({
-        where: { userId },
+        where: { id: userId },
         relations: ['social']
       });
   
