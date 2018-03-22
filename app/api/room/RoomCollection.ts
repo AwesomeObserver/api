@@ -49,6 +49,7 @@ export class RoomCollectionAPI {
   get = async (roomId: number) => {
     return this.repository.find({
       where: { roomId },
+      take: 100,
       relations: ["source"],
       order: {
         "id": "DESC"
