@@ -1,6 +1,6 @@
+import { broker } from 'core/broker';
 import {
   roomAPI,
-  roomUserAPI,
   accessAPI,
   roomModeWaitlistAPI
 } from 'app/api';
@@ -10,7 +10,7 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await roomUserAPI.getOneFull(userId, roomId);
+  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
 
   await accessAPI.check('waitlistAdd', current);
 
@@ -33,6 +33,5 @@ export async function resolver(
   const currentUserId = ctx.userId;
 
   await access(currentUserId, roomId);
-
   return roomModeWaitlistAPI.add(roomId, currentUserId);
 }

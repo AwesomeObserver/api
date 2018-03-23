@@ -1,4 +1,4 @@
-import { roomFollowerAPI } from 'app/api';
+import { broker } from 'core/broker';
 
 export const schema = `
   getFollowRooms: [Room]
@@ -11,5 +11,5 @@ export async function resolver(root, args, ctx) {
     return [];
   }
   
-  return roomFollowerAPI.getRooms(userId);
+  return broker.call('roomUser.getFollowRooms', { userId });
 }

@@ -1,4 +1,5 @@
-import { accessAPI, roomUserAPI, roomBanAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   unbanUserRoom(
@@ -8,8 +9,7 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await roomUserAPI.getOneFull(userId, roomId);
-
+  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
   await accessAPI.check('unbanUserRoom', current);
 }
 
@@ -25,6 +25,5 @@ export async function resolver(
   const contextUserId = ctx.userId;
 
   await access(contextUserId, roomId);
-
-  return roomBanAPI.unban(roomId, userId);
+  return broker.call('roomUser.unban', { roomId, userId });
 }

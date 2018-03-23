@@ -64,20 +64,22 @@ export class RoomCollectionAPI {
   addFromLink = async (roomId, userId, link, useTimecode) => {
     let { source, start } = await sourceAPI.addFromLink(link, useTimecode);
 
-    const res = await this.addSource(roomId, source.id);
+    const res = await this.addSource(roomId, source.id, userId);
 
     return this.repository.findOneById(res.id, { relations: ["source"] });
   }
 
-  addSource = async (roomId: number, sourceId: number) => {
+  addSource = async (roomId: number, sourceId: number, userId) => {
     if (await this.repository.findOne({ roomId, sourceId })) {
       throw new Error('collectionDuplicateSource');
     }
 
     let roomSource = new RoomSourceEntity();
     roomSource.roomId = roomId;
+    roomSource.userId = userId;
     roomSource.sourceId = sourceId;
     roomSource.lastPlay = format(+new Date(1995, 11, 17));
+    roomSource.createDate = format(+new Date());
 
     return this.repository.save(roomSource);
   }

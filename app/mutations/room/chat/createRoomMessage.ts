@@ -1,8 +1,9 @@
 import * as crypto from 'crypto';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
+import { broker } from 'core/broker';
 import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI, roomUserAPI, roomAPI } from 'app/api';
+import { accessAPI, actionTimeAPI, roomAPI } from 'app/api';
 
 export const schema = `
 	createRoomMessage(
@@ -67,10 +68,8 @@ export async function resolver(
 		throw new Error('Outside room');
 	}
 
-	const user: any = await roomUserAPI.getOneFull(userId, roomId);
-
+	const user: any = await broker.call('roomUser.getOneFull', { roomId, userId });
 	await access(roomId, user);
-
 	actionTimeAPI.set(userId, `sendMessage:${roomId}`);
 
 	const messageId = crypto.randomBytes(4).toString('hex');
@@ -86,6 +85,5 @@ export async function resolver(
 		]
 	];
 	const messageData = [messageId, userData, message];
-
 	pubSub.publish('chatMessage', messageData, { roomId });
 }

@@ -1,4 +1,5 @@
-import { roomAPI, roomUserAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { roomAPI } from 'app/api';
 
 export const schema = `
   getRoomByName(roomName: String!): Room
@@ -21,7 +22,10 @@ export async function resolver(
     throw new Error('RoomBanned');
   }
 
-  const user: any = await roomUserAPI.getOneFull(ctx.userId, room.id);
+  const user: any = await broker.call('roomUser.getOneFull', {
+    roomId: room.id,
+    userId: ctx.userId
+  });
 
   if (!user) {
     return room;

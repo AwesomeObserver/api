@@ -1,5 +1,6 @@
+import { broker } from 'core/broker';
 import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI, roomUserAPI } from 'app/api';
+import { accessAPI, actionTimeAPI } from 'app/api';
 
 export const schema = `
   removeRoomMessage(
@@ -10,7 +11,6 @@ export const schema = `
 
 async function access(roomId: number, current) {
   const userId = current.site.id;
-
   await accessAPI.check('removeMessage', current);
 }
 
@@ -29,9 +29,7 @@ export async function resolver(
     throw new Error('Outside room');
   }
 
-  const user = await roomUserAPI.getOneFull(userId, roomId);
-
+  const user = await broker.call('roomUser.getOneFull', { roomId, userId });
   await access(roomId, user);
-
   pubSub.publish('removeMessage', messageId, { roomId });
 }
