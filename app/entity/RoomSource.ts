@@ -3,9 +3,11 @@ import {
   PrimaryGeneratedColumn, 
   Column,
   OneToOne,
-  JoinColumn
+  JoinColumn,
+  ManyToOne
 } from "typeorm";
 import { Room } from './Room';
+import { User } from "./User";
 import { Source } from './Source';
 
 @Entity()
@@ -23,12 +25,22 @@ export class RoomSource {
   @Column({ type: 'integer' })
   sourceId: number;
 
+  @Column({ type: 'integer', nullable: true })
+  userId: number;
+
+  @OneToOne(type => User)
+  @JoinColumn()
+  user: User;
+
   @OneToOne(type => Source)
   @JoinColumn()
   source: Source;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   lastPlay: string;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  createDate: string;
 
   @Column({ type: 'integer', default: 0 })
   plays: number;
