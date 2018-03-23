@@ -25,12 +25,14 @@ export const setupUserService = () => {
     })
     async getOne(ctx) {
       const { userId } = ctx.params;
+      
+      if (!userId) return null;
+      
       let user = await repository.findOne({
         where: { id: userId },
         relations: ['social']
       });
   
-      if (!userId) return null;
       if (!user.name) user.name = user.social[0].name;
       if (!user.avatar) user.avatar = user.social[0].avatar;
   

@@ -6,8 +6,6 @@ import { pubSub } from 'core/pubsub';
 import { broker } from 'core/broker';
 import {
   cacheAPI,
-  roomFollowerAPI,
-  roomRoleAPI,
   roomModeWaitlistAPI,
   roomCollectionAPI
 } from 'app/api';
@@ -33,8 +31,8 @@ export class RoomAPI {
   async withData(room) {
     const roomId = room.id;
     const [counts, followersCount, collectionCount] = await Promise.all([
-      broker.call('connection.getRoomCounts',{ roomId }),
-      roomFollowerAPI.getCount(room.id),
+      broker.call('connection.getRoomCounts', { roomId }),
+      broker.call('roomUser.getRoomFollowersCount', { roomId }),
       roomCollectionAPI.getCount(room.id)
     ]);
 
@@ -119,11 +117,13 @@ export class RoomAPI {
     const roomData = await this.manager.save(room);
 
     await Promise.all([
-      roomRoleAPI.set({
-        roomId: roomData.id,
-        userId,
-        role: 'owner',
-        whoSetRoleId: null
+      broker.call('roomUser.setRole', {
+        roleData: {
+          roomId: roomData.id,
+          userId,
+          role: 'owner',
+          whoSetRoleId: null
+        }
       }),
       roomModeWaitlistAPI.create(roomData.id)
     ]);
@@ -242,4 +242,21 @@ export class RoomAPI {
 
     return true;
   }
+
+  async getOnline(roomId: number) {
+		const connections: any = await broker.call('connection.getRoomConnections', { roomId });
+		const usersIds = new Map();
+		let users = [];
+
+		connections.forEach(({ userId }) => {
+			if (userId) {
+				if (!usersIds.has(userId)) {
+					usersIds.set(userId, userId);
+					users.push(broker.call('roomUser.getOneFull', { roomId, userId }));
+				}
+			}
+		});
+
+		return users;
+	}
 }

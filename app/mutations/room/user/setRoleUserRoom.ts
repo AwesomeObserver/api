@@ -1,4 +1,5 @@
-import { accessAPI, roomUserAPI, roomRoleAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   setRoleUserRoom(
@@ -15,8 +16,8 @@ async function access(
   role: string
 ) {
   const [current, context] = await Promise.all([
-    roomUserAPI.getOneFull(currentUserId, roomId),
-    roomUserAPI.getOneFull(userId, roomId)
+    broker.call('roomUser.getOneFull', { roomId, userId: currentUserId }),
+    broker.call('roomUser.getOneFull', { roomId, userId })
   ]);
 
   await accessAPI.check('setRoleRoom', current, context);
@@ -47,10 +48,12 @@ export async function resolver(
 
   await access(currentUserId, userId, roomId, role);
 
-  return roomRoleAPI.set({
-    roomId,
-    userId,
-    role,
-    whoSetId: currentUserId
+  return broker.call('roomUser.setRole', {
+    roleData: {
+      roomId,
+      userId,
+      role,
+      whoSetId: currentUserId
+    }
   });
 }

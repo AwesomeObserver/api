@@ -1,16 +1,12 @@
-import {
-  roomUserAPI,
-  accessAPI,
-  roomCollectionAPI
-} from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI, roomCollectionAPI } from 'app/api';
 
 export const schema = `
   collectionStart(roomId: Int!): Boolean
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await roomUserAPI.getOneFull(userId, roomId);
-
+  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
   await accessAPI.check('collectionStart', current);
 }
 

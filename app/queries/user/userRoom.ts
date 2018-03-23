@@ -1,4 +1,4 @@
-import { roomUserAPI } from 'app/api';
+import { broker } from 'core/broker';
 
 export const schema = `
   userRoom(roomId: Int!, userId: Int): UserRoom
@@ -12,11 +12,11 @@ export async function resolver(
   },
   ctx: any
 ) {
-  let userId = args.userId;
+  let { roomId, userId } = args;
 
   if (!userId) {
     userId = ctx.userId;
   }
   
-  return await roomUserAPI.getOne(userId, args.roomId);
+  return broker.call('roomUser.getOne', { roomId, userId });
 }

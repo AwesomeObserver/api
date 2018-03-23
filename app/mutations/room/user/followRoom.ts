@@ -1,12 +1,12 @@
-import { accessAPI, roomUserAPI, roomFollowerAPI } from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   followRoom(roomId: Int!): Int
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await roomUserAPI.getOneFull(userId, roomId);
-
+  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
   return accessAPI.check('follow', current);
 }
 
@@ -24,6 +24,6 @@ export async function resolver(
     return new Error('Deny');
   }
 
-  await roomFollowerAPI.follow(roomId, userId);
-  return roomFollowerAPI.getCount(roomId);
+  await broker.call('roomUser.follow', { roomId, userId });
+  return broker.call('roomUser.getRoomFollowersCount', { roomId });
 }

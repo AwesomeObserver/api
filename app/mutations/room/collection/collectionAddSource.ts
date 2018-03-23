@@ -1,16 +1,12 @@
-import {
-  roomUserAPI,
-  accessAPI,
-  roomCollectionAPI
-} from 'app/api';
+import { broker } from 'core/broker';
+import { accessAPI, roomCollectionAPI } from 'app/api';
 
 export const schema = `
   collectionAddSource(roomId: Int!, link: String!, useTimecode: Boolean): RoomSource
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await roomUserAPI.getOneFull(userId, roomId);
-
+  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
   await accessAPI.check('collectionAddSource', current);
 }
 
@@ -26,7 +22,7 @@ export async function resolver(
   const { roomId, link, useTimecode } = args;
   const userId = ctx.userId;
 
-  // await access(userId);
+  await access(userId, roomId);
   
   return roomCollectionAPI.addFromLink(roomId, userId, link, useTimecode);
 }
