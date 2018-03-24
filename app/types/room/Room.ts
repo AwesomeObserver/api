@@ -11,8 +11,6 @@ export const type = `
     followersCount: Int
     connectionsCount: Int
     waitlistLock: Int
-    usersCount: Int
-    guestsCount: Int
     contentTitle: String
   }
 `;
