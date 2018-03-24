@@ -1,6 +1,6 @@
 import { Service, Action, BaseSchema } from 'moleculer-decorators';
 import { format } from 'date-fns';
-import { getManager, getRepository } from "typeorm";
+import { getManager, getRepository, getConnection } from "typeorm";
 import { broker } from 'core/broker';
 import { logger } from 'core/logger';
 import { pubSub } from 'core/pubsub';
@@ -209,12 +209,17 @@ export const setupRoomUserService = () => {
     async getFollowRooms(ctx) {
       const { userId } = ctx.params;
 
-      const userRooms = await repository.find({
-        where: { userId, follower: true },
-        relations: ['room'],
-        select: ['room']
-      });
-  
+      const userRooms = await repository
+        .createQueryBuilder("roomUser")
+        .where("roomUser.userId = :userId", { userId })
+        .andWhere("roomUser.follower = TRUE")
+        .select("room")
+        .leftJoinAndSelect("roomUser.room", "room")
+        .orderBy("room.connectionsCount", "DESC")
+        .addOrderBy("room.contentTitle", "DESC")
+        .limit(10)
+        .getMany();
+
       return userRooms.map(({ room }) => room);
     }
   
@@ -226,7 +231,7 @@ export const setupRoomUserService = () => {
       if (data) {
         if (data.follower) return true;
   
-        return broker.call('roomUser.update', {
+        await broker.call('roomUser.update', {
           userId,
           roomId,
           data: {
@@ -234,9 +239,20 @@ export const setupRoomUserService = () => {
             lastFollowDate: format(+new Date())
           }
         });
+
+        const count = await broker.call('roomUser.getRoomFollowersCount', { roomId });
+
+        await broker.call('room.update', {
+          roomId,
+          data: {
+            followersCount: count
+          }
+        });
+
+        return count;
       }
   
-      return broker.call('roomUser.create', {
+      await broker.call('roomUser.create', {
         userData: {
           roomId: roomId,
           userId: userId,
@@ -245,6 +261,17 @@ export const setupRoomUserService = () => {
           lastFollowDate: format(+new Date())
         }
       });
+
+      const count = await broker.call('roomUser.getRoomFollowersCount', { roomId });
+
+      await broker.call('room.update', {
+        roomId,
+        data: {
+          followersCount: count
+        }
+      });
+
+      return count;
     }
     
     @Action()
@@ -254,7 +281,7 @@ export const setupRoomUserService = () => {
   
       if (!data.follower) return true;
   
-      return broker.call('roomUser.update', {
+      await broker.call('roomUser.update', {
         userId,
         roomId,
         data: {
@@ -262,6 +289,17 @@ export const setupRoomUserService = () => {
           lastUnfollowDate: format(+new Date())
         }
       });
+
+      const count = await broker.call('roomUser.getRoomFollowersCount', { roomId });
+
+      await broker.call('room.update', {
+        roomId,
+        data: {
+          followersCount: count
+        }
+      });
+      
+      return count;
     }
   }
 

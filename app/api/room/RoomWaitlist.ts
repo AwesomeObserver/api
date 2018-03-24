@@ -9,13 +9,12 @@ import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
 import {
-  roomAPI,
   sourceAPI,
   roomCollectionAPI,
   roomModeWaitlistUserAPI
 } from 'app/api';
 
-export class RoomModeWaitlistAPI {
+export class RoomWaitlistAPI {
 
   get repository() {
     return getConnection().getRepository(WaitlistQueueEntity);
@@ -107,7 +106,7 @@ export class RoomModeWaitlistAPI {
       end: format(end)
     });
 
-    roomAPI.setContentTitle(roomId, source.title);
+    broker.call('room.setContentTitle', { roomId, contentTitle: source.title });
     
     // Publish New Play Data in Room
     pubSub.publish('waitlistPlayData', {
@@ -128,7 +127,7 @@ export class RoomModeWaitlistAPI {
       end: null
     });
 
-    roomAPI.setContentTitle(roomId, '');
+    broker.call('room.setContentTitle', { roomId, contentTitle: '' });
 
     pubSub.publish('waitlistPlayData', null, { roomId });
   }

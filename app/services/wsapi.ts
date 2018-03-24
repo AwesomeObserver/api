@@ -7,7 +7,7 @@ export const setupWsService = () => {
   @Service({
     name: 'wsapi'
   })
-  class UserWSAPIService extends BaseSchema {
+  class WSAPIService extends BaseSchema {
     @Event()
     'wsapi.publish'(ctx) {
       const { eventName, payload, filterData } = ctx;
@@ -15,5 +15,5 @@ export const setupWsService = () => {
     }
   }
 
-  return broker.createService(UserWSAPIService);
+  return broker.createService(WSAPIService);
 }

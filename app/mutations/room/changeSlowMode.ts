@@ -26,5 +26,5 @@ export async function resolver(
 
   await access(userId, roomId);
 
-  return roomAPI.setSlowMode(roomId, isActive);
+  return broker.call('room.setSlowMode', { roomId, isActive });
 }

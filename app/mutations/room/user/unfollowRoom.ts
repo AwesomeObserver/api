@@ -21,6 +21,5 @@ export async function resolver(
   const userId = ctx.userId;
   
   await access(userId, roomId);
-  await broker.call('roomUser.unfollow', { roomId, userId });
-  return broker.call('roomUser.getRoomFollowersCount', { roomId });
+  return broker.call('roomUser.unfollow', { roomId, userId });
 }

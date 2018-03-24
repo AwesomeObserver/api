@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { pgClient, redis } from 'core/db';
+import { broker } from 'core/broker';
 import { getConnection } from "typeorm";
 import { RoomSource as RoomSourceEntity } from 'app/entity/RoomSource';
 import { sourceAPI, roomModeWaitlistAPI } from 'app/api';
@@ -81,7 +81,17 @@ export class RoomCollectionAPI {
     roomSource.lastPlay = format(+new Date(1995, 11, 17));
     roomSource.createDate = format(+new Date());
 
-    return this.repository.save(roomSource);
+    const res = await this.repository.save(roomSource);
+    const count = await this.getCount(roomId);
+    
+    await broker.call('room.update', {
+      roomId,
+      data: {
+        collectionCount: count
+      }
+    });
+
+    return res;
   }
 
   removeSource = async (roomId: number, roomSourceId: number) => {
@@ -90,6 +100,16 @@ export class RoomCollectionAPI {
       roomId
     });
 
-    return this.repository.remove(roomSource);
+    const res = await this.repository.remove(roomSource);
+    const count = await this.getCount(roomId);
+    
+    await broker.call('room.update', {
+      roomId,
+      data: {
+        collectionCount: count
+      }
+    });
+
+    return res;
   }
 }

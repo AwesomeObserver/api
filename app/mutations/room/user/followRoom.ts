@@ -24,6 +24,5 @@ export async function resolver(
     return new Error('Deny');
   }
 
-  await broker.call('roomUser.follow', { roomId, userId });
-  return broker.call('roomUser.getRoomFollowersCount', { roomId });
+  return broker.call('roomUser.follow', { roomId, userId });
 }

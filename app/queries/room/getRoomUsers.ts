@@ -1,4 +1,4 @@
-import { roomAPI } from 'app/api';
+import { broker } from 'core/broker';
 
 export const schema = `
   getRoomUsers(roomId: Int!): [UserWithRoom]
@@ -11,5 +11,6 @@ export async function resolver(
   },
   ctx: any
 ) {
-  return roomAPI.getOnline(args.roomId);
+  const { roomId } = args;
+  return broker.call('room.getOnline', { roomId });
 }

@@ -7,7 +7,7 @@ import { pubSub } from 'core/pubsub';
 import { reorder } from 'core/utils';
 import { sourceAPI } from 'app/api';
 
-export class RoomModeWaitlistUserAPI {
+export class RoomUserPlaylistAPI {
 
   get repository() {
     return getConnection().getRepository(UserWaitlistQueueEntity);

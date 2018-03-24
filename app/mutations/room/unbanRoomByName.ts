@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   unbanRoomByName(roomName: String!): Boolean
@@ -23,5 +23,5 @@ export async function resolver(
   
   await access(userId);
 
-  return roomAPI.unbanByName(roomName);
+  return broker.call('room.unbanByName', { roomName });
 }

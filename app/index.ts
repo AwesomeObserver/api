@@ -10,6 +10,7 @@ import { setupWsService } from 'app/services/wsapi';
 import { setupUserService } from 'app/services/user';
 import { setupUserSocialService } from 'app/services/userSocial';
 import { setupRoomUserService } from 'app/services/roomUser';
+import { setupRoomService } from 'app/services/room';
 
 export async function startup() {
   logger.info(`API Server is ready`);
@@ -47,4 +48,5 @@ export async function startup() {
   setupUserService();
   setupUserSocialService();
   setupRoomUserService();
+  setupRoomService();
 }
