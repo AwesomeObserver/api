@@ -1,5 +1,4 @@
 import { broker } from 'core/broker';
-import { roomAPI } from 'app/api';
 
 export const schema = `
   getRoomByName(roomName: String!): Room
@@ -12,7 +11,8 @@ export async function resolver(
   },
   ctx: any
 ) {
-  const room = await roomAPI.getByName(args.roomName);
+  const { roomName } = args;
+  const room: any = await broker.call('room.getOneByName', { roomName });
 
   if (!room) {
     throw new Error('NotFound');

@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   banRoom(roomId: Int!): Boolean
@@ -23,8 +23,11 @@ export async function resolver(
 
   await access(userId);
 
-  return roomAPI.ban(roomId, {
-    whoSetBanId: userId,
-    banReason: null
+  return broker.call('room.ban', {
+    roomId,
+    data: {
+      whoSetBanId: userId,
+      banReason: null
+    }
   });
 }

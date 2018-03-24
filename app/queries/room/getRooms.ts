@@ -1,9 +1,9 @@
-import { roomAPI } from 'app/api';
+import { broker } from 'core/broker';
 
 export const schema = `
   getRooms: [Room]
 `;
 
 export async function resolver(root, args, ctx) {
-  return roomAPI.get();
+  return broker.call('room.getTop');
 }

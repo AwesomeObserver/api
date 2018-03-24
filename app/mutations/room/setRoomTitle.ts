@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   setRoomTitle(
@@ -25,5 +25,5 @@ export async function resolver(
   const userId = ctx.userId;
 
   await access(userId, roomId);
-  return roomAPI.setTitle(roomId, title);
+  return broker.call('room.setTitle', { roomId, title });
 }

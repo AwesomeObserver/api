@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   changeWaitlistLock(
@@ -26,5 +26,5 @@ export async function resolver(
 
   await access(userId, roomId);
 
-  return roomAPI.setWaitlistLock(roomId, isLock);
+  return broker.call('room.setWaitlistLock', { roomId, isLock });
 }

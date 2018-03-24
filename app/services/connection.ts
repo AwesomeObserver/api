@@ -98,8 +98,15 @@ export const setupConnectionService = () => {
     @Action()
     async recalcRoomCount(ctx) {
       const roomId = parseInt(`${ctx.params.roomId}`, 10);
-      const counts = await broker.call('connection.getRoomCounts', { roomId });
-      pubSub.publish('connectionsCountChanged', counts, { roomId });
+      const counts: any = await broker.call('connection.getRoomCounts', { roomId });
+      const { connectionsCount } = counts;
+      broker.call('room.update', {
+        roomId,
+        data: {
+          connectionsCount
+        }
+      });
+      pubSub.publish('connectionsCountChanged', connectionsCount, { roomId });
     }
 
     @Action()

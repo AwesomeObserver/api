@@ -1,9 +1,5 @@
 import { broker } from 'core/broker';
-import {
-  roomAPI,
-  accessAPI,
-  roomModeWaitlistAPI
-} from 'app/api';
+import { accessAPI, roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   waitlistAdd(roomId: Int!, userId: Int): Boolean
@@ -14,7 +10,7 @@ async function access(userId: number, roomId: number) {
 
   await accessAPI.check('waitlistAdd', current);
 
-  const room = await roomAPI.getById(roomId);
+  const room: any = await broker.call('room.getOne', { roomId });
 
   if (room.waitlistLock) {
     await accessAPI.check('waitlistLockIgnore', current);

@@ -21,6 +21,15 @@ export class Room {
   @Column({ type: 'varchar', length: 200, nullable: true, default: '' })
   contentTitle: string;
 
+  @Column({ type: 'integer', nullable: true, default: 0 })
+  connectionsCount: number;
+  
+  @Column({ type: 'integer', nullable: true, default: 0 })
+  followersCount: number;
+  
+  @Column({ type: 'integer', nullable: true, default: 0 })
+  collectionCount: number;
+
   @Column({ type: 'varchar', default: 'waitlist' })
   mode: string;
 

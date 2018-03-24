@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   removeRoom(roomId: Int!): Boolean
@@ -21,5 +21,5 @@ export async function resolver(
   const userId = ctx.userId;
 
   await access(userId, roomId);
-  return roomAPI.remove(args.roomId);
+  return broker.call('room.remove', { roomId });
 }

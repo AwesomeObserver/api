@@ -3,7 +3,7 @@ import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
 import { broker } from 'core/broker';
 import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI, roomAPI } from 'app/api';
+import { accessAPI, actionTimeAPI } from 'app/api';
 
 export const schema = `
 	createRoomMessage(
@@ -17,7 +17,7 @@ async function access(roomId: number, current) {
 
 	await accessAPI.check('sendMessage', current);
 
-	const room = await roomAPI.getById(roomId);
+	const room: any = await broker.call('room.getOne', { roomId });
 
 	// Slow Mode
 	if (room.slowMode) {

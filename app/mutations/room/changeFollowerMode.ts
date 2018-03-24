@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   changeFollowerMode(
@@ -26,5 +26,5 @@ export async function resolver(
 
   await access(userId, roomId);
 
-  return roomAPI.setFollowerMode(roomId, isActive);
+  return broker.call('room.setFollowerMode', { roomId, isActive });
 }

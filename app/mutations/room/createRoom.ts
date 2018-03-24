@@ -1,5 +1,5 @@
 import { broker } from 'core/broker';
-import { accessAPI, roomAPI } from 'app/api';
+import { accessAPI } from 'app/api';
 
 export const schema = `
   createRoom(
@@ -27,5 +27,11 @@ export async function resolver(
   
   await access(userId);
 
-  return roomAPI.create(name, title, userId);
+  return broker.call('room.create', {
+    roomData: {
+      name,
+      title,
+      userId
+    }
+  });
 }

@@ -1,10 +1,11 @@
 import { makeExecutableSchema } from 'graphql-tools';
 import { getFolderData } from './utils';
+import * as typeResolvers from 'app/typeResolvers';
 
 export function buildSchema() {
   const gqlDir = __dirname + '/../app/';
   const typeDefs = [];
-  const resolvers = {};
+  const resolvers = { ...typeResolvers };
 
   const typesData = getFolderData(`${gqlDir}types/`);
   Object.keys(typesData).forEach(name => typeDefs.push(typesData[name].type));
