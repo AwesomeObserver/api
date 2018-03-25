@@ -84,6 +84,6 @@ export async function resolver(
 			user.room.role
 		]
 	];
-	const messageData = [messageId, userData, message];
+	const messageData = [messageId, userData, message.trim().slice(0, 320)];
 	pubSub.publish('chatMessage', messageData, { roomId });
 }
