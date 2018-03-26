@@ -1,8 +1,7 @@
 import { Service, Action, BaseSchema } from 'moleculer-decorators';
 import { getConnection, getManager, getRepository } from "typeorm";
 import { format } from 'date-fns';
-import { broker } from 'core/broker';
-import { pubSub } from 'core/pubsub';
+import { broker, pubSub } from 'core';
 import { Room as RoomEntity } from 'app/entity/Room';
 import {
   roomModeWaitlistAPI,

@@ -1,4 +1,4 @@
-import { broker } from 'core/broker';
+import { broker } from 'core';
 
 class PubSub {
 

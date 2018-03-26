@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI, roomCollectionAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   collectionRemoveSource(roomId: Int!, roomSourceId: Int!): Boolean
@@ -7,7 +6,7 @@ export const schema = `
 
 async function access(userId: number, roomId: number) {
   const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessAPI.check('collectionRemoveSource', current);
+  await accessCheck('collectionRemoveSource', current);
 }
 
 export async function resolver(
@@ -22,6 +21,5 @@ export async function resolver(
   const userId = ctx.userId;
 
   await access(userId, roomId);
-  
-  return roomCollectionAPI.removeSource(roomId, roomSourceId);
+  return broker.call('roomCollection.removeSource', { roomId, roomSourceId });
 }

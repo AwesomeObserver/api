@@ -1,10 +1,9 @@
-import { broker } from 'core/broker';
+import { broker } from 'core';
 import { getTime } from 'date-fns';
 import {
   sourceAPI,
   roomModeWaitlistAPI,
-  roomModeWaitlistUserAPI,
-  roomCollectionAPI
+  roomModeWaitlistUserAPI
 } from 'app/api';
 
 export const schema = `
@@ -46,7 +45,7 @@ export async function resolver(
   if (data.start) {
     playData = {
       source: data.source,
-      user: data.user || roomCollectionAPI.getBotData(),
+      user: data.user || broker.call('roomCollection.getBotData'),
       start: getTime(data.start),
       serverTime: +new Date() 
     }
@@ -54,7 +53,7 @@ export async function resolver(
 
   users = users.map(userData => {
     if (!userData) {
-      return roomCollectionAPI.getBotData();
+      return broker.call('roomCollection.getBotData');
     }
 
     return userData;

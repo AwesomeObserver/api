@@ -1,8 +1,6 @@
 import { Service, Action, BaseSchema } from 'moleculer-decorators';
 import { getManager, getRepository } from "typeorm";
-import { broker } from 'core/broker';
-import { logger } from 'core/logger';
-import { pubSub } from 'core/pubsub';
+import { broker, logger, pubSub } from 'core';
 import { User as UserEntity } from 'app/entity/User';
 
 export const setupUserService = () => {

@@ -1,18 +1,12 @@
 import { format, addSeconds } from 'date-fns';
 import { getConnection } from "typeorm";
 import { agenda } from 'core/db';
-import { broker } from 'core/broker';
-import { pubSub } from 'core/pubsub';
+import { broker, pubSub, logger } from 'core';
 import { reorder } from 'core/utils';
-import { logger } from 'core/logger';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
-import {
-  sourceAPI,
-  roomCollectionAPI,
-  roomModeWaitlistUserAPI
-} from 'app/api';
+import { sourceAPI, roomModeWaitlistUserAPI } from 'app/api';
 
 export class RoomWaitlistAPI {
 
@@ -44,15 +38,15 @@ export class RoomWaitlistAPI {
   // Set User to Current Play
   async setPlay(roomId: number, userId?: number) {
     let source = null;
-    let user = null;
+    let user: any = null;
     let sourceStart = 0;
 
     if (!userId) {
 
       userId = null;
-      user = roomCollectionAPI.getBotData();
-      const roomSource = await roomCollectionAPI.getNext(roomId);
-
+      user = broker.call('roomCollection.getBotData');
+      const roomSource: any = await broker.call('roomCollection.getNext', { roomId });
+      
       if (!roomSource) {
         const waitlistQueue = await this.get(roomId);
   
@@ -192,7 +186,7 @@ export class RoomWaitlistAPI {
 
     if (!userId) {
       userId = 0;
-      user = roomCollectionAPI.getBotData();
+      user = broker.call('roomCollection.getBotData');
     } else {
       const userQueue = await roomModeWaitlistUserAPI.getWithCreate(roomId, userId);
 

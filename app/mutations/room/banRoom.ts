@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   banRoom(roomId: Int!): Boolean
@@ -8,7 +7,7 @@ export const schema = `
 async function access(userId: number) {
   const current = await broker.call('user.getOne', { userId });
 
-  await accessAPI.check('banRoom', current);
+  await accessCheck('banRoom', current);
 }
 
 export async function resolver(

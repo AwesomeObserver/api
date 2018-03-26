@@ -1,4 +1,4 @@
-import { broker } from 'core/broker';
+import { broker } from 'core';
 
 export const schema = `
   getRoomUsers(roomId: Int!): [UserWithRoom]

@@ -1,7 +1,6 @@
+import { broker, logger } from 'core';
 import { redis } from 'core/db';
-import { logger } from 'core/logger';
 import { instanceId } from 'core/config';
-import { broker } from 'core/broker';
 
 export async function connect(cdata) {
 	const { connectionId } = cdata;

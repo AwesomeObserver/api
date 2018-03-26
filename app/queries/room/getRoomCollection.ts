@@ -1,4 +1,4 @@
-import { roomCollectionAPI } from 'app/api';
+import { broker } from 'core';
 
 export const schema = `
   getRoomCollection(roomId: Int!): [RoomSource]
@@ -11,5 +11,5 @@ export async function resolver(
   },
   ctx: any
 ) {
-  return roomCollectionAPI.get(args.roomId);
+  return broker.call('roomCollection.get', { roomId: args.roomId });
 }

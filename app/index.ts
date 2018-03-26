@@ -1,9 +1,8 @@
+import { broker, logger } from 'core';
 import { agenda, redis } from 'core/db';
 import { instanceId } from 'core/config';
 import { wsAPI } from 'core/wsapi';
 import { objFilter } from 'core/utils';
-import { logger } from 'core/logger';
-import { broker } from 'core/broker';
 import { roomModeWaitlistAPI } from 'app/api';
 import { setupConnectionService } from 'app/services/connection';
 import { setupWsService } from 'app/services/wsapi';
@@ -11,6 +10,7 @@ import { setupUserService } from 'app/services/user';
 import { setupUserSocialService } from 'app/services/userSocial';
 import { setupRoomUserService } from 'app/services/roomUser';
 import { setupRoomService } from 'app/services/room';
+import { setupRoomCollectionService } from 'app/services/roomCollection';
 
 export async function startup() {
   logger.info(`API Server is ready`);
@@ -49,4 +49,5 @@ export async function startup() {
   setupUserSocialService();
   setupRoomUserService();
   setupRoomService();
+  setupRoomCollectionService();
 }

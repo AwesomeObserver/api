@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   setRoomTitle(
@@ -10,7 +9,7 @@ export const schema = `
 
 async function access(userId: number, roomId: number) {
   const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessAPI.check('setRoomTitle', current);
+  await accessCheck('setRoomTitle', current);
 }
 
 export async function resolver(

@@ -1,6 +1,4 @@
-import { broker } from 'core/broker';
-import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI } from 'app/api';
+import { broker, pubSub, accessCheck } from 'core';
 
 export const schema = `
   clearRoomChat(roomId: Int!): Boolean
@@ -8,7 +6,7 @@ export const schema = `
 
 async function access(roomId: number, current) {
   const userId = current.site.id;
-  await accessAPI.check('removeAllMessages', current);
+  await accessCheck('removeAllMessages', current);
 }
 
 export async function resolver(

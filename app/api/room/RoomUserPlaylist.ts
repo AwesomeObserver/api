@@ -2,8 +2,7 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
-import { logger } from 'core/logger';
-import { pubSub } from 'core/pubsub';
+import { pubSub, logger } from 'core';
 import { reorder } from 'core/utils';
 import { sourceAPI } from 'app/api';
 

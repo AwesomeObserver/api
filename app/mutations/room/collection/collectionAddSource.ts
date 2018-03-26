@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI, roomCollectionAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   collectionAddSource(roomId: Int!, link: String!, useTimecode: Boolean): RoomSource
@@ -7,7 +6,7 @@ export const schema = `
 
 async function access(userId: number, roomId: number) {
   const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessAPI.check('collectionAddSource', current);
+  await accessCheck('collectionAddSource', current);
 }
 
 export async function resolver(
@@ -23,6 +22,10 @@ export async function resolver(
   const userId = ctx.userId;
 
   await access(userId, roomId);
-  
-  return roomCollectionAPI.addFromLink(roomId, userId, link, useTimecode);
+  return broker.call('roomCollection.addFromLink', {
+    roomId,
+    userId,
+    link,
+    useTimecode
+  });
 }

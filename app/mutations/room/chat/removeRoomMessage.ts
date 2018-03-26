@@ -1,6 +1,4 @@
-import { broker } from 'core/broker';
-import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI } from 'app/api';
+import { accessCheck, broker, pubSub } from 'core';
 
 export const schema = `
   removeRoomMessage(
@@ -11,7 +9,7 @@ export const schema = `
 
 async function access(roomId: number, current) {
   const userId = current.site.id;
-  await accessAPI.check('removeMessage', current);
+  await accessCheck('removeMessage', current);
 }
 
 export async function resolver(

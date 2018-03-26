@@ -1,8 +1,6 @@
 import { Service, Action, Event, BaseSchema } from 'moleculer-decorators';
 import { getManager, getRepository } from "typeorm";
-import { broker } from 'core/broker';
-import { logger } from 'core/logger';
-import { pubSub } from 'core/pubsub';
+import { broker, logger, pubSub } from 'core';
 import { Connection as ConnectionEntity } from 'app/entity/Connection';
 
 export const setupConnectionService = () => {
@@ -12,7 +10,7 @@ export const setupConnectionService = () => {
   @Service({
     name: 'connection'
   })
-  class UserWSAPIService extends BaseSchema {
+  class ConnectionService extends BaseSchema {
     @Event()
     async 'connection.join'(ctx) {
       const { connectionId, instanceId } = ctx;
@@ -180,5 +178,5 @@ export const setupConnectionService = () => {
     }
   }
 
-  return broker.createService(UserWSAPIService);
+  return broker.createService(ConnectionService);
 }

@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   setRoleUser(
@@ -14,13 +13,13 @@ async function access(currentUserId: number, userId: number, role: string) {
     broker.call('user.getOne', { userId })
   ]);
 
-  await accessAPI.check('setRole', current, context);
+  await accessCheck('setRole', current, context);
 
   switch (role) {
     case 'admin':
-      return accessAPI.check('setRoleAdmin', current, context);
+      return accessCheck('setRoleAdmin', current, context);
     case 'user':
-      return accessAPI.check('setRoleUser', current, context);
+      return accessCheck('setRoleUser', current, context);
     default:
       throw new Error('Deny');
   }

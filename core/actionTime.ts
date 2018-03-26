@@ -1,6 +1,6 @@
 import { redis } from 'core/db';
 
-export class ActionTimeAPI {
+export class ActionTime {
 
   async get(userId, actionName) {
     const key = `users:${userId}:actionsTime`;
@@ -14,3 +14,5 @@ export class ActionTimeAPI {
     return redis.hset(key, actionName, +new Date());
   }
 }
+
+export const actionTime = new ActionTime();
