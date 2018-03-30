@@ -133,41 +133,39 @@ export const checkAccess = (action, current, context) => {
   return true;
 }
 
-export class AccessAPI {
-  userDataFormatHack(user) {
-    if (user.room) {
-      return Object.assign({}, user, {
-        id: user.site.id,
-        roles: uniq([user.site.role, user.room.role]),
-        banned: user.site.banned || user.room.banned
-      });
-    }
-  
+const userDataFormatHack = (user) => {
+  if (user.room) {
     return Object.assign({}, user, {
-      roles: [user.role],
-      banned: user.banned
+      id: user.site.id,
+      roles: uniq([user.site.role, user.room.role]),
+      banned: user.site.banned || user.room.banned
     });
   }
 
-  check(action: string, current, context?) {
-    if (current) {
-      current = this.userDataFormatHack(current);
-    } else {
-      current = {
-        id: 0,
-        roles: ['guest'],
-        banned: false
-      }
-    }
-  
-    if (context) {
-      context = this.userDataFormatHack(context);
-    }
+  return Object.assign({}, user, {
+    roles: [user.role],
+    banned: user.banned
+  });
+}
 
-    if (!checkAccess(action, current, context)) {
-      throw new Error('Deny');
+export const accessCheck = (action: string, current, context?) => {
+  if (current) {
+    current = userDataFormatHack(current);
+  } else {
+    current = {
+      id: 0,
+      roles: ['guest'],
+      banned: false
     }
-  
-    return true;
   }
+
+  if (context) {
+    context = userDataFormatHack(context);
+  }
+
+  if (!checkAccess(action, current, context)) {
+    throw new Error('Deny');
+  }
+
+  return true;
 }

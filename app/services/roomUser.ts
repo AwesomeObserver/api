@@ -1,9 +1,7 @@
 import { Service, Action, BaseSchema } from 'moleculer-decorators';
 import { format } from 'date-fns';
 import { getManager, getRepository, getConnection } from "typeorm";
-import { broker } from 'core/broker';
-import { logger } from 'core/logger';
-import { pubSub } from 'core/pubsub';
+import { broker, logger, pubSub } from 'core';
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 
 export const setupRoomUserService = () => {
@@ -21,6 +19,7 @@ export const setupRoomUserService = () => {
         keys: ["roomId", "userId"]
       },
       params: {
+        roomId: "number",
         userId: "number"
       }
     })

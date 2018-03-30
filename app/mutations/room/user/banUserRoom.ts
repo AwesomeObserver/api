@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   banUserRoom(
@@ -18,7 +17,7 @@ async function access(
     broker.call('roomUser.getOneFull', { roomId, userId: currentUserId }),
     broker.call('roomUser.getOneFull', { roomId, userId })
   ]);
-  await accessAPI.check('banUserRoom', current, context);
+  await accessCheck('banUserRoom', current, context);
 }
 
 export async function resolver(

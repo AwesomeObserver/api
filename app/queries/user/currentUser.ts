@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { broker } from 'core/broker';
+import { broker } from 'core';
 import { redis } from 'core/db';
 
 export const schema = `

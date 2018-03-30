@@ -1,22 +1,26 @@
+import { broker, logger } from 'core';
 import { agenda, redis } from 'core/db';
 import { instanceId } from 'core/config';
-import { wsAPI } from 'core/wsapi';
-import { objFilter } from 'core/utils';
-import { logger } from 'core/logger';
-import { broker } from 'core/broker';
-import { roomModeWaitlistAPI } from 'app/api';
 import { setupConnectionService } from 'app/services/connection';
 import { setupWsService } from 'app/services/wsapi';
 import { setupUserService } from 'app/services/user';
 import { setupUserSocialService } from 'app/services/userSocial';
 import { setupRoomUserService } from 'app/services/roomUser';
 import { setupRoomService } from 'app/services/room';
+import { setupRoomCollectionService } from 'app/services/roomCollection';
+import { setupSourceService } from 'app/services/source';
+import { setupYoutubeService } from 'app/services/youtube';
+import { setupSoundcloudService } from 'app/services/soundcloud';
+import { setupRoomUserPlaylistService } from 'app/services/roomUserPlaylist';
+import { setupRoomWaitlistService } from 'app/services/roomWaitlist';
 
 export async function startup() {
   logger.info(`API Server is ready`);
 
   agenda.define('waitlistPlayEnd', (job, done) => {
-    roomModeWaitlistAPI.endPlay(job.attrs.data.roomId).then(() => done());
+    broker.call('roomWaitlist.endPlay', {
+      roomId: job.attrs.data.roomId
+    }).then(() => done());
   });
 
   agenda.start();
@@ -49,4 +53,10 @@ export async function startup() {
   setupUserSocialService();
   setupRoomUserService();
   setupRoomService();
+  setupRoomCollectionService();
+  setupSourceService();
+  setupYoutubeService();
+  setupSoundcloudService();
+  setupRoomUserPlaylistService();
+  setupRoomWaitlistService();
 }

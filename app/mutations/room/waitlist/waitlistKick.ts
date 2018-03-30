@@ -1,5 +1,4 @@
-import { broker } from 'core/broker';
-import { accessAPI, roomModeWaitlistAPI } from 'app/api';
+import { accessCheck, broker } from 'core';
 
 export const schema = `
   waitlistKick(roomId: Int!, current: Boolean): Boolean
@@ -7,7 +6,7 @@ export const schema = `
 
 async function access(userId: number, roomId: number) {
   const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessAPI.check('waitlistKick', current);
+  await accessCheck('waitlistKick', current);
 }
 
 export async function resolver(
@@ -23,12 +22,12 @@ export async function resolver(
 
   if (current) {
     await access(currentUserId, roomId);
-    return roomModeWaitlistAPI.kick(roomId);
+    return broker.call('roomWaitlist.kick', { roomId });
   } else {
     if (!currentUserId) {
       return null;
     }
 
-    return roomModeWaitlistAPI.kick(roomId, currentUserId);
+    return broker.call('roomWaitlist.kick', { roomId, userId: currentUserId });
   }
 }

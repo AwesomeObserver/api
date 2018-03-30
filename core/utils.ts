@@ -54,3 +54,8 @@ export function objFilter(dataObj: Object, filterObj?: Object): boolean {
 
   return pass;
 }
+
+export function parsePlaySource(str: string) {
+  const [sourceId, start] = str.split(':').map(e => parseInt(e, 10));
+  return { sourceId, start };
+}

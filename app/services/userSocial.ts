@@ -1,8 +1,6 @@
 import { Service, Action, BaseSchema } from 'moleculer-decorators';
 import { getManager, getRepository } from "typeorm";
-import { broker } from 'core/broker';
-import { logger } from 'core/logger';
-import { pubSub } from 'core/pubsub';
+import { broker, pubSub, logger } from 'core';
 import { UserSocial as UserSocialEntity } from 'app/entity/UserSocial';
 
 export const setupUserSocialService = () => {
@@ -26,6 +24,10 @@ export const setupUserSocialService = () => {
       }
 
       const user: any = await broker.call('user.create');
+
+      if (user.id === 1) {
+        broker.call('user.setRole', { data: { role: 'founder' } });
+      }
 
       const userSocialData = {
         userId: user.id,

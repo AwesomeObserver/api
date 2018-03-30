@@ -1,9 +1,7 @@
 import * as crypto from 'crypto';
 import * as addSeconds from 'date-fns/add_seconds';
 import * as isBefore from 'date-fns/is_before';
-import { broker } from 'core/broker';
-import { pubSub } from 'core/pubsub';
-import { accessAPI, actionTimeAPI } from 'app/api';
+import { accessCheck, actionTime, broker, pubSub } from 'core';
 
 export const schema = `
 	createRoomMessage(
@@ -15,17 +13,17 @@ export const schema = `
 async function access(roomId: number, current) {
 	const userId = current.site.id;
 
-	await accessAPI.check('sendMessage', current);
+	await accessCheck('sendMessage', current);
 
 	const room: any = await broker.call('room.getOne', { roomId });
 
 	// Slow Mode
 	if (room.slowMode) {
 		try {
-			accessAPI.check('sendMessageSlowModeIgnore', current);
+			accessCheck('sendMessageSlowModeIgnore', current);
 		} catch (error) {
 			const actionName = `sendMessage:${roomId}`;
-			const lastMessageDate = await actionTimeAPI.get(userId, actionName);
+			const lastMessageDate = await actionTime.get(userId, actionName);
 
 			const sendMessageDelay = 10;
 
@@ -38,7 +36,7 @@ async function access(roomId: number, current) {
 	// Follower Mode
 	if (room.followerMode) {
 		try {
-			accessAPI.check('sendMessageFollowerModeIgnore', current);
+			accessCheck('sendMessageFollowerModeIgnore', current);
 		} catch (error) {
 			const { follower, lastFollowDate } = current.room;
 
@@ -70,7 +68,7 @@ export async function resolver(
 
 	const user: any = await broker.call('roomUser.getOneFull', { roomId, userId });
 	await access(roomId, user);
-	actionTimeAPI.set(userId, `sendMessage:${roomId}`);
+	actionTime.set(userId, `sendMessage:${roomId}`);
 
 	const messageId = crypto.randomBytes(4).toString('hex');
 	const userData = [
