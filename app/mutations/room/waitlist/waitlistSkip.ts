@@ -1,5 +1,4 @@
 import { accessCheck, broker } from 'core';
-import { roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   waitlistSkip(roomId: Int!): Boolean
@@ -21,5 +20,5 @@ export async function resolver(
   const currentUserId = ctx.userId;
 
   await access(currentUserId, roomId);
-  return roomModeWaitlistAPI.skip(roomId);
+  return broker.call('roomWaitlist.skip', { roomId });
 }

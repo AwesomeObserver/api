@@ -1,5 +1,4 @@
 import { accessCheck, broker } from 'core';
-import { roomModeWaitlistUserAPI } from 'app/api';
 
 export const schema = `
   waitlistMoveSource(
@@ -11,7 +10,6 @@ export const schema = `
 
 async function access(userId: number) {
   const current = await broker.call('user.getOne', { userId });
-
   await accessCheck('waitlistMoveSource', current);
 }
 
@@ -29,5 +27,10 @@ export async function resolver(
 
   await access(userId);
   
-  return roomModeWaitlistUserAPI.move(roomId, userId, lastPos, newPos);
+  return broker.call('roomUserPlaylist.move', { 
+    roomId,
+    userId,
+    lastPos,
+    newPos
+  });
 }

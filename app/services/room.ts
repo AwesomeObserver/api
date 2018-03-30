@@ -3,7 +3,6 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import { format } from 'date-fns';
 import { broker, pubSub } from 'core';
 import { Room as RoomEntity } from 'app/entity/Room';
-import { roomModeWaitlistAPI } from 'app/api';
 
 import { RoomUser as RoomUserEntity } from 'app/entity/RoomUser';
 import {
@@ -105,7 +104,7 @@ export const setupRoomService = () => {
             whoSetRoleId: null
           }
         }),
-        roomModeWaitlistAPI.create(res.id)
+        broker.call('roomWaitlist.create', { roomId: res.id })
       ]);
 
       await broker.cacher.clean('room.getTop:*');

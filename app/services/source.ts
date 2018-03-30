@@ -12,10 +12,50 @@ export const setupSourceService = () => {
   })
   class SourceService extends BaseSchema {
 
-    @Action()
+    //@ts-ignore
+    @Action({
+      cache: {
+        keys: ["sourceId"]
+      },
+      params: {
+        sourceId: "number"
+      }
+    })
     async getOne(ctx) {
       const { sourceId } = ctx.params;
       return repository.findOne({ id: sourceId });
+    }
+
+    //@ts-ignore
+    @Action({
+      cache: {
+        keys: ["videoId"]
+      },
+      params: {
+        videoId: "string"
+      }
+    })
+    async getByYoutubeId(ctx) {
+      return repository.findOne({
+        service: 'youtube',
+        serviceId: ctx.params.videoId
+      });
+    }
+
+    //@ts-ignore
+    @Action({
+      cache: {
+        keys: ["trackURL"]
+      },
+      params: {
+        trackURL: "string"
+      }
+    })
+    async getBySoundcloudUrl(ctx) {
+      return repository.findOne({
+        service: 'soundcloud',
+        url: ctx.params.trackURL
+      });
     }
     
     @Action()
@@ -88,44 +128,38 @@ export const setupSourceService = () => {
     @Action()
     async addFromYoutubeById(ctx) {
       const { videoId } = ctx.params;
-      const source = await repository.findOne({
-        service: 'youtube',
-        serviceId: videoId
-      });
+      
+      const source = await broker.call('source.getByYoutubeId', { videoId });
 
-      if (source) {
-        return source;
-      }
+      if (source) return source;
 
       const data: any = await broker.call('youtube.getOne', { videoId });
 
-      if (!data) {
-        return null;
-      }
+      if (!data) return null;
 
-      return broker.call('source.save', { data });
+      const newSource = await broker.call('source.save', { data });
+      await broker.cacher.del(`source.getByYoutubeId:${videoId}`);
+      return newSource;
     }
 
+    // ToDo: valid url
     @Action()
     async addFromSoundcloudByUrl(ctx) {
       const { url } = ctx.params;
-      const pureUrl = url.match(/([^#])+/)[0];
-      const source = await repository.findOne({ service: 'soundcloud', url: pureUrl });
+      const trackURL = url.match(/([^#])+/)[0];
+      const source = await broker.call('source.getBySoundcloudUrl', { trackURL });
 
-      if (source) {
-        return source;
-      }
+      if (source) return source;
 
       const data: any = await broker.call('soundcloud.getByUrl', {
-        url: pureUrl
+        url: trackURL
       });
       
+      if (!data) return null;
 
-      if (!data) {
-        return null;
-      }
-
-      return broker.call('source.save', { data });
+      const newSource = await broker.call('source.save', { data });
+      await broker.cacher.del(`source.getBySoundcloudUrl:${trackURL}`);
+      return newSource;
     }
   }
 

@@ -3,7 +3,6 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import { format } from 'date-fns';
 import { broker } from 'core/broker';
 import { RoomSource as RoomSourceEntity } from 'app/entity/RoomSource';
-import { roomModeWaitlistAPI } from 'app/api';
 
 export const setupRoomCollectionService = () => {
   const repository = getRepository(RoomSourceEntity);
@@ -147,7 +146,7 @@ export const setupRoomCollectionService = () => {
     @Action()
     async start(ctx) {
       const { roomId } = ctx.params;
-      return roomModeWaitlistAPI.add(roomId, 0);
+      return broker.call('roomWaitlist.add', { roomId, userId: 0 })
     }
 
     @Action()

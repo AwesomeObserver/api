@@ -1,5 +1,4 @@
 import { accessCheck, broker } from 'core';
-import { roomModeWaitlistUserAPI } from 'app/api';
 
 export const schema = `
   waitlistRemoveSource(roomId: Int!, sourceId: Int!): Boolean
@@ -7,7 +6,6 @@ export const schema = `
 
 async function access(userId: number) {
   const current = await broker.call('user.getOne', { userId });
-
   await accessCheck('waitlistRemoveSource', current);
 }
 
@@ -23,6 +21,10 @@ export async function resolver(
   const userId = ctx.userId;
 
   await access(userId);
-  
-  return roomModeWaitlistUserAPI.remove(roomId, userId, sourceId);
+
+  return broker.call('roomUserPlaylist.remove', { 
+    roomId,
+    userId,
+    sourceId
+  });
 }

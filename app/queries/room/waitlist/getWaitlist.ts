@@ -1,6 +1,6 @@
 import { broker } from 'core';
+import { parsePlaySource } from 'core/utils';
 import { getTime } from 'date-fns';
-import { roomModeWaitlistAPI, roomModeWaitlistUserAPI } from 'app/api';
 
 export const schema = `
   getWaitlist(roomId: Int!): WaitlistPlay
@@ -15,9 +15,12 @@ export async function resolver(
 ) {
   const { roomId } = args;
 
-  const [data, playlist] = await Promise.all([
-    roomModeWaitlistAPI.get(roomId),
-    roomModeWaitlistUserAPI.getWithCreate(roomId, ctx.userId)
+  const [data, playlist]: any = await Promise.all([
+    broker.call('roomWaitlist.get', { roomId }),
+    broker.call('roomUserPlaylist.getWithCreate', {
+      roomId,
+      userId: ctx.userId
+    })
   ]);
 
   let sourcesIds = [];
@@ -27,12 +30,12 @@ export async function resolver(
   }
 
   const sources = await Promise.all(sourcesIds.map(async (sourceData) => {
-    const { sourceId, start } = roomModeWaitlistUserAPI.parse(sourceData);
+    const { sourceId, start } = parsePlaySource(sourceData);
     const source: any = await broker.call('source.getOne', { sourceId });
     return { source, start };
   }));
 
-  let users = await Promise.all(data.users.map(userId => {
+  let users: any = await Promise.all(data.users.map(userId => {
     return broker.call('user.getOne', { userId: parseInt(userId, 10) })
   }));
 

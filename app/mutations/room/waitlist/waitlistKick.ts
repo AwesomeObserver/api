@@ -1,5 +1,4 @@
 import { accessCheck, broker } from 'core';
-import { roomModeWaitlistAPI } from 'app/api';
 
 export const schema = `
   waitlistKick(roomId: Int!, current: Boolean): Boolean
@@ -23,12 +22,12 @@ export async function resolver(
 
   if (current) {
     await access(currentUserId, roomId);
-    return roomModeWaitlistAPI.kick(roomId);
+    return broker.call('roomWaitlist.kick', { roomId });
   } else {
     if (!currentUserId) {
       return null;
     }
 
-    return roomModeWaitlistAPI.kick(roomId, currentUserId);
+    return broker.call('roomWaitlist.kick', { roomId, userId: currentUserId });
   }
 }

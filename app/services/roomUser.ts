@@ -19,6 +19,7 @@ export const setupRoomUserService = () => {
         keys: ["roomId", "userId"]
       },
       params: {
+        roomId: "number",
         userId: "number"
       }
     })
