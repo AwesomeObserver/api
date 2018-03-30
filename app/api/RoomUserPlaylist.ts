@@ -2,9 +2,8 @@ import { getConnection } from "typeorm";
 import {
   RoomUserWaitlistQueue as UserWaitlistQueueEntity
 } from 'app/entity/RoomUserWaitlistQueue';
-import { pubSub, logger } from 'core';
+import { broker, pubSub, logger } from 'core';
 import { reorder } from 'core/utils';
-import { sourceAPI } from 'app/api';
 
 export class RoomUserPlaylistAPI {
 
@@ -87,7 +86,10 @@ export class RoomUserPlaylistAPI {
     link: string,
     useTimecode: boolean
   ) {
-    let { source, start } = await sourceAPI.addFromLink(link, useTimecode);
+    let { source, start }: any = await broker.call('source.addFromLink', {
+      link,
+      useTimecode
+    });
 
     if (!source) {
       return false;

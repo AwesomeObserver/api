@@ -11,6 +11,9 @@ import { setupUserSocialService } from 'app/services/userSocial';
 import { setupRoomUserService } from 'app/services/roomUser';
 import { setupRoomService } from 'app/services/room';
 import { setupRoomCollectionService } from 'app/services/roomCollection';
+import { setupSourceService } from 'app/services/source';
+import { setupYoutubeService } from 'app/services/youtube';
+import { setupSoundcloudService } from 'app/services/soundcloud';
 
 export async function startup() {
   logger.info(`API Server is ready`);
@@ -50,4 +53,7 @@ export async function startup() {
   setupRoomUserService();
   setupRoomService();
   setupRoomCollectionService();
+  setupSourceService();
+  setupYoutubeService();
+  setupSoundcloudService();
 }

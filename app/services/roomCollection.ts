@@ -3,7 +3,7 @@ import { getConnection, getManager, getRepository } from "typeorm";
 import { format } from 'date-fns';
 import { broker } from 'core/broker';
 import { RoomSource as RoomSourceEntity } from 'app/entity/RoomSource';
-import { sourceAPI, roomModeWaitlistAPI } from 'app/api';
+import { roomModeWaitlistAPI } from 'app/api';
 
 export const setupRoomCollectionService = () => {
   const repository = getRepository(RoomSourceEntity);
@@ -75,7 +75,10 @@ export const setupRoomCollectionService = () => {
     @Action()
     async addFromLink(ctx) {
       const { roomId, userId, link, useTimecode } = ctx.params;
-      let { source, start } = await sourceAPI.addFromLink(link, useTimecode);
+      let { source, start }: any = await broker.call('source.addFromLink', {
+        link,
+        useTimecode
+      });
       const res: any = await broker.call('roomCollection.addSource', {
         roomId,
         userId,

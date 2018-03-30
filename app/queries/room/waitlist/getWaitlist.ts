@@ -1,10 +1,6 @@
 import { broker } from 'core';
 import { getTime } from 'date-fns';
-import {
-  sourceAPI,
-  roomModeWaitlistAPI,
-  roomModeWaitlistUserAPI
-} from 'app/api';
+import { roomModeWaitlistAPI, roomModeWaitlistUserAPI } from 'app/api';
 
 export const schema = `
   getWaitlist(roomId: Int!): WaitlistPlay
@@ -32,7 +28,7 @@ export async function resolver(
 
   const sources = await Promise.all(sourcesIds.map(async (sourceData) => {
     const { sourceId, start } = roomModeWaitlistUserAPI.parse(sourceData);
-    const source = await sourceAPI.getById(sourceId);
+    const source: any = await broker.call('source.getOne', { sourceId });
     return { source, start };
   }));
 

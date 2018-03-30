@@ -6,7 +6,7 @@ import { reorder } from 'core/utils';
 import {
   RoomWaitlistQueue as WaitlistQueueEntity
 } from 'app/entity/RoomWaitlistQueue';
-import { sourceAPI, roomModeWaitlistUserAPI } from 'app/api';
+import { roomModeWaitlistUserAPI } from 'app/api';
 
 export class RoomWaitlistAPI {
 
@@ -28,7 +28,9 @@ export class RoomWaitlistAPI {
     }
 
     if (queue.sourceId) {
-      const source: any = await sourceAPI.getById(queue.sourceId);
+      const source: any = await broker.call('source.getOne', {
+        sourceId: queue.sourceId
+      });
       queue.source = source;
     }
 
@@ -37,7 +39,7 @@ export class RoomWaitlistAPI {
 
   // Set User to Current Play
   async setPlay(roomId: number, userId?: number) {
-    let source = null;
+    let source: any = null;
     let user: any = null;
     let sourceStart = 0;
 
@@ -81,7 +83,9 @@ export class RoomWaitlistAPI {
 
       user = userData;
       sourceStart = sourceData.start;
-      source = await sourceAPI.getById(sourceData.sourceId);
+      source = await broker.call('source.getOne', {
+        sourceId: sourceData.sourceId
+      });
     }
 
     const duration = source.duration - sourceStart;
