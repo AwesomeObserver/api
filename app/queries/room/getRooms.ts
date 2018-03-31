@@ -5,5 +5,5 @@ export const schema = `
 `;
 
 export async function resolver(root, args, ctx) {
-  return broker.call('room.getTop');
+	return broker.call('room.getTop');
 }

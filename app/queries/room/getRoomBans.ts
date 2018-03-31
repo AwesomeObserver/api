@@ -5,12 +5,12 @@ export const schema = `
 `;
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+	},
+	ctx: any
 ) {
-  const { roomId } = args;
-  return broker.call('roomUser.getBans', { roomId });
+	const { roomId } = args;
+	return broker.call('roomUser.getBans', { roomId });
 }

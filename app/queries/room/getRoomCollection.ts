@@ -5,11 +5,11 @@ export const schema = `
 `;
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+	},
+	ctx: any
 ) {
-  return broker.call('roomCollection.get', { roomId: args.roomId });
+	return broker.call('roomCollection.get', { roomId: args.roomId });
 }

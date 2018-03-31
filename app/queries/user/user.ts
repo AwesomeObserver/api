@@ -5,17 +5,17 @@ export const schema = `
 `;
 
 export async function resolver(root: any, args: any, ctx: any) {
-  const { userId } = ctx;
+	const { userId } = ctx;
 
-  if (!userId) {
-    throw new Error('Deny');
-  }
+	if (!userId) {
+		throw new Error('Deny');
+	}
 
-  const user = await broker.call('user.getOne', { userId });
+	const user = await broker.call('user.getOne', { userId });
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+	if (!user) {
+		throw new Error('User not found');
+	}
 
-  return user;
+	return user;
 }

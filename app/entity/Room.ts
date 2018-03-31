@@ -1,62 +1,61 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn, 
-  Column,
-  OneToMany,
-  JoinColumn
-} from "typeorm";
-import { RoomUser } from "./RoomUser";
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	OneToMany,
+	JoinColumn
+} from 'typeorm';
+import { RoomUser } from './RoomUser';
 
 @Entity()
 export class Room {
-  @PrimaryGeneratedColumn()
-  id: number;
+	@PrimaryGeneratedColumn() id: number;
 
-  @Column({ type: 'varchar', unique: true, length: 32 })
-  name: string;
+	@Column({ type: 'varchar', unique: true, length: 32 })
+	name: string;
 
-  @Column({ type: 'varchar', length: 48 })
-  title: string;
-  
-  @Column({ type: 'varchar', length: 200, nullable: true, default: '' })
-  contentTitle: string;
+	@Column({ type: 'varchar', length: 48 })
+	title: string;
 
-  @Column({ type: 'integer', nullable: true, default: 0 })
-  connectionsCount: number;
-  
-  @Column({ type: 'integer', nullable: true, default: 0 })
-  followersCount: number;
-  
-  @Column({ type: 'integer', nullable: true, default: 0 })
-  collectionCount: number;
+	@Column({ type: 'varchar', length: 200, nullable: true, default: '' })
+	contentTitle: string;
 
-  @Column({ type: 'varchar', default: 'waitlist' })
-  mode: string;
+	@Column({ type: 'integer', nullable: true, default: 0 })
+	connectionsCount: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  avatar: string;
+	@Column({ type: 'integer', nullable: true, default: 0 })
+	followersCount: number;
 
-  @Column({ type: 'boolean', default: false })
-  banned: boolean;
+	@Column({ type: 'integer', nullable: true, default: 0 })
+	collectionCount: number;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  banDate: string;
+	@Column({ type: 'varchar', default: 'waitlist' })
+	mode: string;
 
-  @Column({ type: 'integer', nullable: true })
-  whoSetBanId: number;
+	@Column({ type: 'varchar', nullable: true })
+	avatar: string;
 
-  @Column({ type: 'text', nullable: true })
-  banReason: string;
+	@Column({ type: 'boolean', default: false })
+	banned: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  followerMode: boolean;
+	@Column({ type: 'timestamp with time zone', nullable: true })
+	banDate: string;
 
-  @Column({ type: 'boolean', default: false })
-  waitlistLock: boolean;
+	@Column({ type: 'integer', nullable: true })
+	whoSetBanId: number;
 
-  @Column({ type: 'boolean', default: false })
-  slowMode: boolean;
+	@Column({ type: 'text', nullable: true })
+	banReason: string;
 
-  @OneToMany(type => RoomUser, roomUser => roomUser.room)
-  users: RoomUser[];
+	@Column({ type: 'boolean', default: false })
+	followerMode: boolean;
+
+	@Column({ type: 'boolean', default: false })
+	waitlistLock: boolean;
+
+	@Column({ type: 'boolean', default: false })
+	slowMode: boolean;
+
+	@OneToMany((type) => RoomUser, (roomUser) => roomUser.room)
+	users: RoomUser[];
 }
