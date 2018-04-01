@@ -15,48 +15,52 @@ import { setupRoomUserPlaylistService } from 'app/services/roomUserPlaylist';
 import { setupRoomWaitlistService } from 'app/services/roomWaitlist';
 
 export async function startup() {
-  logger.info(`API Server is ready`);
+	logger.info(`API Server is ready`);
 
-  agenda.define('waitlistPlayEnd', (job, done) => {
-    broker.call('roomWaitlist.endPlay', {
-      roomId: job.attrs.data.roomId
-    }).then(() => done());
-  });
+	agenda.define('waitlistPlayEnd', (job, done) => {
+		broker
+			.call('roomWaitlist.endPlay', {
+				roomId: job.attrs.data.roomId
+			})
+			.then(() => done());
+	});
 
-  agenda.start();
+	agenda.start();
 
-  const hcTimeout = 2000;
+	const hcTimeout = 2000;
 
-  setInterval(() => {
-    redis.hset('ihc', instanceId, +new Date());
-  }, 2000);
+	setInterval(() => {
+		redis.hset('ihc', instanceId, +new Date());
+	}, 2000);
 
-  setInterval(async () => {
-    const instances = await redis.hgetall(`ihc`);
+	setInterval(async () => {
+		const instances = await redis.hgetall(`ihc`);
 
-    Object.keys(instances).forEach(instanceName => {
-      const diff = +new Date() - instances[instanceName];
+		Object.keys(instances).forEach((instanceName) => {
+			const diff = +new Date() - instances[instanceName];
 
-      if (diff > (hcTimeout + 1000)) {
-        broker.call("connection.clearInstance", {
-          instanceId: instanceName
-        }).then(() => {
-          redis.hdel('ihc', instanceName);          
-        });
-      }
-    });
-  }, 5000);
+			if (diff > hcTimeout + 1000) {
+				broker
+					.call('connection.clearInstance', {
+						instanceId: instanceName
+					})
+					.then(() => {
+						redis.hdel('ihc', instanceName);
+					});
+			}
+		});
+	}, 5000);
 
-  setupConnectionService();
-  setupWsService();
-  setupUserService();
-  setupUserSocialService();
-  setupRoomUserService();
-  setupRoomService();
-  setupRoomCollectionService();
-  setupSourceService();
-  setupYoutubeService();
-  setupSoundcloudService();
-  setupRoomUserPlaylistService();
-  setupRoomWaitlistService();
+	setupConnectionService();
+	setupWsService();
+	setupUserService();
+	setupUserSocialService();
+	setupRoomUserService();
+	setupRoomService();
+	setupRoomCollectionService();
+	setupSourceService();
+	setupYoutubeService();
+	setupSoundcloudService();
+	setupRoomUserPlaylistService();
+	setupRoomWaitlistService();
 }
