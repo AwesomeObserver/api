@@ -8,26 +8,26 @@ export const schema = `
 `;
 
 export async function access(currentUserId: number, userId: number) {
-  const [current, context] = await Promise.all([
-    broker.call('user.getOne', { userId: currentUserId }),
-    broker.call('user.getOne', { userId })
-  ]);
+	const [current, context] = await Promise.all([
+		broker.call('user.getOne', { userId: currentUserId }),
+		broker.call('user.getOne', { userId })
+	]);
 
-  await accessCheck('banRoom', current, context);
+	await accessCheck('banRoom', current, context);
 }
 
 export async function resolver(
-  root: any,
-  args: {
-    userId: number,
-    reason?: string
-  },
-  ctx: any
+	root: any,
+	args: {
+		userId: number;
+		reason?: string;
+	},
+	ctx: any
 ) {
-  const { userId } = args;
-  const currentUserId = ctx.userId;
-  
-  await access(currentUserId, userId);
+	const { userId } = args;
+	const currentUserId = ctx.userId;
 
-  return broker.call('user.ban', { userId });
+	await access(currentUserId, userId);
+
+	return broker.call('user.ban', { userId });
 }

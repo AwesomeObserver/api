@@ -27,7 +27,12 @@ async function access(roomId: number, current) {
 
 			const sendMessageDelay = 10;
 
-			if (isBefore(+new Date(), addSeconds(lastMessageDate, sendMessageDelay))) {
+			if (
+				isBefore(
+					+new Date(),
+					addSeconds(lastMessageDate, sendMessageDelay)
+				)
+			) {
 				throw new Error('denyForSlowMode');
 			}
 		}
@@ -53,10 +58,10 @@ async function access(roomId: number, current) {
 
 export async function resolver(
 	root: any,
-  args: {
-		roomId: number,
-		message: string
-  },
+	args: {
+		roomId: number;
+		message: string;
+	},
 	ctx: any
 ) {
 	const { roomId, message } = args;
@@ -66,21 +71,17 @@ export async function resolver(
 		throw new Error('Outside room');
 	}
 
-	const user: any = await broker.call('roomUser.getOneFull', { roomId, userId });
+	const user: any = await broker.call('roomUser.getOneFull', {
+		roomId,
+		userId
+	});
 	await access(roomId, user);
 	actionTime.set(userId, `sendMessage:${roomId}`);
 
 	const messageId = crypto.randomBytes(4).toString('hex');
 	const userData = [
-		[
-			user.site.id,
-			user.site.name,
-			user.site.role,
-			user.site.avatar
-		],
-		[
-			user.room.role
-		]
+		[user.site.id, user.site.name, user.site.role, user.site.avatar],
+		[user.room.role]
 	];
 	const messageData = [messageId, userData, message.trim().slice(0, 320)];
 	pubSub.publish('chatMessage', messageData, { roomId });

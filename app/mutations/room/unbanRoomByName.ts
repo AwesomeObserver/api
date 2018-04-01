@@ -5,22 +5,22 @@ export const schema = `
 `;
 
 async function access(userId: number) {
-  const current = await broker.call('user.getOne', { userId });
+	const current = await broker.call('user.getOne', { userId });
 
-  await accessCheck('unbanRoom', current);
+	await accessCheck('unbanRoom', current);
 }
 
 export async function resolver(
-  root: any,
-  args: {
-    roomName: string
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomName: string;
+	},
+	ctx: any
 ) {
-  const { roomName } = args;
-  const userId = ctx.userId;
-  
-  await access(userId);
+	const { roomName } = args;
+	const userId = ctx.userId;
 
-  return broker.call('room.unbanByName', { roomName });
+	await access(userId);
+
+	return broker.call('room.unbanByName', { roomName });
 }

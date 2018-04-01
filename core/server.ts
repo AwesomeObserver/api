@@ -24,12 +24,13 @@ function setupServices(router) {
 			new serviceData.Strategy(
 				{
 					...serviceData.strategyOptions,
-					callbackURL: `${process.env.BASE_URL}authend/${serviceData.name}`,
+					callbackURL: `${process.env
+						.BASE_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
 					process.nextTick(async function() {
-						const userId = await broker.call('userSocial.auth', { 
+						const userId = await broker.call('userSocial.auth', {
 							serviceData: serviceData.getData(profile)
 						});
 
@@ -92,7 +93,7 @@ export class RPServer {
 	}
 
 	async setupAuth() {
-		this.app.keys = [ process.env.SESSION_SECRET ];
+		this.app.keys = [process.env.SESSION_SECRET];
 		this.app.use(
 			koaSession(
 				{

@@ -5,24 +5,27 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessCheck('waitlistRemoveUser', current);
+	const current = await broker.call('roomUser.getOneFull', {
+		roomId,
+		userId
+	});
+	await accessCheck('waitlistRemoveUser', current);
 }
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number,
-    userId: number
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+		userId: number;
+	},
+	ctx: any
 ) {
-  const { roomId, userId } = args;
-  const contextUserId = ctx.userId;
+	const { roomId, userId } = args;
+	const contextUserId = ctx.userId;
 
-  if (userId != contextUserId) {
-    await access(contextUserId, roomId);
-  }
+	if (userId != contextUserId) {
+		await access(contextUserId, roomId);
+	}
 
-  return broker.call('roomWaitlist.remove', { roomId, userId });
+	return broker.call('roomWaitlist.remove', { roomId, userId });
 }

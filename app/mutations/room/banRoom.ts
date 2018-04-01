@@ -5,28 +5,28 @@ export const schema = `
 `;
 
 async function access(userId: number) {
-  const current = await broker.call('user.getOne', { userId });
+	const current = await broker.call('user.getOne', { userId });
 
-  await accessCheck('banRoom', current);
+	await accessCheck('banRoom', current);
 }
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+	},
+	ctx: any
 ) {
-  const { roomId } = args;
-  const userId = ctx.userId;
+	const { roomId } = args;
+	const userId = ctx.userId;
 
-  await access(userId);
+	await access(userId);
 
-  return broker.call('room.ban', {
-    roomId,
-    data: {
-      whoSetBanId: userId,
-      banReason: null
-    }
-  });
+	return broker.call('room.ban', {
+		roomId,
+		data: {
+			whoSetBanId: userId,
+			banReason: null
+		}
+	});
 }
