@@ -15,6 +15,6 @@ export default {
 		avatar: profile._json.image.url
 	}),
 	authOptions: {
-		scope: [ 'profile', 'email' ]
+		scope: ['profile', 'email']
 	}
 };

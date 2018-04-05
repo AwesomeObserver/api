@@ -5,27 +5,30 @@ export const schema = `
 `;
 
 async function access(userId: number, roomId: number) {
-  const current = await broker.call('roomUser.getOneFull', { roomId, userId });
-  await accessCheck('collectionAddSource', current);
+	const current = await broker.call('roomUser.getOneFull', {
+		roomId,
+		userId
+	});
+	await accessCheck('collectionAddSource', current);
 }
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number,
-    link: string,
-    useTimecode?: boolean
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+		link: string;
+		useTimecode?: boolean;
+	},
+	ctx: any
 ) {
-  const { roomId, link, useTimecode } = args;
-  const userId = ctx.userId;
+	const { roomId, link, useTimecode } = args;
+	const userId = ctx.userId;
 
-  await access(userId, roomId);
-  return broker.call('roomCollection.addFromLink', {
-    roomId,
-    userId,
-    link,
-    useTimecode
-  });
+	await access(userId, roomId);
+	return broker.call('roomCollection.addFromLink', {
+		roomId,
+		userId,
+		link,
+		useTimecode
+	});
 }

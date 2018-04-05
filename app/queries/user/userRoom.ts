@@ -5,18 +5,18 @@ export const schema = `
 `;
 
 export async function resolver(
-  root: any,
-  args: {
-    roomId: number,
-    userId?: number
-  },
-  ctx: any
+	root: any,
+	args: {
+		roomId: number;
+		userId?: number;
+	},
+	ctx: any
 ) {
-  let { roomId, userId } = args;
+	let { roomId, userId } = args;
 
-  if (!userId) {
-    userId = ctx.userId;
-  }
-  
-  return broker.call('roomUser.getOne', { roomId, userId });
+	if (!userId) {
+		userId = ctx.userId;
+	}
+
+	return broker.call('roomUser.getOne', { roomId, userId });
 }

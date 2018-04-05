@@ -7,25 +7,25 @@ export const schema = `
 `;
 
 export async function resolver(root: any, args: any, ctx: any) {
-  const { userId } = ctx;
+	const { userId } = ctx;
 
-  if (!userId) {
-    return null;
-  }
+	if (!userId) {
+		return null;
+	}
 
-  const user = await broker.call('user.getOne', { userId });
+	const user = await broker.call('user.getOne', { userId });
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+	if (!user) {
+		throw new Error('User not found');
+	}
 
-  const token = crypto.randomBytes(16).toString('hex');
-  const key = `connectionToken:${token}`;
-  await redis.set(key, userId);
-  await redis.expire(key, 12);
+	const token = crypto.randomBytes(16).toString('hex');
+	const key = `connectionToken:${token}`;
+	await redis.set(key, userId);
+	await redis.expire(key, 12);
 
-  return {
-    global: user,
-    token
-  };
+	return {
+		global: user,
+		token
+	};
 }

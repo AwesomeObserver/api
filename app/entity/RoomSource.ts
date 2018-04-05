@@ -1,47 +1,46 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn, 
-  Column,
-  OneToOne,
-  JoinColumn,
-  ManyToOne
-} from "typeorm";
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	OneToOne,
+	JoinColumn,
+	ManyToOne
+} from 'typeorm';
 import { Room } from './Room';
-import { User } from "./User";
+import { User } from './User';
 import { Source } from './Source';
 
 @Entity()
 export class RoomSource {
-  @PrimaryGeneratedColumn()
-  id: number;
+	@PrimaryGeneratedColumn() id: number;
 
-  @Column({ type: 'integer' })
-  roomId: number;
-  
-  @OneToOne(type => Room)
-  @JoinColumn()
-  room: Room;
+	@Column({ type: 'integer' })
+	roomId: number;
 
-  @Column({ type: 'integer' })
-  sourceId: number;
+	@OneToOne((type) => Room)
+	@JoinColumn()
+	room: Room;
 
-  @Column({ type: 'integer', nullable: true })
-  userId: number;
+	@Column({ type: 'integer' })
+	sourceId: number;
 
-  @OneToOne(type => User)
-  @JoinColumn()
-  user: User;
+	@Column({ type: 'integer', nullable: true })
+	userId: number;
 
-  @OneToOne(type => Source)
-  @JoinColumn()
-  source: Source;
+	@OneToOne((type) => User)
+	@JoinColumn()
+	user: User;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  lastPlay: string;
+	@OneToOne((type) => Source)
+	@JoinColumn()
+	source: Source;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  createDate: string;
+	@Column({ type: 'timestamp with time zone', nullable: true })
+	lastPlay: string;
 
-  @Column({ type: 'integer', default: 0 })
-  plays: number;
+	@Column({ type: 'timestamp with time zone', nullable: true })
+	createDate: string;
+
+	@Column({ type: 'integer', default: 0 })
+	plays: number;
 }

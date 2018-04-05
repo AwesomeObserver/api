@@ -4,12 +4,12 @@ import { instanceId } from 'core/config';
 
 export async function connect(cdata) {
 	const { connectionId } = cdata;
-	broker.emit("connection.join", { connectionId, instanceId });
+	broker.emit('connection.join', { connectionId, instanceId });
 }
 
 export async function disconnect(cdata) {
 	const { connectionId } = cdata;
-	broker.emit("connection.leave", { connectionId });
+	broker.emit('connection.leave', { connectionId });
 }
 
 export async function login(token: string, cdata) {
@@ -29,7 +29,7 @@ export async function login(token: string, cdata) {
 	cdata.token = token;
 	const userId = parseInt(tokenData, 10);
 	cdata.userId = userId;
-	broker.emit("connection.login", {
+	broker.emit('connection.login', {
 		connectionId: cdata.connectionId,
 		userId
 	});
@@ -41,7 +41,7 @@ export async function join(roomId: number, cdata) {
 	}
 
 	cdata.roomId = roomId;
-	broker.emit("connection.joinRoom", {
+	broker.emit('connection.joinRoom', {
 		connectionId: cdata.connectionId,
 		roomId
 	});
@@ -55,7 +55,7 @@ export async function leave(data: any, cdata) {
 	}
 
 	cdata.roomId = null;
-	broker.emit("connection.leaveRoom", {
+	broker.emit('connection.leaveRoom', {
 		connectionId: cdata.connectionId,
 		roomId
 	});

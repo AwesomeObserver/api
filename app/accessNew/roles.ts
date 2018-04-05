@@ -1,4 +1,4 @@
-export const accessRoles = [
+export const roles = [
 	{
 		name: 'guest',
 		actions: ['login']
