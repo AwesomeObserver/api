@@ -15,13 +15,16 @@ export async function resolver(
 ) {
 	const { roomId } = args;
 
-	const [data, playlist]: any = await Promise.all([
-		broker.call('roomWaitlist.get', { roomId }),
-		broker.call('roomUserPlaylist.getWithCreate', {
+	const data: any = await broker.call('roomWaitlist.get', { roomId });
+
+	let playlist: any = false;
+
+	if (ctx.userId) {
+		playlist = await broker.call('roomUserPlaylist.getWithCreate', {
 			roomId,
 			userId: ctx.userId
-		})
-	]);
+		});
+	}
 
 	let sourcesIds = [];
 
