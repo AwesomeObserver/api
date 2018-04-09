@@ -2,6 +2,12 @@ import { merge, flip, union, uniq } from 'ramda';
 import { accessActions } from 'app/access/actions';
 import { accessRoles } from 'app/access/roles';
 
+import { Access } from './lib/Access';
+import { actions as allActions } from 'app/accessNew/actions';
+import { roles as allRoles } from 'app/accessNew/roles';
+
+export const access = new Access(allActions, allRoles);
+
 const actionMask = {
 	// Нужна ли инфа о пользователе в контексте
 	context: false,
@@ -26,6 +32,8 @@ const makeActions = (actions) => {
 
 	return res;
 };
+
+const fullAccessActions = makeActions(accessActions);
 
 const extendRole = (role) => {
 	const pureExtRole = accessRoles.find((r) => r.name === role.extend);
@@ -55,14 +63,53 @@ const makeRoles = (roles) => {
 	});
 };
 
-const fullAccessActions = makeActions(accessActions);
-const fullAccessRoles = makeRoles(accessRoles);
+// const getGroupsActions = (groups) => {
+// 	return;
+// };
+
+// const extractGroups = (roles) => {
+// 	return roles.map((role) => {
+// 		return {
+// 			...role,
+// 			actions: union(role.actions, getGroupsActions(role.groups))
+// 		};
+// 	});
+// }
+
+const addAllows = (roles) => {
+	return roles.map((role) => {
+		return {
+			...role,
+			allows: role.actions.map((action) => {
+				return (
+					fullAccessActions[action] || {
+						name: action,
+						options: 0
+					}
+				);
+			})
+		};
+	});
+};
+
+const fullAccessRoles = addAllows(makeRoles(accessRoles));
+
+console.log(fullAccessRoles);
+
+export const getRoleWeight = (role) => {
+	return fullAccessRoles.findIndex((r) => r.name === role) + 1;
+};
+
+export const getRoleAllows = (role) => {
+	const roleData = fullAccessRoles.find((r) => r.name === role);
+	return roleData.allows;
+};
 
 const getRolesWeight = (roles) => {
 	let max = -1;
 
 	roles.forEach((role) => {
-		const current = fullAccessRoles.findIndex((r) => r.name === role);
+		const current = getRoleWeight(role);
 
 		if (current > max) {
 			max = current;
