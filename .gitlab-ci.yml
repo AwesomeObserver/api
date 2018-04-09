@@ -14,10 +14,3 @@ build:
     - docker push registry.gitlab.com/ravepro/api:latest
   only:
     - master
-  
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploy to staging server"
-  only:
-    - master
