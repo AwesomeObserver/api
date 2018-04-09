@@ -17,5 +17,7 @@ build:
   
 deploy:
   stage: deploy
+  script:
+    - echo "Deploy to staging server"
   only:
     - master
