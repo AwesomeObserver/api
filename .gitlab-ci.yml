@@ -4,7 +4,7 @@ services:
 
 stages:
   - build
-  - deploy
+  - production
 
 build:
   stage: build
@@ -14,3 +14,15 @@ build:
     - docker push registry.gitlab.com/ravepro/api:latest
   only:
     - master
+
+production:
+  stage: production
+  script:
+    - deploy
+  environment:
+    name: production
+    url: http://$CI_PROJECT_PATH_SLUG.$AUTO_DEVOPS_DOMAIN
+  only:
+    refs:
+      - master
+    kubernetes: active
