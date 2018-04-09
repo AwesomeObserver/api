@@ -4,6 +4,7 @@ services:
 
 stages:
   - build
+  - deploy
 
 build:
   stage: build
@@ -13,3 +14,7 @@ build:
     - docker push registry.gitlab.com/ravepro/api:latest
   only:
     - master
+  
+deploy:
+  stage: deploy
+  script: make deploy

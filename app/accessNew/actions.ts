@@ -1,5 +1,11 @@
 export const actions = [
 	{
+		name: 'login'
+	},
+	{
+		name: 'logout'
+	},
+	{
 		name: 'createRoom'
 	},
 	{

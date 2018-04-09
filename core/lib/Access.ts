@@ -1,3 +1,5 @@
+import { union } from 'ramda';
+
 interface Action {
 	name: string;
 	groups?: string[];
@@ -8,7 +10,6 @@ interface Action {
 
 interface PureAction {
 	name: string;
-	access: number;
 	groups: string[];
 	context: boolean;
 	hierarchy: boolean;
@@ -25,7 +26,9 @@ interface Role {
 interface PureRole {
 	name: string;
 	weight: number;
-	permission: number;
+	actions: string[];
+	allows: PureAction[];
+	groups: string[];
 }
 
 interface Roles {
@@ -35,7 +38,7 @@ interface Roles {
 
 interface Group {
 	name: string;
-	permission: number;
+	actions: string[];
 }
 
 export class Access {
@@ -53,14 +56,13 @@ export class Access {
 		this.roles = this.extendRoles(roles);
 	}
 
-	extendAction = (action: Action, i: number): PureAction => {
+	extendAction = (action: Action): PureAction => {
 		const orDefault = (value, defaultValue) => {
 			return typeof value === 'boolean' ? value : defaultValue;
 		};
 
 		let newAction = {
 			name: action.name,
-			access: 1 << i,
 			context: orDefault(action.context, false),
 			hierarchy: orDefault(action.hierarchy, true),
 			self: orDefault(action.self, false),
@@ -86,12 +88,11 @@ export class Access {
 				if (!groups[group]) {
 					groups[group] = {
 						name: group,
-						permission: 0
+						actions: []
 					};
 				}
 
-				groups[group].permission =
-					groups[group].permission | action.access;
+				groups[group].actions.push(action.name);
 			});
 		});
 
@@ -101,27 +102,32 @@ export class Access {
 	extendRole = (role: Role, roles: Role[]): PureRole => {
 		const name = role.name;
 		const weight = roles.findIndex(({ name }) => name === role.name) + 1;
-		let permission = 0;
+		let actions = role.actions || [];
+		let groups = role.groups || [];
 
 		if (role.extend) {
 			const extRole = roles.find(({ name }) => name === role.extend);
 			const extPureRole = this.extendRole(extRole, roles);
-			permission = permission | extPureRole.permission;
+			actions = union(actions, extPureRole.actions);
+			groups = union(groups, extPureRole.groups);
 		}
 
 		if (role.groups) {
 			role.groups.forEach((group) => {
-				permission = permission | this.getGroup(group).permission;
+				const groupActions = this.getGroup(group).actions;
+				actions = union(actions, groupActions);
 			});
 		}
 
-		if (role.actions) {
-			role.actions.forEach((action) => {
-				permission = permission | this.getAction(action).access;
-			});
-		}
+		const allows = actions.map((action) => this.getAction(action));
 
-		return { name, permission, weight };
+		return {
+			name,
+			actions,
+			groups,
+			allows,
+			weight
+		};
 	};
 
 	extendRoles = (roles: Role[]): PureRole[] => {
@@ -133,31 +139,43 @@ export class Access {
 	};
 
 	getAction = (action: string): PureAction => {
-		return this.actions.find(({ name }) => name === action);
+		const actionData = this.actions.find(({ name }) => name === action);
+
+		if (!actionData) {
+			throw new Error(`Action ${action} not exist`);
+		}
+
+		return actionData;
 	};
 
 	getGroup = (group: string): Group => {
 		return this.groups.find(({ name }) => name === group);
 	};
 
-	getRolesData = (roles: string[]): Roles => {
-		let permission = 0;
-		let weight = 0;
+	// getRolesData = (roles: string[]): Roles => {
+	// 	let permission = 0;
+	// 	let weight = 0;
 
-		roles.forEach((role, i) => {
-			const roleData = this.getRole(role);
-			permission = permission | roleData.permission;
+	// 	roles.forEach((role, i) => {
+	// 		const roleData = this.getRole(role);
+	// 		permission = permission | roleData.permission;
 
-			if (roleData.weight > weight) {
-				weight = roleData.weight;
-			}
-		});
+	// 		if (roleData.weight > weight) {
+	// 			weight = roleData.weight;
+	// 		}
+	// 	});
 
-		return { permission, weight };
-	};
+	// 	return { permission, weight };
+	// };
 
-	checkAction = (action: string, permission: number): boolean => {
-		const actionData = this.getAction(action);
-		return !!(actionData.access & permission);
-	};
+	// checkByPermission = (action: string, permission: number): boolean => {
+	// 	const actionData = this.getAction(action);
+	// 	return !!(actionData.access & permission);
+	// };
+
+	// checkByRoles = (action: string, roles: string[]): boolean => {
+	// 	const actionData = this.getAction(action);
+	// 	const rolesData = this.getRolesData(roles);
+	// 	return !!(actionData.access & rolesData.permission);
+	// };
 }
