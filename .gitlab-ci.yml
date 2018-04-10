@@ -14,28 +14,11 @@ build:
     - docker push registry.gitlab.com/ravepro/api:latest
   only:
     - master
-  
-.auto_deploy: &auto_deploy
-  |
-    CI_ENVIRONMENT_HOSTNAME="${CI_ENVIRONMENT_URL}"
-    CI_ENVIRONMENT_HOSTNAME="${CI_ENVIRONMENT_HOSTNAME/http:\/\//}"
-    CI_ENVIRONMENT_HOSTNAME="${CI_ENVIRONMENT_HOSTNAME/https:\/\//}"
-
-    echo ciEnvironmentSlug=$CI_ENVIRONMENT_SLUG,ciPipelineID=\\"$CI_PIPELINE_ID\\",ciBuildID=\\"$CI_BUILD_ID\\",ciEnvironmentHostname=$CI_ENVIRONMENT_HOSTNAME,ciRegistryImage=$CI_REGISTRY_IMAGE,ciRegistryTag=$CI_REGISTRY_TAG
-
-    echo "Creating/upgrading release"
-    helm upgrade --wait -i $CI_PROJECT_NAME-$CI_PROJECT_ID-$CI_ENVIRONMENT_SLUG --namespace $KUBE_NAMESPACE --set ciEnvironmentSlug=$CI_ENVIRONMENT_SLUG,ciPipelineID=\\"$CI_PIPELINE_ID\\",ciBuildID=\\"$CI_BUILD_ID\\",ciEnvironmentHostname=$CI_ENVIRONMENT_HOSTNAME,ciRegistryImage=$CI_REGISTRY_IMAGE,ciRegistryTag=$CI_REGISTRY_TAG gitlab/auto-deploy-app
-
-    echo "Application is accessible at: ${CI_ENVIRONMENT_URL}"
-    echo ""
-
 
 production:
   stage: production
-  variables:
-    CI_ENVIRONMENT_URL: http://$CI_PROJECT_NAME.$KUBE_DOMAIN
   script:
-    - *auto_deploy
+    - echo "deploy to production!"
   environment:
     name: production
     url: http://$CI_PROJECT_NAME.$KUBE_DOMAIN
