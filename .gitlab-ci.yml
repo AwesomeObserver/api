@@ -64,6 +64,7 @@ build:
 
 test:
   stage: test
+  allow_failure: true
   script:
     - yarn
   only:
