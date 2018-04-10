@@ -4,7 +4,6 @@ services:
 
 stages:
   - build
-  - production
 
 build:
   stage: build
@@ -12,12 +11,5 @@ build:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/ravepro/api .
     - docker push registry.gitlab.com/ravepro/api:latest
-  only:
-    - master
-
-production:
-  stage: production
-  script:
-    - echo "deploy to production!"
   only:
     - master
