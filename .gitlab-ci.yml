@@ -40,7 +40,14 @@ variables:
 
 stages:
   - build
+  - test
+  - review
+  - dast
+  - staging
+  - canary
   - production
+  - performance
+  - cleanup
 
 build:
   stage: build
