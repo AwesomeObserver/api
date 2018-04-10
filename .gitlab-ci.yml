@@ -19,9 +19,5 @@ production:
   stage: production
   script:
     - echo "deploy to production!"
-  environment:
-    name: production
-    url: http://$CI_PROJECT_NAME.$KUBE_DOMAIN
-  when: manual
   only:
     - master
