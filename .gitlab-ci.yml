@@ -40,6 +40,7 @@ variables:
 
 stages:
   - build
+  - test
   - review
   - dast
   - staging
@@ -58,6 +59,13 @@ build:
   script:
     - setup_docker
     - build
+  only:
+    - branches
+
+test:
+  stage: test
+  script:
+    - yarn
   only:
     - branches
 
