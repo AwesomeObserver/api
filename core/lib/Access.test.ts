@@ -4,6 +4,6 @@ import { Access } from './Access';
 
 export const access = new Access(allActions, allRoles);
 
-test('checkByPermission', () => {
-	console.log(access.roles);
+test('some', () => {
+	console.log(access.getRole('user'));
 });

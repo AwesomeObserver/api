@@ -3,188 +3,201 @@ export const actions = [
 		name: 'login'
 	},
 	{
-		name: 'logout'
+		name: 'logout',
+		groups: ['global']
 	},
 	{
-		name: 'createRoom'
+		name: 'createRoom',
+		groups: ['global']
 	},
 	{
-		name: 'removeRoom'
+		name: 'removeRoom',
+		groups: ['global']
 	},
 	{
-		name: 'banRoom'
+		name: 'banRoom',
+		groups: ['global']
 	},
 	{
-		name: 'unbanRoom'
+		name: 'unbanRoom',
+		groups: ['global']
 	},
 	{
-		name: 'profileMenu'
+		name: 'profileMenu',
+		groups: ['global']
 	},
 	{
 		name: 'banUser',
+		groups: ['global'],
 		context: true
 	},
 	{
 		name: 'setRole',
+		groups: ['global'],
 		context: true
 	},
 	{
 		name: 'setRoleUser',
+		groups: ['global'],
 		context: true
 	},
 	{
 		name: 'setRoleAdmin',
+		groups: ['global'],
 		context: true
 	},
 	{
-		name: 'waitlistAddSource'
+		name: 'waitlistAddSource',
+		groups: ['global']
 	},
 	{
-		name: 'waitlistMoveSource'
+		name: 'waitlistMoveSource',
+		groups: ['global']
 	},
 	{
-		name: 'waitlistRemoveSource'
+		name: 'waitlistRemoveSource',
+		groups: ['global']
 	},
 	{
 		name: 'setRoomTitle',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'manageRoom',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'follow',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'unfollow',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	// User
 	{
 		name: 'banUserRoom',
-		groups: ['room'],
+		groups: ['global', 'room'],
 		context: true
 	},
 	{
 		name: 'unbanUserRoom',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'setRoleRoom',
-		groups: ['room'],
+		groups: ['global', 'room'],
 		context: true
 	},
 	{
 		name: 'setRoleRoomManager',
-		groups: ['room'],
+		groups: ['global', 'room'],
 		context: true
 	},
 	{
 		name: 'setRoleRoomMod',
-		groups: ['room'],
+		groups: ['global', 'room'],
 		context: true
 	},
 	{
 		name: 'setRoleRoomUser',
-		groups: ['room'],
+		groups: ['global', 'room'],
 		context: true
 	},
 	{
 		name: 'getRoomBans',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'chatMenu',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'manageMessage',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'sendMessage',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'replyMessage',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'removeMessage',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'sendMessageSlowModeIgnore',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'sendMessageFollowerModeIgnore',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'removeAllMessages',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'changeFollowerMode',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'changeSlowMode',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistAdd',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistMoveUser',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistRemoveUser',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'modeWaitlistOpenMyPlaylist',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistMenu',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistSkip',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistKick',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistClear',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'collectionAddSource',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'collectionRemoveSource',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'collectionStart',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistLock',
-		groups: ['room']
+		groups: ['global', 'room']
 	},
 	{
 		name: 'waitlistLockIgnore',
-		groups: ['room']
+		groups: ['global', 'room']
 	}
 ];

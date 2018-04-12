@@ -66,11 +66,11 @@ export class Access {
 			context: orDefault(action.context, false),
 			hierarchy: orDefault(action.hierarchy, true),
 			self: orDefault(action.self, false),
-			groups: ['global']
+			groups: []
 		};
 
 		if (action['groups']) {
-			newAction.groups = ['global', ...action['groups']];
+			newAction.groups = action['groups'];
 		}
 
 		return newAction;
