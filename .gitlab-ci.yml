@@ -1,29 +1,3 @@
-# This file is a template, and might need editing before it works on your project.
-# Auto DevOps
-# This CI/CD configuration provides a standard pipeline for
-# * building a Docker image (using a buildpack if necessary),
-# * storing the image in the container registry,
-# * running tests from a buildpack,
-# * running code quality analysis,
-# * creating a review app for each topic branch,
-# * and continuous deployment to production
-#
-# In order to deploy, you must have a Kubernetes cluster configured either
-# via a project integration, or via group/project variables.
-# AUTO_DEVOPS_DOMAIN must also be set as a variable at the group or project
-# level, or manually added below.
-#
-# If you want to deploy to staging first, or enable canary deploys,
-# uncomment the relevant jobs in the pipeline below.
-#
-# If Auto DevOps fails to detect the proper buildpack, or if you want to
-# specify a custom buildpack, set a project variable `BUILDPACK_URL` to the
-# repository URL of the buildpack.
-# e.g. BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-ruby.git#v142
-# If you need multiple buildpacks, add a file to your project called
-# `.buildpacks` that contains the URLs, one on each line, in order.
-# Note: Auto CI does not work with multiple buildpacks yet
-
 image: alpine:latest
 
 variables:
@@ -49,7 +23,6 @@ stages:
   - staging
   - canary
   - production
-  - performance
   - cleanup
 
 build:
@@ -72,65 +45,6 @@ test:
     - yarn
   only:
     - branches
-
-codequality:
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:dind
-  script:
-    - setup_docker
-    - codeclimate
-  artifacts:
-    paths: [codeclimate.json]
-
-performance:
-  stage: performance
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:dind
-  script:
-    - setup_docker
-    - performance
-  artifacts:
-    paths:
-    - performance.json
-    - sitespeed-results/
-  only:
-    refs:
-      - branches
-    kubernetes: active
-
-sast:
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:dind
-  script:
-    - setup_docker
-    - sast
-  artifacts:
-    paths: [gl-sast-report.json]
-
-sast:container:
-  image: docker:latest
-  variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:dind
-  script:
-    - setup_docker
-    - sast_container
-  artifacts:
-    paths: [gl-sast-container-report.json]
 
 dast:
   stage: dast
@@ -290,51 +204,11 @@ production:
   # Extract "MAJOR.MINOR" from CI_SERVER_VERSION and generate "MAJOR-MINOR-stable" for Security Products
   export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
 
-  function sast_container() {
-    if [[ -n "$CI_REGISTRY_USER" ]]; then
-      echo "Logging to GitLab Container Registry with CI credentials..."
-      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-      echo ""
-    fi
-
-    docker run -d --name db arminc/clair-db:latest
-    docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.1
-    apk add -U wget ca-certificates
-    docker pull ${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}
-    wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
-    mv clair-scanner_linux_amd64 clair-scanner
-    chmod +x clair-scanner
-    touch clair-whitelist.yml
-    ./clair-scanner -c http://docker:6060 --ip $(hostname -i) -r gl-sast-container-report.json -l clair.log -w clair-whitelist.yml ${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG} || true
-  }
-
   function codeclimate() {
     docker run --env SOURCE_CODE="$PWD" \
                --volume "$PWD":/code \
                --volume /var/run/docker.sock:/var/run/docker.sock \
                "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
-  }
-
-  function sast() {
-    case "$CI_SERVER_VERSION" in
-      *-ee)
-
-        # Deprecation notice for CONFIDENCE_LEVEL variable
-        if [ -z "$SAST_CONFIDENCE_LEVEL" -a "$CONFIDENCE_LEVEL" ]; then
-          SAST_CONFIDENCE_LEVEL="$CONFIDENCE_LEVEL"
-          echo "WARNING: CONFIDENCE_LEVEL is deprecated and MUST be replaced with SAST_CONFIDENCE_LEVEL"
-        fi
-
-        docker run --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}" \
-                   --env SAST_DISABLE_REMOTE_CHECKS="${SAST_DISABLE_REMOTE_CHECKS:-false}" \
-                   --volume "$PWD:/code" \
-                   --volume /var/run/docker.sock:/var/run/docker.sock \
-                   "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
-        ;;
-      *)
-        echo "GitLab EE is required"
-        ;;
-    esac
   }
 
   function deploy() {
@@ -417,15 +291,6 @@ production:
         export DOCKER_HOST='tcp://localhost:2375'
       fi
     fi
-  }
-
-  function setup_test_db() {
-    if [ -z ${KUBERNETES_PORT+x} ]; then
-      DB_HOST=postgres
-    else
-      DB_HOST=localhost
-    fi
-    export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}"
   }
 
   function download_chart() {
@@ -528,25 +393,6 @@ production:
     mkdir /zap/wrk/
     /zap/zap-baseline.py -J gl-dast-report.json -t "$CI_ENVIRONMENT_URL" || true
     cp /zap/wrk/gl-dast-report.json .
-  }
-
-  function performance() {
-    export CI_ENVIRONMENT_URL=$(cat environment_url.txt)
-
-    mkdir gitlab-exporter
-    wget -O gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/10-5/index.js
-
-    mkdir sitespeed-results
-
-    if [ -f .gitlab-urls.txt ]
-    then
-      sed -i -e 's@^@'"$CI_ENVIRONMENT_URL"'@' .gitlab-urls.txt
-      docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results .gitlab-urls.txt
-    else
-      docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results "$CI_ENVIRONMENT_URL"
-    fi
-
-    mv sitespeed-results/data/performance.json performance.json
   }
 
   function persist_environment_url() {
