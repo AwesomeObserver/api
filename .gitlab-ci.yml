@@ -204,51 +204,11 @@ production:
   # Extract "MAJOR.MINOR" from CI_SERVER_VERSION and generate "MAJOR-MINOR-stable" for Security Products
   export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
 
-  function sast_container() {
-    if [[ -n "$CI_REGISTRY_USER" ]]; then
-      echo "Logging to GitLab Container Registry with CI credentials..."
-      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-      echo ""
-    fi
-
-    docker run -d --name db arminc/clair-db:latest
-    docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:v2.0.1
-    apk add -U wget ca-certificates
-    docker pull ${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG}
-    wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
-    mv clair-scanner_linux_amd64 clair-scanner
-    chmod +x clair-scanner
-    touch clair-whitelist.yml
-    ./clair-scanner -c http://docker:6060 --ip $(hostname -i) -r gl-sast-container-report.json -l clair.log -w clair-whitelist.yml ${CI_APPLICATION_REPOSITORY}:${CI_APPLICATION_TAG} || true
-  }
-
   function codeclimate() {
     docker run --env SOURCE_CODE="$PWD" \
                --volume "$PWD":/code \
                --volume /var/run/docker.sock:/var/run/docker.sock \
                "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
-  }
-
-  function sast() {
-    case "$CI_SERVER_VERSION" in
-      *-ee)
-
-        # Deprecation notice for CONFIDENCE_LEVEL variable
-        if [ -z "$SAST_CONFIDENCE_LEVEL" -a "$CONFIDENCE_LEVEL" ]; then
-          SAST_CONFIDENCE_LEVEL="$CONFIDENCE_LEVEL"
-          echo "WARNING: CONFIDENCE_LEVEL is deprecated and MUST be replaced with SAST_CONFIDENCE_LEVEL"
-        fi
-
-        docker run --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}" \
-                   --env SAST_DISABLE_REMOTE_CHECKS="${SAST_DISABLE_REMOTE_CHECKS:-false}" \
-                   --volume "$PWD:/code" \
-                   --volume /var/run/docker.sock:/var/run/docker.sock \
-                   "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
-        ;;
-      *)
-        echo "GitLab EE is required"
-        ;;
-    esac
   }
 
   function deploy() {
@@ -331,15 +291,6 @@ production:
         export DOCKER_HOST='tcp://localhost:2375'
       fi
     fi
-  }
-
-  function setup_test_db() {
-    if [ -z ${KUBERNETES_PORT+x} ]; then
-      DB_HOST=postgres
-    else
-      DB_HOST=localhost
-    fi
-    export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:5432/${POSTGRES_DB}"
   }
 
   function download_chart() {
