@@ -256,6 +256,7 @@ production:
       --set image.secrets[0].name="$secret_name" \
       --set application.track="$track" \
       --set application.database_url="$DATABASE_URL" \
+      --set application.MONGO_URL="$MONGO_URL" \
       --set service.url="$CI_ENVIRONMENT_URL" \
       --set replicaCount="$replicas" \
       --set postgresql.enabled="$postgres_enabled" \
