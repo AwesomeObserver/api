@@ -178,6 +178,8 @@ production:
   environment:
     name: production
     url: http://$CI_PROJECT_PATH_SLUG.$AUTO_DEVOPS_DOMAIN
+  variables:
+    TESTT: "true"
   artifacts:
     paths: [environment_url.txt]
 #  when: manual
