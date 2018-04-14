@@ -40,9 +40,11 @@ build:
 
 test:
   stage: test
+  image: node
   allow_failure: true
   script:
     - yarn
+    - yarn test
   only:
     - branches
 
