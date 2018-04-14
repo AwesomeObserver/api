@@ -160,7 +160,6 @@ production:
     - check_kube_domain
     - install_dependencies
     - download_chart
-    - ensure_namespace
     - install_tiller
     - create_secret
     - deploy
