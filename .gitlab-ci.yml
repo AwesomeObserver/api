@@ -25,6 +25,15 @@ stages:
   - production
   - cleanup
 
+test:
+  stage: test
+  image: node
+  script:
+    - yarn
+    - yarn test
+  only:
+    - branches
+
 build:
   stage: build
   image: docker:git
@@ -35,16 +44,6 @@ build:
   script:
     - setup_docker
     - build
-  only:
-    - branches
-
-test:
-  stage: test
-  image: node
-  allow_failure: true
-  script:
-    - yarn
-    - yarn test
   only:
     - branches
 
