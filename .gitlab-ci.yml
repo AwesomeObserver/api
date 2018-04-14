@@ -194,12 +194,6 @@ production:
 
 .auto_devops: &auto_devops |
   # Auto DevOps variables and functions
-  [[ "$TRACE" ]] && set -x
-  auto_database_url=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${CI_ENVIRONMENT_SLUG}-postgres:5432/${POSTGRES_DB}
-  export DATABASE_URL=${DATABASE_URL-$auto_database_url}
-
-  export POSTGRES_URL=${POSTGRES_URL}
-  export MONGO_URL=${MONGO_URL}
   
   export CI_APPLICATION_REPOSITORY=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
   export CI_APPLICATION_TAG=$CI_COMMIT_SHA
@@ -259,14 +253,9 @@ production:
       --set image.pullPolicy=IfNotPresent \
       --set image.secrets[0].name="$secret_name" \
       --set application.track="$track" \
-      --set application.database_url="$POSTGRES_URL" \
+      --set application.POSTGRES_URL="$POSTGRES_URL" \
       --set service.url="$CI_ENVIRONMENT_URL" \
       --set replicaCount="$replicas" \
-      --set postgresql.enabled="$postgres_enabled" \
-      --set postgresql.nameOverride="postgres" \
-      --set postgresql.postgresUser="$POSTGRES_USER" \
-      --set postgresql.postgresPassword="$POSTGRES_PASSWORD" \
-      --set postgresql.postgresDatabase="$POSTGRES_DB" \
       --namespace="$KUBE_NAMESPACE" \
       --version="$CI_PIPELINE_ID-$CI_JOB_ID" \
       "$name" \
