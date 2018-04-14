@@ -16,7 +16,6 @@ variables:
   HELM_VERSION: 2.6.1
 
 stages:
-  - test
   - build
   - review
   - dast
@@ -24,15 +23,6 @@ stages:
   - canary
   - production
   - cleanup
-
-test:
-  stage: test
-  image: node
-  script:
-    - yarn
-    - yarn test
-  only:
-    - branches
 
 build:
   stage: build
