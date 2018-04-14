@@ -27,9 +27,6 @@ stages:
 build:
   stage: build
   image: docker:git
-  cache:
-    paths:
-    - node_modules/
   services:
   - docker:dind
   variables:
@@ -325,8 +322,8 @@ production:
     fi
 
     echo "Building Dockerfile-based application..."
-    docker pull $CONTAINER_IMAGE:latest || true
-    docker build --cache-from $CONTAINER_IMAGE:latest --tag $CONTAINER_IMAGE:$CI_BUILD_REF --tag $CONTAINER_IMAGE:latest .
+    docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
+    docker build --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" .
 
     echo "Pushing to GitLab Container Registry..."
     docker push "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
