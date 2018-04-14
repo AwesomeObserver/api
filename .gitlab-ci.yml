@@ -323,10 +323,10 @@ production:
 
     echo "Building Dockerfile-based application..."
     docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
-    docker build --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" .
+    docker build --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:latest" .
 
     echo "Pushing to GitLab Container Registry..."
-    docker push "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG"
+    docker push "$CI_APPLICATION_REPOSITORY:latest"
     echo ""
   }
 
