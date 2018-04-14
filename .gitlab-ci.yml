@@ -259,8 +259,7 @@ production:
       --set image.pullPolicy=IfNotPresent \
       --set image.secrets[0].name="$secret_name" \
       --set application.track="$track" \
-      --set application.database_url="$DATABASE_URL" \
-      --set MONGO_URL="$MONGO_URL" \
+      --set application.database_url="$POSTGRES_URL" \
       --set service.url="$CI_ENVIRONMENT_URL" \
       --set replicaCount="$replicas" \
       --set postgresql.enabled="$postgres_enabled" \
