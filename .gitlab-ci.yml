@@ -16,8 +16,8 @@ variables:
   HELM_VERSION: 2.6.1
 
 stages:
-  - build
   - test
+  - build
   - review
   - dast
   - staging
