@@ -37,6 +37,9 @@ test:
 build:
   stage: build
   image: docker:git
+  cache:
+    paths:
+    - node_modules/
   services:
   - docker:dind
   variables:
