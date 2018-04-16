@@ -29,7 +29,7 @@ export const setupUserSocialService = () => {
 			const user: any = await broker.call('user.create');
 
 			if (user.id === 1) {
-				broker.call('user.setRole', { data: { role: 'founder' } });
+				broker.call('user.setRole', { userId: 1, role: 'founder' });
 			}
 
 			const userSocialData = {

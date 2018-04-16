@@ -1,130 +1,187 @@
-export const accessActions = {
-	createRoom: {},
-	removeRoom: {},
-	banRoom: {},
-	unbanRoom: {},
-	profileMenu: {},
-	banUser: {
-		context: true
+export const actions = [
+	{
+		name: 'createRoom',
+		groups: ['global']
 	},
-	setRole: {
-		context: true
+	{
+		name: 'removeRoom',
+		groups: ['global']
 	},
-	setRoleUser: {
-		context: true
+	{
+		name: 'banRoom',
+		groups: ['global']
 	},
-	setRoleAdmin: {
-		context: true
+	{
+		name: 'unbanRoom',
+		groups: ['global']
 	},
-	waitlistAddSource: {},
-	waitlistMoveSource: {},
-	waitlistRemoveSource: {},
-	setRoomTitle: {
-		groups: ['room']
+	{
+		name: 'profileMenu',
+		groups: ['global']
 	},
-	manageRoom: {
-		groups: ['room']
+	{
+		name: 'banUser',
+		groups: ['global']
 	},
-	follow: {
-		groups: ['room']
+	{
+		name: 'setRole',
+		groups: ['global']
 	},
-	unfollow: {
-		groups: ['room']
+	{
+		name: 'setRoleUser',
+		groups: ['global']
+	},
+	{
+		name: 'setRoleAdmin',
+		groups: ['global']
+	},
+	{
+		name: 'waitlistAddSource',
+		groups: ['global']
+	},
+	{
+		name: 'waitlistMoveSource',
+		groups: ['global']
+	},
+	{
+		name: 'waitlistRemoveSource',
+		groups: ['global']
+	},
+	{
+		name: 'setRoomTitle',
+		groups: ['global', 'room']
+	},
+	{
+		name: 'manageRoom',
+		groups: ['global', 'room']
+	},
+	{
+		name: 'follow',
+		groups: ['global', 'room']
+	},
+	{
+		name: 'unfollow',
+		groups: ['global', 'room']
 	},
 	// User
-	banUserRoom: {
-		groups: ['room'],
-		context: true
+	{
+		name: 'banUserRoom',
+		groups: ['global', 'room']
 	},
-	unbanUserRoom: {
-		groups: ['room']
+	{
+		name: 'unbanUserRoom',
+		groups: ['global', 'room']
 	},
-	setRoleRoom: {
-		groups: ['room'],
-		context: true
+	{
+		name: 'setRoleRoom',
+		groups: ['global', 'room']
 	},
-	setRoleRoomManager: {
-		groups: ['room'],
-		context: true
+	{
+		name: 'setRoleRoomManager',
+		groups: ['global', 'room']
 	},
-	setRoleRoomMod: {
-		groups: ['room'],
-		context: true
+	{
+		name: 'setRoleRoomMod',
+		groups: ['global', 'room']
 	},
-	setRoleRoomUser: {
-		groups: ['room'],
-		context: true
+	{
+		name: 'setRoleRoomUser',
+		groups: ['global', 'room']
 	},
-	getRoomBans: {
-		groups: ['room']
+	{
+		name: 'getRoomBans',
+		groups: ['global', 'room']
 	},
-	chatMenu: {
-		groups: ['room']
+	{
+		name: 'chatMenu',
+		groups: ['global', 'room']
 	},
-	manageMessage: {
-		groups: ['room']
+	{
+		name: 'manageMessage',
+		groups: ['global', 'room']
 	},
-	sendMessage: {
-		groups: ['room']
+	{
+		name: 'sendMessage',
+		groups: ['global', 'room']
 	},
-	replyMessage: {
-		groups: ['room']
+	{
+		name: 'replyMessage',
+		groups: ['global', 'room']
 	},
-	removeMessage: {
-		groups: ['room']
+	{
+		name: 'removeMessage',
+		groups: ['global', 'room']
 	},
-	sendMessageSlowModeIgnore: {
-		groups: ['room']
+	{
+		name: 'sendMessageSlowModeIgnore',
+		groups: ['global', 'room']
 	},
-	sendMessageFollowerModeIgnore: {
-		groups: ['room']
+	{
+		name: 'sendMessageFollowerModeIgnore',
+		groups: ['global', 'room']
 	},
-	removeAllMessages: {
-		groups: ['room']
+	{
+		name: 'removeAllMessages',
+		groups: ['global', 'room']
 	},
-	changeFollowerMode: {
-		groups: ['room']
+	{
+		name: 'changeFollowerMode',
+		groups: ['global', 'room']
 	},
-	changeSlowMode: {
-		groups: ['room']
+	{
+		name: 'changeSlowMode',
+		groups: ['global', 'room']
 	},
-	waitlistAdd: {
-		groups: ['room']
+	{
+		name: 'waitlistAdd',
+		groups: ['global', 'room']
 	},
-	waitlistMoveUser: {
-		groups: ['room']
+	{
+		name: 'waitlistMoveUser',
+		groups: ['global', 'room']
 	},
-	waitlistRemoveUser: {
-		groups: ['room']
+	{
+		name: 'waitlistRemoveUser',
+		groups: ['global', 'room']
 	},
-	modeWaitlistOpenMyPlaylist: {
-		groups: ['room']
+	{
+		name: 'modeWaitlistOpenMyPlaylist',
+		groups: ['global', 'room']
 	},
-	waitlistMenu: {
-		groups: ['room']
+	{
+		name: 'waitlistMenu',
+		groups: ['global', 'room']
 	},
-	waitlistSkip: {
-		groups: ['room']
+	{
+		name: 'waitlistSkip',
+		groups: ['global', 'room']
 	},
-	waitlistKick: {
-		groups: ['room']
+	{
+		name: 'waitlistKick',
+		groups: ['global', 'room']
 	},
-	waitlistClear: {
-		groups: ['room']
+	{
+		name: 'waitlistClear',
+		groups: ['global', 'room']
 	},
-	collectionAddSource: {
-		groups: ['room']
+	{
+		name: 'collectionAddSource',
+		groups: ['global', 'room']
 	},
-	collectionRemoveSource: {
-		groups: ['room']
+	{
+		name: 'collectionRemoveSource',
+		groups: ['global', 'room']
 	},
-	collectionStart: {
-		groups: ['room']
+	{
+		name: 'collectionStart',
+		groups: ['global', 'room']
 	},
-	waitlistLock: {
-		groups: ['room']
+	{
+		name: 'waitlistLock',
+		groups: ['global', 'room']
 	},
-	waitlistLockIgnore: {
-		groups: ['room']
+	{
+		name: 'waitlistLockIgnore',
+		groups: ['global', 'room']
 	}
-};
+];

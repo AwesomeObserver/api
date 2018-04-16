@@ -1,12 +1,11 @@
-export const accessRoles = [
+export const roles = [
 	{
 		name: 'guest',
-		actions: ['login']
+		allows: []
 	},
 	{
 		name: 'user',
-		actions: [
-			'logout',
+		allows: [
 			'manageMessage',
 			'replyMessage',
 			'sendMessage',
@@ -22,7 +21,7 @@ export const accessRoles = [
 	{
 		name: 'mod',
 		extend: 'user',
-		actions: [
+		allows: [
 			'manageRoom',
 			'removeMessage',
 			'removeAllMessages',
@@ -46,7 +45,7 @@ export const accessRoles = [
 	{
 		name: 'manager',
 		extend: 'mod',
-		actions: [
+		allows: [
 			'manageRoom',
 			'setRoomTitle',
 			'setRoleRoom',

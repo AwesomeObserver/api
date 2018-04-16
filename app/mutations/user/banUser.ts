@@ -27,6 +27,10 @@ export async function resolver(
 	const { userId } = args;
 	const currentUserId = ctx.userId;
 
+	if (userId === currentUserId) {
+		throw new Error('Connot ban yourself');
+	}
+
 	await access(currentUserId, userId);
 
 	return broker.call('user.ban', { userId });
