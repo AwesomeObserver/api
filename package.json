@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.38.2",
+	"version": "0.39.0",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -67,15 +67,10 @@
 		"uws": "^9.147.0"
 	},
 	"jest": {
-		"moduleFileExtensions": [
-			"ts",
-			"js"
-		],
+		"moduleFileExtensions": ["ts", "js"],
 		"transform": {
 			"^.+\\.ts$": "<rootDir>/preprocessor.js"
 		},
-		"testMatch": [
-			"**/*.test.ts"
-		]
+		"testMatch": ["**/*.test.ts"]
 	}
 }
