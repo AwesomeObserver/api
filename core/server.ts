@@ -102,7 +102,8 @@ export class RPServer {
 						host: 'sestorage',
 						port: 6379
 					}),
-					maxAge: 63072000000
+					maxAge: 63072000000,
+					domain: process.env.COOKIE_DOMAIN
 				},
 				this.app
 			)
