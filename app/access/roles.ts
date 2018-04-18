@@ -22,6 +22,9 @@ export const roles = [
 		name: 'mod',
 		extend: 'user',
 		allows: [
+			'chatMenu',
+			'banUserRoom',
+			'unbanUserRoom',
 			'manageRoom',
 			'removeMessage',
 			'removeAllMessages',
@@ -39,7 +42,8 @@ export const roles = [
 			'collectionRemoveSource',
 			'collectionStart',
 			'waitlistLock',
-			'waitlistLockIgnore'
+			'waitlistLockIgnore',
+			'profileMenu'
 		]
 	},
 	{
