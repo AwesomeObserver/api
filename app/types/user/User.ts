@@ -5,7 +5,7 @@ export const type = `
     avatar: String
     role: String
     weight: Int
-    allows: [AccessAction]
+    allows: [String]
     banned: Boolean
     unbanDate: String
     room: UserRoom

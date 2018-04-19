@@ -1,4 +1,4 @@
-import { accessCheck, broker } from 'core';
+import { access, accessCheck, broker } from 'core';
 
 export const schema = `
   setRoleUserRoom(
@@ -7,31 +7,6 @@ export const schema = `
     role: String!
   ): Boolean
 `;
-
-async function access(
-	currentUserId: number,
-	userId: number,
-	roomId: number,
-	role: string
-) {
-	const [current, context] = await Promise.all([
-		broker.call('roomUser.getOneFull', { roomId, userId: currentUserId }),
-		broker.call('roomUser.getOneFull', { roomId, userId })
-	]);
-
-	await accessCheck('setRoleRoom', current, context);
-
-	switch (role) {
-		case 'manager':
-			return accessCheck('setRoleRoomManager', current, context);
-		case 'mod':
-			return accessCheck('setRoleRoomMod', current, context);
-		case 'user':
-			return accessCheck('setRoleRoomUser', current, context);
-		default:
-			throw new Error('Deny');
-	}
-}
 
 export async function resolver(
 	root,
@@ -45,7 +20,41 @@ export async function resolver(
 	const { roomId, userId, role } = args;
 	const currentUserId = ctx.userId;
 
-	await access(currentUserId, userId, roomId, role);
+	if (userId === currentUserId) {
+		throw new Error('Connot set role yourself');
+	}
+
+	const [current, context] = await Promise.all([
+		broker.call('roomUser.getOneFull', { roomId, userId: currentUserId }),
+		broker.call('roomUser.getOneFull', { roomId, userId })
+	]);
+
+	await accessCheck('setRoleRoom', current, context);
+
+	switch (role) {
+		case 'manager':
+			accessCheck('setRoleRoomManager', current, context);
+			break;
+		case 'mod':
+			accessCheck('setRoleRoomMod', current, context);
+			break;
+		case 'user':
+			accessCheck('setRoleRoomUser', current, context);
+			break;
+		default:
+			throw new Error('Deny');
+	}
+
+	const currentW = access.getRole(current.site.role).weight;
+	const contextW = access.getRole(context.site.role).weight;
+	const currentWR = access.getRole(current.room.role).weight;
+	const contextWR = access.getRole(context.room.role).weight;
+	const currentWMax = currentW > currentWR ? currentW : currentWR;
+	const contextWMax = contextW > contextWR ? contextW : contextWR;
+
+	if (currentWMax <= contextWMax) {
+		throw new Error('RoleWeightDeny');
+	}
 
 	return broker.call('roomUser.setRole', {
 		roleData: {

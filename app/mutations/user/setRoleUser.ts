@@ -1,4 +1,4 @@
-import { accessCheck, broker } from 'core';
+import { access, accessCheck, broker } from 'core';
 
 export const schema = `
   setRoleUser(
@@ -6,24 +6,6 @@ export const schema = `
     role: String!
   ): Boolean
 `;
-
-async function access(currentUserId: number, userId: number, role: string) {
-	const [current, context] = await Promise.all([
-		broker.call('user.getOne', { userId: currentUserId }),
-		broker.call('user.getOne', { userId })
-	]);
-
-	await accessCheck('setRole', current, context);
-
-	switch (role) {
-		case 'admin':
-			return accessCheck('setRoleAdmin', current, context);
-		case 'user':
-			return accessCheck('setRoleUser', current, context);
-		default:
-			throw new Error('Deny');
-	}
-}
 
 export async function resolver(
 	root: any,
@@ -36,7 +18,34 @@ export async function resolver(
 	const { userId, role } = args;
 	const currentUserId = ctx.userId;
 
-	await access(currentUserId, userId, role);
+	if (userId === currentUserId) {
+		throw new Error('Cannot set role yourself');
+	}
+
+	const [current, context] = await Promise.all([
+		broker.call('user.getOne', { userId: currentUserId }),
+		broker.call('user.getOne', { userId })
+	]);
+
+	await accessCheck('setRole', current, context);
+
+	switch (role) {
+		case 'admin':
+			accessCheck('setRoleAdmin', current, context);
+			break;
+		case 'user':
+			accessCheck('setRoleUser', current, context);
+			break;
+		default:
+			throw new Error('Deny');
+	}
+
+	const currentWeight = access.getRole(current.site.role).weight;
+	const contextWeight = access.getRole(context.site.role).weight;
+
+	if (currentWeight <= contextWeight) {
+		throw new Error('RoleWeightDeny');
+	}
 
 	return broker.call('user.setRole', { userId, role });
 }

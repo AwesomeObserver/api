@@ -59,3 +59,9 @@ export function parsePlaySource(str: string) {
 	const [sourceId, start] = str.split(':').map((e) => parseInt(e, 10));
 	return { sourceId, start };
 }
+
+export const uniq = (array) => {
+	return array.filter((value, index, self) => {
+		return self.indexOf(value) === index;
+	});
+};

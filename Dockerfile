@@ -4,7 +4,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ADD . .
 
-RUN npm install pm2 -g
 RUN yarn
 RUN yarn build
 

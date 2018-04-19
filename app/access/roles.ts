@@ -1,12 +1,11 @@
-export const accessRoles = [
+export const roles = [
 	{
 		name: 'guest',
-		actions: ['login']
+		allows: []
 	},
 	{
 		name: 'user',
-		actions: [
-			'logout',
+		allows: [
 			'manageMessage',
 			'replyMessage',
 			'sendMessage',
@@ -22,7 +21,10 @@ export const accessRoles = [
 	{
 		name: 'mod',
 		extend: 'user',
-		actions: [
+		allows: [
+			'chatMenu',
+			'banUserRoom',
+			'unbanUserRoom',
 			'manageRoom',
 			'removeMessage',
 			'removeAllMessages',
@@ -40,13 +42,14 @@ export const accessRoles = [
 			'collectionRemoveSource',
 			'collectionStart',
 			'waitlistLock',
-			'waitlistLockIgnore'
+			'waitlistLockIgnore',
+			'profileMenu'
 		]
 	},
 	{
 		name: 'manager',
 		extend: 'mod',
-		actions: [
+		allows: [
 			'manageRoom',
 			'setRoomTitle',
 			'setRoleRoom',

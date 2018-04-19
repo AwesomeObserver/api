@@ -12,7 +12,8 @@ export const Room = {
 
 export const User = {
 	allows(root) {
-		return access.getRole(root.role).allows;
+		const res = access.getRole(root.role).allows;
+		return res;
 	},
 	weight(root) {
 		return access.getRole(root.role).weight;
