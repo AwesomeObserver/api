@@ -86,9 +86,8 @@ export class RPServer {
 		this.app.use(koaBody());
 		this.app.use(
 			cors({
-				origin: '*',
-				allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-				allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+				origin: 'https://rave.pro',
+				credentials: true
 			})
 		);
 
