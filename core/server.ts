@@ -84,7 +84,12 @@ export class RPServer {
 		this.router = new koaRouter();
 
 		this.app.use(koaBody());
-		this.app.use(cors());
+		this.app.use(
+			cors({
+				origin: '*',
+				credentials: true
+			})
+		);
 
 		this.setupAuth();
 		this.setupGQL();
