@@ -37,6 +37,7 @@ services:
     environment:
       SESSION_SECRET: f092m0f93j093n1-nfg023
       BASE_URL: "http://localhost/"
+      AUTH_URL: "http://localhost/"
       COOKIE_DOMAIN: "localhost"
 
       GOOGLE_CLIENT_ID: "146472258192-mio4jc9tvoku8a7efnimou72du9c7lqd.apps.googleusercontent.com"
