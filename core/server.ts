@@ -86,7 +86,7 @@ export class RPServer {
 		this.app.use(koaBody());
 		this.app.use(
 			cors({
-				origin: '*',
+				origin: true,
 				credentials: true
 			})
 		);
