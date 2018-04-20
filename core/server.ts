@@ -53,6 +53,7 @@ function setupServices(router) {
 			`/authend/${serviceData.name}/`,
 			passport.authenticate(serviceData.name, { failureRedirect: '/' }),
 			(ctx, next) => {
+				ctx.cookies.set('token', '123');
 				ctx.redirect(ctx.session.redirectTo || '/');
 			}
 		);
@@ -130,6 +131,7 @@ export class RPServer {
 		this.router.post(
 			'/graphql',
 			graphqlKoa(function(ctx) {
+				console.log(ctx.cookies.get('token'));
 				const token = ctx.request.header.token;
 
 				return {
