@@ -1,3 +1,4 @@
+import * as urlTools from 'url';
 import * as koa from 'koa';
 import * as cors from 'koa2-cors';
 import * as passport from 'koa-passport';
@@ -25,7 +26,7 @@ function setupServices(router) {
 				{
 					...serviceData.strategyOptions,
 					callbackURL: `${process.env
-						.BASE_URL}authend/${serviceData.name}`,
+						.AUTH_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
@@ -53,8 +54,7 @@ function setupServices(router) {
 			`/authend/${serviceData.name}/`,
 			passport.authenticate(serviceData.name, { failureRedirect: '/' }),
 			(ctx, next) => {
-				ctx.cookies.set('token', '123');
-				ctx.redirect(ctx.session.redirectTo || '/');
+				ctx.redirect(ctx.session.redirectTo || process.env.BASE_URL);
 			}
 		);
 	}
@@ -82,11 +82,10 @@ export class RPServer {
 	setupHttp() {
 		this.app = new koa();
 		this.router = new koaRouter();
-
 		this.app.use(koaBody());
 		this.app.use(
 			cors({
-				origin: 'https://rave.pro',
+				origin: process.env.BASE_URL,
 				credentials: true
 			})
 		);
@@ -100,6 +99,7 @@ export class RPServer {
 
 	async setupAuth() {
 		this.app.keys = [process.env.SESSION_SECRET];
+
 		this.app.use(
 			koaSession(
 				{
@@ -109,8 +109,10 @@ export class RPServer {
 						port: 6379
 					}),
 					maxAge: 63072000000,
-					domain: process.env.COOKIE_DOMAIN,
-					httpOnly: false
+					secure:
+						urlTools.parse(process.env.BASE_URL).protocol ===
+						'https:',
+					domain: process.env.COOKIE_DOMAIN
 				},
 				this.app
 			)
@@ -126,7 +128,7 @@ export class RPServer {
 
 		this.router.get('/logout', (ctx) => {
 			ctx.logout();
-			ctx.redirect('/');
+			ctx.redirect(process.env.BASE_URL);
 		});
 	}
 
@@ -136,9 +138,6 @@ export class RPServer {
 		this.router.post(
 			'/graphql',
 			graphqlKoa(function(ctx) {
-				console.log(ctx.cookies.get('token'));
-				const token = ctx.request.header.token;
-
 				return {
 					schema,
 					debug: false,
