@@ -103,7 +103,8 @@ export class RPServer {
 						port: 6379
 					}),
 					maxAge: 63072000000,
-					domain: process.env.COOKIE_DOMAIN
+					domain: process.env.COOKIE_DOMAIN,
+					httpOnly: false
 				},
 				this.app
 			)
