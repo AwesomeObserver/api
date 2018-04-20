@@ -109,9 +109,6 @@ export class RPServer {
 						port: 6379
 					}),
 					maxAge: 63072000000,
-					secure:
-						urlTools.parse(process.env.BASE_URL).protocol ===
-						'https:',
 					domain: process.env.COOKIE_DOMAIN
 				},
 				this.app
