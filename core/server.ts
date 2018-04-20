@@ -24,8 +24,7 @@ function setupServices(router) {
 			new serviceData.Strategy(
 				{
 					...serviceData.strategyOptions,
-					callbackURL: `${process.env
-						.BASE_URL}authend/${serviceData.name}`,
+					callbackURL: `${process.env.BASE_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
@@ -84,12 +83,7 @@ export class RPServer {
 		this.router = new koaRouter();
 
 		this.app.use(koaBody());
-		this.app.use(
-			cors({
-				origin: true,
-				credentials: true
-			})
-		);
+		this.app.use(cors(false));
 
 		this.setupAuth();
 		this.setupGQL();
