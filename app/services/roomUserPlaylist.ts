@@ -32,12 +32,9 @@ export const setupRoomUserPlaylistService = () => {
 			}
 
 			const firstSource = parsePlaySource(userQueue.sources[0]);
-			const sources = removeFromArray(
-				userQueue.sources,
-				firstSource.sourceId
-			);
+			const sources = removeFromArray(userQueue.sources, firstSource.sourceId);
 
-			await repository.updateById(userQueue.id, { sources });
+			await repository.update({ id: userQueue.id }, { sources });
 			await broker.cacher.del(
 				`roomUserPlaylist.getWithCreate:${roomId}|${userId}`
 			);
@@ -82,10 +79,7 @@ export const setupRoomUserPlaylistService = () => {
 		async addFromLink(ctx) {
 			const { roomId, userId, link, useTimecode } = ctx.params;
 
-			let {
-				source,
-				start
-			}: any = await broker.call('source.addFromLink', {
+			let { source, start }: any = await broker.call('source.addFromLink', {
 				link,
 				useTimecode
 			});
@@ -137,9 +131,12 @@ export const setupRoomUserPlaylistService = () => {
 				return false;
 			}
 
-			const res = await repository.updateById(userQueue.id, {
-				sources: [...userQueue.sources, `${sourceId}:${start}`]
-			});
+			const res = await repository.update(
+				{ id: userQueue.id },
+				{
+					sources: [...userQueue.sources, `${sourceId}:${start}`]
+				}
+			);
 
 			await broker.cacher.del(
 				`roomUserPlaylist.getWithCreate:${roomId}|${userId}`
@@ -179,7 +176,7 @@ export const setupRoomUserPlaylistService = () => {
 
 			sources = reorder(userQueue.sources, lastPos, newPos);
 
-			const res = await repository.updateById(userQueue.id, { sources });
+			const res = await repository.update({ id: userQueue.id }, { sources });
 
 			await broker.cacher.del(
 				`roomUserPlaylist.getWithCreate:${roomId}|${userId}`
@@ -213,9 +210,12 @@ export const setupRoomUserPlaylistService = () => {
 				return false;
 			}
 
-			const res = await repository.updateById(userQueue.id, {
-				sources: removeFromArray(userQueue.sources, sourceId)
-			});
+			const res = await repository.update(
+				{ id: userQueue.id },
+				{
+					sources: removeFromArray(userQueue.sources, sourceId)
+				}
+			);
 
 			await broker.cacher.del(
 				`roomUserPlaylist.getWithCreate:${roomId}|${userId}`

@@ -9,7 +9,7 @@ export class UserSocial {
 	@Column({ type: 'integer' })
 	userId: number;
 
-	@ManyToOne((type) => User, (user) => user.userRooms, { cascadeAll: true })
+	@ManyToOne((type) => User, (user) => user.userRooms)
 	user: User;
 
 	@Column({ type: 'varchar' })

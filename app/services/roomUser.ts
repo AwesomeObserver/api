@@ -86,7 +86,7 @@ export const setupRoomUserService = () => {
 					}
 				});
 			} else {
-				await repository.updateById(userRoom.id, data);
+				await repository.update({ id: userRoom.id }, data);
 			}
 
 			await broker.cacher.del(`roomUser.getOne:${roomId}|${userId}`);

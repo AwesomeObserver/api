@@ -27,10 +27,13 @@ export const setupRoomCollectionService = () => {
 				return null;
 			}
 
-			repository.updateById(roomSource.id, {
-				plays: roomSource.plays + 1,
-				lastPlay: format(+new Date())
-			});
+			repository.update(
+				{ id: roomSource.id },
+				{
+					plays: roomSource.plays + 1,
+					lastPlay: format(+new Date())
+				}
+			);
 
 			return roomSource;
 		}
@@ -74,10 +77,7 @@ export const setupRoomCollectionService = () => {
 		@Action()
 		async addFromLink(ctx) {
 			const { roomId, userId, link, useTimecode } = ctx.params;
-			let {
-				source,
-				start
-			}: any = await broker.call('source.addFromLink', {
+			let { source, start }: any = await broker.call('source.addFromLink', {
 				link,
 				useTimecode
 			});
@@ -86,7 +86,10 @@ export const setupRoomCollectionService = () => {
 				userId,
 				sourceId: source.id
 			});
-			return repository.findOneById(res.id, { relations: ['source'] });
+			return repository.findOne({
+				where: { id: res.id },
+				relations: ['source']
+			});
 		}
 
 		@Action()

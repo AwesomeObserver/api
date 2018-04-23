@@ -53,7 +53,7 @@ export const setupUserService = () => {
 		@Action()
 		async update(ctx) {
 			const { userId, data } = ctx.params;
-			await repository.updateById(userId, data);
+			await repository.update({ id: userId }, data);
 			await broker.cacher.del(`user.getOne:${userId}`);
 			return broker.call('user.getOne', { userId });
 		}
