@@ -235,6 +235,7 @@ export const setupRoomUserService = () => {
 				.select('room')
 				.leftJoinAndSelect('roomUser.room', 'room')
 				.orderBy('room.connectionsCount', 'DESC')
+				.addOrderBy('room.followersCount', 'DESC')
 				.addOrderBy('room.contentTitle', 'DESC')
 				.limit(10)
 				.getMany();
@@ -262,10 +263,9 @@ export const setupRoomUserService = () => {
 					}
 				});
 
-				const count = await broker.call(
-					'roomUser.getRoomFollowersCount',
-					{ roomId }
-				);
+				const count = await broker.call('roomUser.getRoomFollowersCount', {
+					roomId
+				});
 
 				await broker.call('room.update', {
 					roomId,

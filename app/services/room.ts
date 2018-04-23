@@ -66,6 +66,7 @@ export const setupRoomService = () => {
 			const rooms = await repository.find({
 				order: {
 					connectionsCount: 'DESC',
+					followersCount: 'DESC',
 					contentTitle: 'DESC'
 				},
 				take: 50
