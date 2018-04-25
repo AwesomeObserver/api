@@ -66,6 +66,7 @@ export const setupRoomService = () => {
 			const rooms = await repository.find({
 				order: {
 					connectionsCount: 'DESC',
+					followersCount: 'DESC',
 					contentTitle: 'DESC'
 				},
 				take: 50
@@ -119,7 +120,7 @@ export const setupRoomService = () => {
 
 			const roomName = room.name;
 
-			await repository.updateById(roomId, data);
+			await repository.update(roomId, data);
 
 			await Promise.all([
 				broker.cacher.clean('room.getTop:*'),

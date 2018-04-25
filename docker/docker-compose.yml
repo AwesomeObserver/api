@@ -46,6 +46,10 @@ services:
       VK_SECRET: "CLN5xTCfBR6YEmiCL6tU"
       TWITCH_CLIENT_ID: "sakl7zvgcbpy2hyg28vdj2g9v8ybyi"
       TWITCH_SECRET: "kggsonhfxe74efkfuhx8n71nfjdpzq"
+      XSOLLA_SECRET: "PL0OeJtrEIN2HAVd"
+      XSOLLA_PROJECT_KEY: "D50kJfshT8C8Ho5r"
+      XSOLLA_PROJECT_ID: "20327"
+      XSOLLA_SUB_ID: "32919"
 
       YT_KEY: "AIzaSyD3hVAg2TV7rrtBC7Rw4oxy_js-rAYx74M"
       SC_KEY: "d03bc67acf78cf6f304edecde8cfc48c"

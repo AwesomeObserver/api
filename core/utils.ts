@@ -65,3 +65,8 @@ export const uniq = (array) => {
 		return self.indexOf(value) === index;
 	});
 };
+
+
+export const btoa = (str) => {
+	return Buffer.from(str, 'binary').toString('base64');
+}

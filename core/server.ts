@@ -1,3 +1,4 @@
+import * as crypto from 'crypto';
 import * as urlTools from 'url';
 import * as koa from 'koa';
 import * as cors from 'koa2-cors';
@@ -25,8 +26,7 @@ function setupServices(router) {
 			new serviceData.Strategy(
 				{
 					...serviceData.strategyOptions,
-					callbackURL: `${process.env
-						.AUTH_URL}authend/${serviceData.name}`,
+					callbackURL: `${process.env.AUTH_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
@@ -92,6 +92,7 @@ export class RPServer {
 
 		this.setupAuth();
 		this.setupGQL();
+		this.setupXsolla();
 
 		this.app.use(this.router.routes());
 		this.app.use(this.router.allowedMethods());
@@ -146,6 +147,28 @@ export class RPServer {
 		);
 
 		this.app.listen(this.API_PORT);
+	}
+
+	async setupXsolla() {
+		const projectKey = process.env.XSOLLA_PROJECT_KEY;
+
+		this.router.post('/xsolla', (ctx, next) => {
+			const authorization = ctx.request.header.authorization;
+			const bodyStr = JSON.stringify(ctx.request.body);
+			const currentSign = crypto
+				.createHash('sha1')
+				.update(bodyStr + projectKey)
+				.digest('hex');
+
+			if (authorization !== `Signature ${currentSign}`) {
+				return ctx.throw(400);
+			}
+
+			console.log(ctx.request.body);
+
+			ctx.response.body = null;
+			next();
+		});
 	}
 
 	async run() {

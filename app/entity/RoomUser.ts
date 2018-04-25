@@ -16,13 +16,13 @@ export class RoomUser {
 	@Column({ type: 'integer' })
 	userId: number;
 
-	@ManyToOne((type) => User, (user) => user.userRooms, { cascadeAll: true })
+	@ManyToOne((type) => User, (user) => user.userRooms)
 	user: User;
 
 	@Column({ type: 'integer' })
 	roomId: number;
 
-	@ManyToOne((type) => Room, (room) => room.users, { cascadeAll: true })
+	@ManyToOne((type) => Room, (room) => room.users)
 	room: Room;
 
 	@Column({ type: 'boolean', default: false })
