@@ -14,8 +14,6 @@ import { broker, logger } from 'core';
 import { instanceId } from 'core/config';
 import { agenda, redis } from 'core/db';
 
-import * as fetch from 'node-fetch';
-
 export async function startup() {
 	logger.info(`API Server is ready`);
 
@@ -65,42 +63,4 @@ export async function startup() {
 	setupSoundcloudService();
 	setupRoomUserPlaylistService();
 	setupRoomWaitlistService();
-
-	function btoa(str) {
-		return Buffer.from(str, 'binary').toString('base64');
-	}
-
-	const authKey = btoa(`32919:${process.env.XSOLLA_SECRET}`);
-
-	fetch('https://api.xsolla.com/merchant/merchants/32919/token', {
-		method: 'POST',
-		body: JSON.stringify({
-			user: {
-				id: {
-					value: '1'
-				},
-				email: {
-					value: 'sygeman@gmail.com'
-				}
-			},
-			settings: {
-				project_id: 20327,
-				ui: {
-					theme: 'dark',
-					desktop: {
-						header: {
-							is_visible: false
-						}
-					}
-				}
-			}
-		}),
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `Basic ${authKey}`
-		}
-	})
-		.then((res) => res.json())
-		.then((json) => console.log(json));
 }
