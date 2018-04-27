@@ -43,5 +43,6 @@ export class RoomWaitlistQueue {
 	@Column({ type: 'timestamp with time zone', nullable: true })
 	end: string;
 
-	@Column('simple-array') users: string[];
+	@Column('simple-array', { default: '' })
+	users: string[];
 }

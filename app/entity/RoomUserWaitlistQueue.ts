@@ -26,5 +26,6 @@ export class RoomUserWaitlistQueue {
 	@JoinColumn()
 	room: Room;
 
-	@Column('simple-array') sources: string[];
+	@Column('simple-array', { default: '' })
+	sources: string[];
 }
