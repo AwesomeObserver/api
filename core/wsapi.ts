@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import * as ws from 'uws';
+import * as ws from 'ws';
 import * as actions from 'app/wsapi';
 import { logger } from 'core/logger';
 
