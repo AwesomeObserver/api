@@ -1,11 +1,11 @@
-FROM node
+FROM mhart/alpine-node
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 COPY package.json .
 
-RUN yarn
+RUN yarn install --ignore-engines
 
 EXPOSE 8000 8200 8500
 CMD ["yarn", "dev"]
