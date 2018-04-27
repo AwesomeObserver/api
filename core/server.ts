@@ -7,6 +7,7 @@ import * as koaSession from 'koa-session';
 import * as koaBody from 'koa-bodyparser';
 import * as koaRouter from 'koa-router';
 import * as RedisStore from 'koa-redis';
+import * as IoRedis from 'ioredis';
 import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
 import { buildSchema } from './schema';
 import { setupDB } from './db';
@@ -26,7 +27,8 @@ function setupServices(router) {
 			new serviceData.Strategy(
 				{
 					...serviceData.strategyOptions,
-					callbackURL: `${process.env.AUTH_URL}authend/${serviceData.name}`,
+					callbackURL: `${process.env
+						.AUTH_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
@@ -106,8 +108,10 @@ export class RPServer {
 				{
 					key: 'rpsession',
 					store: new RedisStore({
-						host: 'sestorage',
-						port: 6379
+						client: new IoRedis({
+							host: 'sestorage',
+							port: 6379
+						})
 					}),
 					maxAge: 63072000000,
 					domain: process.env.COOKIE_DOMAIN
