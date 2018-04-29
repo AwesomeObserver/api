@@ -57,6 +57,7 @@ services:
       REDIS_URL: "redis://redis:6379"
       POSTGRES_URL: "postgresql://postgres:123@postgres/ravepro"
       MONGO_URL: "mongodb://mongo/ravepro"
+      NATS_URL: "nats://nats:4222"
     volumes:
       - ../:/usr/src/app
       - /usr/src/app/node_modules

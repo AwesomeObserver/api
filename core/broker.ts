@@ -2,7 +2,7 @@ import { ServiceBroker } from 'moleculer';
 import { logger } from 'core/logger';
 
 export let broker = new ServiceBroker({
-	transporter: 'nats://nats:4222',
+	transporter: process.env.NATS_URL,
 	logger,
 	logLevel: 'warn', //process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
 	cacher: {
