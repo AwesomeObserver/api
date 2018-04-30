@@ -15,13 +15,36 @@ export const setupRoomCollectionService = () => {
 		@Action()
 		async getNext(ctx) {
 			const { roomId } = ctx.params;
-			const roomSource = await repository.findOne({
-				where: { roomId },
-				relations: ['source'],
-				order: {
-					lastPlay: 'ASC'
-				}
-			});
+			let roomSource = null;
+
+			const testRoomSource = await repository
+				.createQueryBuilder('roomSource')
+				.where('roomSource.roomId = :roomId', { roomId })
+				.andWhere("roomSource.lastPlay < now() - interval '1 hour'")
+				.orderBy('random()')
+				.getOne();
+
+			console.log(testRoomSource);
+
+			if (testRoomSource) {
+				roomSource = await repository.findOne({
+					where: { id: testRoomSource.id },
+					relations: ['source']
+				});
+			}
+
+			// Если такого нет, то берем что-то что не играл дольше всех
+			if (!roomSource) {
+				console.log('get old method');
+
+				roomSource = await repository.findOne({
+					where: { roomId },
+					relations: ['source'],
+					order: {
+						lastPlay: 'ASC'
+					}
+				});
+			}
 
 			if (!roomSource) {
 				return null;
@@ -77,7 +100,10 @@ export const setupRoomCollectionService = () => {
 		@Action()
 		async addFromLink(ctx) {
 			const { roomId, userId, link, useTimecode } = ctx.params;
-			let { source, start }: any = await broker.call('source.addFromLink', {
+			let {
+				source,
+				start
+			}: any = await broker.call('source.addFromLink', {
 				link,
 				useTimecode
 			});
