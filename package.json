@@ -62,7 +62,7 @@
 		"query-string": "^6.0.0",
 		"redis": "^2.8.0",
 		"reflect-metadata": "^0.1.12",
-		"typeorm": "^0.1.9"
+		"typeorm": "^0.2.4"
 	},
 	"jest": {
 		"moduleFileExtensions": ["ts", "js"],
