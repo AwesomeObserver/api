@@ -20,7 +20,7 @@ export const setupRoomCollectionService = () => {
 			const testRoomSource = await repository
 				.createQueryBuilder('roomSource')
 				.where('roomSource.roomId = :roomId', { roomId })
-				.andWhere("roomSource.lastPlay < now() - interval '1 hour'")
+				.andWhere("roomSource.lastPlay < now() - interval '4 hours'")
 				.orderBy('random()')
 				.getOne();
 
