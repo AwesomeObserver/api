@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.41.2",
+	"version": "0.42.0",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -62,7 +62,8 @@
 		"query-string": "^6.0.0",
 		"redis": "^2.8.0",
 		"reflect-metadata": "^0.1.12",
-		"typeorm": "^0.1.9"
+		"typeorm": "^0.1.9",
+		"ws": "^5.1.1"
 	},
 	"jest": {
 		"moduleFileExtensions": ["ts", "js"],
