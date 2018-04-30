@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 COPY package.json .
 
-RUN yarn install --ignore-engines
+RUN yarn
 
 EXPOSE 8000 8200 8500
 CMD ["yarn", "dev"]
