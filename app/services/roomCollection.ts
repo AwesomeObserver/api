@@ -24,8 +24,6 @@ export const setupRoomCollectionService = () => {
 				.orderBy('random()')
 				.getOne();
 
-			console.log(testRoomSource);
-
 			if (testRoomSource) {
 				roomSource = await repository.findOne({
 					where: { id: testRoomSource.id },
@@ -35,8 +33,6 @@ export const setupRoomCollectionService = () => {
 
 			// Если такого нет, то берем что-то что не играл дольше всех
 			if (!roomSource) {
-				console.log('get old method');
-
 				roomSource = await repository.findOne({
 					where: { roomId },
 					relations: ['source'],
