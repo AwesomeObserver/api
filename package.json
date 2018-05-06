@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.42.1",
+	"version": "0.42.2",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -26,13 +26,13 @@
 		"@types/koa": "^2.0.45",
 		"@types/koa-bodyparser": "4.2.0",
 		"@types/koa-router": "7.0.28",
-		"@types/node": "^10.0.2",
+		"@types/node": "^10.0.4",
 		"@types/pg": "^7.4.8",
 		"jest": "^22.4.3",
-		"nodemon": "^1.17.3",
+		"nodemon": "^1.17.4",
 		"ts-node": "^6.0.2",
 		"tsconfig-paths": "^2.7.3",
-		"tslint": "^5.9.1",
+		"tslint": "^5.10.0",
 		"typescript": "^2.8.3"
 	},
 	"dependencies": {
@@ -53,16 +53,16 @@
 		"koa2-cors": "^2.0.5",
 		"moleculer": "^0.12.3",
 		"moleculer-decorators": "^1.0.14",
-		"nats": "^0.8.4",
+		"nats": "^0.8.10",
 		"node-fetch": "^2.1.2",
 		"passport-google-oauth2": "^0.1.6",
 		"passport-twitch": "^1.0.3",
 		"passport-vkontakte": "^0.3.2",
-		"pg": "^7.4.1",
-		"query-string": "^6.0.0",
+		"pg": "^7.4.2",
+		"query-string": "^6.1.0",
 		"redis": "^2.8.0",
 		"reflect-metadata": "^0.1.12",
-		"typeorm": "^0.2.4",
+		"typeorm": "^0.1.9",
 		"ws": "^5.1.1"
 	},
 	"jest": {
