@@ -14,61 +14,24 @@ import { broker, logger } from 'core';
 import { instanceId } from 'core/config';
 import { getRepository, getManager } from 'typeorm';
 import { Instance as InstanceEntity } from 'app/entity/Instance';
-import { RoomWaitlistQueue as RoomWaitlistQueueEntity } from 'app/entity/RoomWaitlistQueue';
 import { format } from 'date-fns';
 
-async function runInstanceWatcher() {
+async function runInstanceAlive() {
 	const repository = getRepository(InstanceEntity);
 
 	let instance = new InstanceEntity();
 	instance.instanceId = instanceId;
 	instance.lastAlive = format(+new Date());
-	getManager().save(instance);
+	await getManager().save(instance);
 
 	setInterval(() => {
 		repository.update({ instanceId }, { lastAlive: format(+new Date()) });
 	}, 2000);
-
-	setInterval(async () => {
-		const deadInstances = await repository
-			.createQueryBuilder('instance')
-			.where("instance.lastAlive < now() - interval '6 seconds'")
-			.getMany();
-
-		deadInstances.forEach((deadInstance) => {
-			broker
-				.call('connection.clearInstance', {
-					instanceId: deadInstance.instanceId
-				})
-				.then(() => {
-					repository.delete({ instanceId: deadInstance.instanceId });
-				});
-		});
-	}, 5000);
-}
-
-async function runTrackEndWatcher() {
-	const repository = getRepository(RoomWaitlistQueueEntity);
-
-	setInterval(async () => {
-		const ends = await repository
-			.createQueryBuilder('queue')
-			.where('queue.end < now()')
-			.getMany();
-
-		ends.forEach((end) => {
-			broker.call('roomWaitlist.endPlay', {
-				roomId: end.roomId
-			});
-		});
-	}, 1000);
 }
 
 export async function startup() {
-	// Watchers
-	runInstanceWatcher();
-	runTrackEndWatcher();
-	// Services
+	runInstanceAlive();
+
 	setupConnectionService();
 	setupWsService();
 	setupUserService();
@@ -82,5 +45,5 @@ export async function startup() {
 	setupRoomUserPlaylistService();
 	setupRoomWaitlistService();
 
-	logger.info(`API Server is ready`);
+	logger.info(`API Server [${instanceId}] is ready`);
 }
