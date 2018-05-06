@@ -387,6 +387,20 @@ export const setupRoomWaitlistService = () => {
 			pubSub.publish('waitlistMoveUser', { lastPos, newPos }, { roomId });
 			return res;
 		}
+
+		@Action()
+		async watchTrackEnd(ctx) {
+			const ends = await repository
+				.createQueryBuilder('queue')
+				.where('queue.end < now()')
+				.getMany();
+
+			ends.forEach((end) => {
+				broker.call('roomWaitlist.endPlay', {
+					roomId: end.roomId
+				});
+			});
+		}
 	}
 
 	return broker.createService(RoomWaitlistService);

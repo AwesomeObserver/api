@@ -2,15 +2,36 @@ import { Service, Action, Event, BaseSchema } from 'moleculer-decorators';
 import { getManager, getRepository } from 'typeorm';
 import { broker, logger, pubSub } from 'core';
 import { Connection as ConnectionEntity } from 'app/entity/Connection';
+import { Instance as InstanceEntity } from 'app/entity/Instance';
+import { format } from 'date-fns';
 
 export const setupConnectionService = () => {
 	const repository = getRepository(ConnectionEntity);
+	const instanceRepository = getRepository(InstanceEntity);
 	const manager = getManager();
 
 	@Service({
 		name: 'connection'
 	})
 	class ConnectionService extends BaseSchema {
+		@Action()
+		async checkInstanceAlive(ctx) {
+			const deadInstances = await instanceRepository
+				.createQueryBuilder('instance')
+				.where("instance.lastAlive < now() - interval '6 seconds'")
+				.getMany();
+
+			deadInstances.forEach((deadInstance) => {
+				broker
+					.call('connection.clearInstance', {
+						instanceId: deadInstance.instanceId
+					})
+					.then(() => {
+						instanceRepository.delete({ instanceId: deadInstance.instanceId });
+					});
+			});
+		}
+
 		@Event()
 		async 'connection.join'(ctx) {
 			const { connectionId, instanceId } = ctx;
