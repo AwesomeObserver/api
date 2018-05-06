@@ -19,7 +19,6 @@
 	"license": "MIT",
 	"homepage": "https://bitbucket.org/ravepro/api#readme",
 	"devDependencies": {
-		"@types/agenda": "^1.0.3",
 		"@types/graphql": "^0.13.0",
 		"@types/ioredis": "^3.2.7",
 		"@types/jest": "^22.2.3",
@@ -36,7 +35,6 @@
 		"typescript": "^2.8.3"
 	},
 	"dependencies": {
-		"agenda": "^1.0.3",
 		"apollo-link": "^1.2.2",
 		"apollo-server-koa": "^1.3.6",
 		"bunyan": "^1.8.12",
