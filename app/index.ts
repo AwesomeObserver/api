@@ -82,5 +82,5 @@ export async function startup() {
 	setupRoomUserPlaylistService();
 	setupRoomWaitlistService();
 
-	logger.info(`API Server is ready`);
+	logger.info(`API Server [${instanceId}] is ready`);
 }
