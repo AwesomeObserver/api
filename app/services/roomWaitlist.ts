@@ -3,7 +3,6 @@ import { getManager, getRepository, getConnection } from 'typeorm';
 import { format, addSeconds } from 'date-fns';
 import { reorder, parsePlaySource } from 'core/utils';
 import { broker, pubSub, logger } from 'core';
-import { agenda } from 'core/db';
 import { RoomWaitlistQueue as WaitlistQueueEntity } from 'app/entity/RoomWaitlistQueue';
 
 export const setupRoomWaitlistService = () => {
@@ -64,20 +63,14 @@ export const setupRoomWaitlistService = () => {
 			if (!userId) {
 				userId = null;
 				user = await broker.call('roomCollection.getBotData');
-				const roomSource: any = await broker.call(
-					'roomCollection.getNext',
-					{
-						roomId
-					}
-				);
+				const roomSource: any = await broker.call('roomCollection.getNext', {
+					roomId
+				});
 
 				if (!roomSource) {
-					const waitlistQueue: any = await broker.call(
-						'roomWaitlist.get',
-						{
-							roomId
-						}
-					);
+					const waitlistQueue: any = await broker.call('roomWaitlist.get', {
+						roomId
+					});
 
 					if (waitlistQueue.users.length === 0) {
 						return broker.call('roomWaitlist.clearPlay', {
@@ -107,12 +100,9 @@ export const setupRoomWaitlistService = () => {
 				]);
 
 				if (!sourceData) {
-					const waitlistQueue: any = await broker.call(
-						'roomWaitlist.get',
-						{
-							roomId
-						}
-					);
+					const waitlistQueue: any = await broker.call('roomWaitlist.get', {
+						roomId
+					});
 
 					if (waitlistQueue.users.length === 0) {
 						return broker.call('roomWaitlist.clearPlay', {
@@ -141,15 +131,6 @@ export const setupRoomWaitlistService = () => {
 			const duration = source.duration - sourceStart;
 			const start = +new Date() - sourceStart * 1000;
 			const end = +new Date() + duration * 1000;
-
-			agenda.create('waitlistPlayEnd', { roomId });
-			agenda.schedule(
-				addSeconds(new Date(), duration),
-				'waitlistPlayEnd',
-				{
-					roomId
-				}
-			);
 
 			// Save Current Play Data
 			await repository.update(
@@ -206,18 +187,6 @@ export const setupRoomWaitlistService = () => {
 		}
 
 		@Action()
-		async cancelPlay(ctx) {
-			const { roomId } = ctx.params;
-
-			return new Promise((resolve) => {
-				agenda.cancel(
-					{ name: 'waitlistPlayEnd', data: { roomId } },
-					resolve
-				);
-			});
-		}
-
-		@Action()
 		async kick(ctx) {
 			const { roomId, userId } = ctx.params;
 			const waitlistQueue: any = await broker.call('roomWaitlist.get', {
@@ -228,8 +197,6 @@ export const setupRoomWaitlistService = () => {
 				logger.info(`User ${userId} not playing now`);
 				return false;
 			}
-
-			await broker.call('roomWaitlist.cancelPlay', { roomId });
 
 			if (waitlistQueue.users.length === 0) {
 				return broker.call('roomWaitlist.clearPlay', { roomId });
@@ -249,7 +216,6 @@ export const setupRoomWaitlistService = () => {
 		@Action()
 		async skip(ctx) {
 			const { roomId } = ctx.params;
-			await broker.call('roomWaitlist.cancelPlay', { roomId });
 			return broker.call('roomWaitlist.endPlay', { roomId });
 		}
 
@@ -330,9 +296,7 @@ export const setupRoomWaitlistService = () => {
 
 			if (
 				waitlistQueue.userId === userId ||
-				(waitlistQueue.userId === null &&
-					!!waitlistQueue.start &&
-					userId === 0)
+				(waitlistQueue.userId === null && !!waitlistQueue.start && userId === 0)
 			) {
 				logger.info(`User ${userId} palying now`);
 				return false;
@@ -344,9 +308,7 @@ export const setupRoomWaitlistService = () => {
 			}
 
 			if (
-				waitlistQueue.users.findIndex(
-					(uId) => parseInt(uId, 10) == userId
-				) >= 0
+				waitlistQueue.users.findIndex((uId) => parseInt(uId, 10) == userId) >= 0
 			) {
 				logger.info(`User ${userId} wait now`);
 				return false;

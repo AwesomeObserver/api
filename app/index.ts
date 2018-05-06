@@ -12,46 +12,63 @@ import { setupWsService } from 'app/services/wsapi';
 import { setupYoutubeService } from 'app/services/youtube';
 import { broker, logger } from 'core';
 import { instanceId } from 'core/config';
-import { agenda, redis } from 'core/db';
-import * as fetch from 'node-fetch';
+import { getRepository, getManager } from 'typeorm';
+import { Instance as InstanceEntity } from 'app/entity/Instance';
+import { RoomWaitlistQueue as RoomWaitlistQueueEntity } from 'app/entity/RoomWaitlistQueue';
+import { format } from 'date-fns';
 
-export async function startup() {
-	logger.info(`API Server is ready`);
+async function runInstanceWatcher() {
+	const repository = getRepository(InstanceEntity);
 
-	agenda.define('waitlistPlayEnd', (job, done) => {
-		broker
-			.call('roomWaitlist.endPlay', {
-				roomId: job.attrs.data.roomId
-			})
-			.then(() => done());
-	});
-
-	agenda.start();
-
-	const hcTimeout = 2000;
+	let instance = new InstanceEntity();
+	instance.instanceId = instanceId;
+	instance.lastAlive = format(+new Date());
+	getManager().save(instance);
 
 	setInterval(() => {
-		redis.hset('ihc', instanceId, +new Date());
+		repository.update({ instanceId }, { lastAlive: format(+new Date()) });
 	}, 2000);
 
 	setInterval(async () => {
-		const instances = await redis.hgetall(`ihc`);
+		const deadInstances = await repository
+			.createQueryBuilder('instance')
+			.where("instance.lastAlive < now() - interval '6 seconds'")
+			.getMany();
 
-		Object.keys(instances).forEach((instanceName) => {
-			const diff = +new Date() - instances[instanceName];
-
-			if (diff > hcTimeout + 1000) {
-				broker
-					.call('connection.clearInstance', {
-						instanceId: instanceName
-					})
-					.then(() => {
-						redis.hdel('ihc', instanceName);
-					});
-			}
+		deadInstances.forEach((deadInstance) => {
+			broker
+				.call('connection.clearInstance', {
+					instanceId: deadInstance.instanceId
+				})
+				.then(() => {
+					repository.delete({ instanceId: deadInstance.instanceId });
+				});
 		});
 	}, 5000);
+}
 
+async function runTrackEndWatcher() {
+	const repository = getRepository(RoomWaitlistQueueEntity);
+
+	setInterval(async () => {
+		const ends = await repository
+			.createQueryBuilder('queue')
+			.where('queue.end < now()')
+			.getMany();
+
+		ends.forEach((end) => {
+			broker.call('roomWaitlist.endPlay', {
+				roomId: end.roomId
+			});
+		});
+	}, 1000);
+}
+
+export async function startup() {
+	// Watchers
+	runInstanceWatcher();
+	runTrackEndWatcher();
+	// Services
 	setupConnectionService();
 	setupWsService();
 	setupUserService();
@@ -65,51 +82,5 @@ export async function startup() {
 	setupRoomUserPlaylistService();
 	setupRoomWaitlistService();
 
-	// const json = {
-	// 	notification_type: 'payment',
-	// 	purchase: {
-	// 		checkout: { currency: 'USD', amount: 11 },
-	// 		subscription: {
-	// 			subscription_id: 777,
-	// 			plan_id: 'D68pYcDk',
-	// 			product_id: 33,
-	// 			date_create: '2018-04-25T23:19:58+03:00',
-	// 			currency: 'USD',
-	// 			amount: 11
-	// 		},
-	// 		total: { currency: 'USD', amount: 11 }
-	// 	},
-	// 	user: { id: '1' },
-	// 	transaction: {
-	// 		id: 123,
-	// 		external_id: '132',
-	// 		payment_date: '2018-04-25T23:19:58+03:00',
-	// 		payment_method: 26,
-	// 		dry_run: 1,
-	// 		agreement: 32177
-	// 	},
-	// 	payment_details: {
-	// 		payment: { currency: 'USD', amount: 11 },
-	// 		payment_method_sum: { currency: 'USD', amount: 11 },
-	// 		xsolla_balance_sum: { currency: 'USD', amount: 0 },
-	// 		payout: { currency: 'USD', amount: 9.81 },
-	// 		xsolla_fee: { currency: 'USD', amount: 0.55 },
-	// 		payment_method_fee: { currency: 'USD', amount: 0 },
-	// 		vat: { currency: 'USD', amount: 0 },
-	// 		sales_tax: { currency: 'USD', amount: 0 },
-	// 		payout_currency_rate: '1'
-	// 	}
-	// };
-
-	// const data = await fetch(`http://api:8200/xsolla`, {
-	// 	method: 'POST',
-	// 	body: JSON.stringify(json),
-	// 	headers: {
-	// 		Accept: 'application/json',
-	// 		'Content-Type': 'application/json',
-	// 		Authorization: 'Signature 5c6244fdbd819a3ea897a163b9f47adfe38bd1cd'
-	// 	}
-	// });
-
-	// console.log(data);
+	logger.info(`API Server is ready`);
 }
