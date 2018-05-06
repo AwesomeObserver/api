@@ -30,7 +30,6 @@ services:
     depends_on:
       - "redis"
       - "postgres"
-      - "mongo"
       - "nats"
     links:
       - "nats"
