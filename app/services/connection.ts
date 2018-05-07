@@ -15,6 +15,24 @@ export const setupConnectionService = () => {
 	})
 	class ConnectionService extends BaseSchema {
 		@Action()
+		async createInstance(ctx) {
+			const { instanceId } = ctx.params;
+			let instance = new InstanceEntity();
+			instance.instanceId = instanceId;
+			instance.lastAlive = format(+new Date());
+			await getManager().save(instance);
+		}
+
+		@Action()
+		async instanceAlive(ctx) {
+			const { instanceId } = ctx.params;
+			instanceRepository.update(
+				{ instanceId },
+				{ lastAlive: format(+new Date()) }
+			);
+		}
+
+		@Action()
 		async checkInstanceAlive(ctx) {
 			const deadInstances = await instanceRepository
 				.createQueryBuilder('instance')
