@@ -1,6 +1,6 @@
 {
 	"name": "ravepro-api",
-	"version": "0.44.0",
+	"version": "0.45.0",
 	"description": "RavePro API",
 	"main": "index.js",
 	"scripts": {
@@ -11,13 +11,8 @@
 		"start": "node ./index.js --max-old-space-size=1024",
 		"test": "jest"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://sygeman@bitbucket.org/ravepro/api.git"
-	},
 	"author": "Sygeman",
-	"license": "MIT",
-	"homepage": "https://bitbucket.org/ravepro/api#readme",
+	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/graphql": "^0.13.0",
 		"@types/ioredis": "^3.2.7",
@@ -29,7 +24,7 @@
 		"@types/pg": "^7.4.8",
 		"jest": "^22.4.3",
 		"nodemon": "^1.17.4",
-		"ts-node": "^6.0.2",
+		"ts-node": "^6.0.3",
 		"tsconfig-paths": "^2.7.3",
 		"tslint": "^5.10.0",
 		"typescript": "^2.8.3"
@@ -60,8 +55,7 @@
 		"query-string": "^6.1.0",
 		"redis": "^2.8.0",
 		"reflect-metadata": "^0.1.12",
-		"typeorm": "^0.1.9",
-		"ws": "^5.1.1"
+		"typeorm": "^0.1.9"
 	},
 	"jest": {
 		"moduleFileExtensions": ["ts", "js"],

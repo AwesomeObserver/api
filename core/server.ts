@@ -13,7 +13,6 @@ import { buildSchema } from './schema';
 import { setupDB } from './db';
 import { getFolderData } from './utils';
 import { broker } from './broker';
-import { wsAPI } from './wsapi';
 
 const authDir = __dirname + '/../app/auth/';
 
@@ -27,8 +26,7 @@ function setupServices(router) {
 			new serviceData.Strategy(
 				{
 					...serviceData.strategyOptions,
-					callbackURL: `${process.env
-						.AUTH_URL}authend/${serviceData.name}`,
+					callbackURL: `${process.env.AUTH_URL}authend/${serviceData.name}`,
 					passReqToCallback: true
 				},
 				(request, accessToken, refreshToken, profile, done) => {
@@ -63,22 +61,15 @@ function setupServices(router) {
 }
 
 export class RPServer {
-	WSAPI_PORT: number;
 	API_PORT: number;
 	app: any;
 	router;
 	any;
 
 	constructor() {
-		this.WSAPI_PORT = 8000;
 		this.API_PORT = 8200;
 		this.app = null;
 		this.router = null;
-	}
-
-	async setupWSAPI() {
-		wsAPI.PORT = this.WSAPI_PORT;
-		return wsAPI.run();
 	}
 
 	setupHttp() {
@@ -178,6 +169,5 @@ export class RPServer {
 	async run() {
 		this.setupHttp();
 		await setupDB();
-		await this.setupWSAPI();
 	}
 }
