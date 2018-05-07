@@ -11,13 +11,8 @@
 		"start": "node ./index.js --max-old-space-size=1024",
 		"test": "jest"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://sygeman@bitbucket.org/ravepro/api.git"
-	},
 	"author": "Sygeman",
-	"license": "MIT",
-	"homepage": "https://bitbucket.org/ravepro/api#readme",
+	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/graphql": "^0.13.0",
 		"@types/ioredis": "^3.2.7",
