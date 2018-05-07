@@ -7,5 +7,5 @@ ADD . .
 RUN yarn
 RUN yarn build
 
-EXPOSE 8000 8200 8500
+EXPOSE 8200
 CMD ["yarn", "start"]
